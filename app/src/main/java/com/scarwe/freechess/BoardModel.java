@@ -12,11 +12,13 @@ public class BoardModel {
     private boolean canPawnMove(Square from, Square to) {
         if (from.getCol() == to.getCol() && pieceLoc(new Square(to.getCol(), to.getRow())) == null) {
             System.out.println(pieceLoc(new Square(to.getCol(), to.getRow())));
+            // check if piece is white player (can only move up)
             if (pieceLoc(new Square(from.getCol(), from.getRow())).player == ChessPlayer.WHITE) {
                 if (from.getRow() == 1) return (to.getRow() == 2 || to.getRow() == 3)
                         && isClearVertically(from, to);
                 else return to.getRow() - from.getRow() == 1;
             }
+            // check for black (can only go down)
             if (pieceLoc(new Square(from.getCol(), from.getRow())).player == ChessPlayer.BLACK) {
                 if (from.getRow() == 6) return (to.getRow() == 5 || to.getRow() == 4)
                         && isClearVertically(from, to);
@@ -27,6 +29,7 @@ public class BoardModel {
     }
 
     private boolean canKnightMove(Square from, Square to) {
+        // calculate possible steps
         return Math.abs(from.getCol() - to.getCol()) == 2 && Math.abs(from.getRow() - to.getRow()) == 1
                 || Math.abs(from.getCol() - to.getCol()) == 1 && Math.abs(from.getRow() - to.getRow()) == 2;
     }
@@ -94,11 +97,14 @@ public class BoardModel {
         return true;
     }
 
+    // check if pieces are able to move, if not don't move them
     public boolean canMove(Square from, Square to) {
         ChessPiece movingPiece = pieceLoc(from);
+        // prevents user from capturing pieces using empty squares (very silly bug)
         if (movingPiece == null) {
             return false;
         }
+        // if you attempt to move back to own square, it won't count turn
         if (from.getCol() == to.getCol() && from.getRow() == to.getRow()) {
             return false;
         }
@@ -130,15 +136,18 @@ public class BoardModel {
     private void movePiece(int fromCol, int fromRow, int toCol, int toRow) {
         if (fromCol == toCol && fromRow == toRow) return;
 
+        // get pieces
         ChessPiece movingPiece = pieceLoc(fromCol, fromRow);
         ChessPiece removePiece = pieceLoc(toCol, toRow);
         try {
+            // players can't capture their own pieces
             if (movingPiece.player == removePiece.player) {
                 return;
             }
         } catch (Exception ex) {
             // do nothing
         }
+        // ensures players can't move null squares (no pieces on them)
         if (movingPiece != null) {
             pieces.remove(removePiece);
             pieces.remove(movingPiece);
@@ -148,7 +157,9 @@ public class BoardModel {
     }
 
     public void resetBoard() {
+        // clears arraylist
         pieces.clear();
+        // draws all pieces to arraylist
         for (int i = 0; i <= 1; i++) {
             // rooks
             pieces.add(new ChessPiece(i * 7, 0, ChessPlayer.WHITE, PieceType.ROOK, R.drawable. wr));
@@ -177,6 +188,7 @@ public class BoardModel {
         return pieceLoc(square.getCol(), square.getRow());
     }
 
+    // locate a piece using its position on the board
     private ChessPiece pieceLoc(int col, int row) {
         for (ChessPiece piece : pieces) {
             if(col == piece.col && row == piece.row) {

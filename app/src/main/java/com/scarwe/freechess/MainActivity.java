@@ -11,9 +11,10 @@ import java.io.PrintWriter;
 public class MainActivity extends AppCompatActivity implements ChessDelegate {
 
     private final BoardModel board = new BoardModel();
-    private final int PORT = 8080;
-    private PrintWriter printWriter;
+    //private final int PORT = 8080;
+    //private PrintWriter printWriter;
 
+    // tag for console logging
     public static String tag = "MainActivity";
 
     @Override
@@ -22,6 +23,7 @@ public class MainActivity extends AppCompatActivity implements ChessDelegate {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // finds the board view by its ID
         BoardView boardView = findViewById(R.id.board_view);
         boardView.chessDelegate = this;
 
@@ -31,6 +33,7 @@ public class MainActivity extends AppCompatActivity implements ChessDelegate {
 
         resetButton.setOnClickListener(v -> {
             board.resetBoard();
+            // draws to board
             boardView.invalidate();
         });
 
@@ -90,6 +93,7 @@ public class MainActivity extends AppCompatActivity implements ChessDelegate {
         }
     }*/
 
+    // required due to interface
     @Override
     public ChessPiece pieceLoc(Square square) {
         return board.pieceLoc(square);
