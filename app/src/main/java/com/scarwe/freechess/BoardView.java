@@ -37,7 +37,6 @@ public class BoardView extends View {
     private final Paint paint = new Paint();
 
     private Bitmap movingPieceBitmap;
-    private ChessPiece movingPiece;
     private int fromCol = -1;
     private int fromRow = -1;
     private float movingPieceX = -1f;
@@ -72,7 +71,7 @@ public class BoardView extends View {
             Log.d(MainActivity.tag, "down at " + fromCol + ", " + fromRow);
 
             try {
-                movingPiece = chessDelegate.pieceLoc(new Square(fromCol, fromRow));
+                ChessPiece movingPiece = chessDelegate.pieceLoc(new Square(fromCol, fromRow));
                 movingPieceBitmap = bitmaps.get(movingPiece.resID);
             } catch (Exception ex) {
                 // do nothing

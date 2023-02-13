@@ -10,20 +10,17 @@ public class BoardModel {
     }
 
     private boolean canPawnMove(Square from, Square to) {
-        if (from.getCol() == to.getCol()) {
+        if (from.getCol() == to.getCol() && pieceLoc(new Square(to.getCol(), to.getRow())) == null) {
+            System.out.println(pieceLoc(new Square(to.getCol(), to.getRow())));
             if (pieceLoc(new Square(from.getCol(), from.getRow())).player == ChessPlayer.WHITE) {
-                if (from.getRow() == 1) {
-                    return to.getRow() == 2 || to.getRow() == 3;
-                } else {
-                    return to.getRow() - from.getRow() == 1;
-                }
+                if (from.getRow() == 1) return (to.getRow() == 2 || to.getRow() == 3)
+                        && isClearVertically(from, to);
+                else return to.getRow() - from.getRow() == 1;
             }
             if (pieceLoc(new Square(from.getCol(), from.getRow())).player == ChessPlayer.BLACK) {
-                if (from.getRow() == 6) {
-                    return to.getRow() == 5 || to.getRow() == 4;
-                } else {
-                    return from.getRow() - to.getRow() == 1;
-                }
+                if (from.getRow() == 6) return (to.getRow() == 5 || to.getRow() == 4)
+                        && isClearVertically(from, to);
+                else return from.getRow() - to.getRow() == 1;
             }
         }
         return false;
@@ -135,9 +132,6 @@ public class BoardModel {
 
         ChessPiece movingPiece = pieceLoc(fromCol, fromRow);
         ChessPiece removePiece = pieceLoc(toCol, toRow);
-
-        System.out.println(movingPiece);
-        System.out.println(removePiece);
         try {
             if (movingPiece.player == removePiece.player) {
                 return;
