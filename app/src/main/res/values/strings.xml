@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Labs</string>
+    <string name="app_name">Free Chess</string>
+    <string name="reset_button">Reset</string>
     <string name="textView">Hello, World!</string>
 </resources>

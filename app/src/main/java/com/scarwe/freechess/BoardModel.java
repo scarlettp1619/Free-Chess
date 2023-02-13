@@ -4,9 +4,34 @@ import java.util.ArrayList;
 
 public class BoardModel {
     ArrayList<ChessPiece> pieces = new ArrayList<>();
+
     {
         resetBoard();
     }
+
+    public void movePiece(int fromCol, int fromRow, int toCol, int toRow) {
+        if (fromCol == toCol && fromRow == toRow) return;
+
+        ChessPiece movingPiece = pieceLoc(fromCol, fromRow);
+        ChessPiece removePiece = pieceLoc(toCol, toRow);
+
+        System.out.println(movingPiece);
+        System.out.println(removePiece);
+        try {
+            if (movingPiece.player == removePiece.player) {
+                return;
+            }
+            pieces.remove(removePiece);
+        } catch (Exception ex) {
+            // do nothing
+        }
+
+        pieces.remove(removePiece);
+        pieces.remove(movingPiece);
+        pieces.add(new ChessPiece(toCol, toRow, movingPiece.player, movingPiece.type, movingPiece.resID));
+
+    }
+
     public void resetBoard() {
         pieces.clear();
         for (int i = 0; i <= 1; i++) {
