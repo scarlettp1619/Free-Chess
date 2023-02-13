@@ -44,9 +44,9 @@ public class MainActivity extends AppCompatActivity implements ChessDelegate {
 
         listenButton.setOnClickListener(v -> {
             ExecutorService executor = Executors.newSingleThreadExecutor();
-            Log.d(tag, "socket server listening...");
             executor.execute(() -> ((Runnable) () -> {
                 try {
+                    Log.d(tag, "socket server listening...");
                     ServerSocket serverSocket = new ServerSocket(PORT);
                     Socket socket = serverSocket.accept();
                     receiveMove(socket);
@@ -62,7 +62,7 @@ public class MainActivity extends AppCompatActivity implements ChessDelegate {
             executor.execute(() -> ((Runnable) () -> {
                 try {
                     Log.d(tag, "socket client connecting to addr:port");
-                    Socket socket = new Socket(InetAddress.getByName("localhost"), PORT);
+                    Socket socket = new Socket("172.11.11.47", PORT);
                     receiveMove(socket);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
@@ -83,7 +83,16 @@ public class MainActivity extends AppCompatActivity implements ChessDelegate {
             for (int i = 0; i < numberStrs.length; i++){
                 move[i] = Integer.parseInt(numberStrs[i]);
             }
-            runOnUiThread(() -> movePiece(move[0], move[1], move[2], move[3]));
+            new Thread() {
+                public void run() {
+                    runOnUiThread(new Runnable () {
+                        @Override
+                        public void run() {
+                            movePiece(move[0], move[1], move[2], move[3]);
+                        }
+                    });
+                }
+            }.start();
         }
     }
 
@@ -96,7 +105,7 @@ public class MainActivity extends AppCompatActivity implements ChessDelegate {
     public void movePiece(int fromCol, int fromRow, int toCol, int toRow) {
         board.movePiece(fromCol, fromRow, toCol, toRow);
         findViewById(R.id.board_view).invalidate();
-        ExecutorService executor = Executors.newSingleThreadExecutor();
-        executor.execute(() -> System.out.println(fromCol +" "+fromRow +" "+toCol +" "+toRow));
+        //ExecutorService executor = Executors.newSingleThreadExecutor();
+        //executor.execute(() -> printWriter.println(fromCol +" "+fromRow +" "+toCol +" "+toRow));
     }
 }
