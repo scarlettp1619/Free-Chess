@@ -9,7 +9,128 @@ public class BoardModel {
         resetBoard();
     }
 
-    public void movePiece(int fromCol, int fromRow, int toCol, int toRow) {
+    private boolean canPawnMove(Square from, Square to) {
+        if (from.getCol() == to.getCol()) {
+            if (pieceLoc(new Square(from.getCol(), from.getRow())).player == ChessPlayer.WHITE) {
+                if (from.getRow() == 1) {
+                    return to.getRow() == 2 || to.getRow() == 3;
+                } else {
+                    return to.getRow() - from.getRow() == 1;
+                }
+            }
+            if (pieceLoc(new Square(from.getCol(), from.getRow())).player == ChessPlayer.BLACK) {
+                if (from.getRow() == 6) {
+                    return to.getRow() == 5 || to.getRow() == 4;
+                } else {
+                    return from.getRow() - to.getRow() == 1;
+                }
+            }
+        }
+        return false;
+    }
+
+    private boolean canKnightMove(Square from, Square to) {
+        return Math.abs(from.getCol() - to.getCol()) == 2 && Math.abs(from.getRow() - to.getRow()) == 1
+                || Math.abs(from.getCol() - to.getCol()) == 1 && Math.abs(from.getRow() - to.getRow()) == 2;
+    }
+
+    private boolean canBishopMove(Square from, Square to) {
+        if (Math.abs(from.getCol() - to.getCol()) == Math.abs(from.getRow() - to.getRow())) {
+            return isClearDiagonally(from, to);
+        }
+        return false;
+    }
+
+    private boolean canRookMove(Square from, Square to) {
+        return from.getCol() == to.getCol() && isClearVertically(from, to) ||
+                from.getRow() == to.getRow() && isClearHorizontally(from, to);
+    }
+
+    private boolean canQueenMove(Square from, Square to) {
+        return canRookMove(from, to) || canBishopMove(from, to);
+    }
+
+    private boolean canKingMove(Square from, Square to) {
+        return (Math.abs(from.getCol() - to.getCol()) <= 1 && (Math.abs(from.getRow() - to.getRow())) <= 1);
+    }
+
+    private boolean isClearVertically(Square from, Square to) {
+        if(from.getCol() != to.getCol()) return false;
+        int gap = Math.abs(from.getRow() - to.getRow()) - 1;
+        if(gap == 0) return true;
+        for (int i = 1; i <= gap; i++) {
+            int nextRow;
+            if (to.getRow() > from.getRow()) nextRow = from.getRow() + i;
+            else nextRow = from.getRow() - i;
+            if (pieceLoc(new Square(from.getCol(), nextRow)) != null) {
+                return false;
+            }
+        }
+        return true;
+
+    }
+    private boolean isClearHorizontally(Square from, Square to) {
+        if(from.getRow() != to.getRow()) return false;
+        int gap = Math.abs(from.getCol() - to.getCol()) - 1;
+        if(gap == 0) return true;
+        for (int i = 1; i <= gap; i++) {
+            int nextCol;
+            if (to.getCol() > from.getCol()) nextCol = from.getCol() + i;
+            else nextCol = from.getCol() - i;
+            if (pieceLoc(new Square(nextCol, from.getRow())) != null) {
+                return false;
+            }
+        }
+        return true;
+    }
+    private boolean isClearDiagonally(Square from, Square to) {
+        if (Math.abs(from.getCol() - to.getCol()) != Math.abs(from.getRow() - to.getRow())) return false;
+        int gap = Math.abs(from.getCol() - to.getCol()) - 1;
+        for (int i = 1; i <= gap; i++) {
+            int nextCol, nextRow;
+            if (to.getCol() > from.getCol()) nextCol = from.getCol() + i;
+            else nextCol = from.getCol() - i;
+            if (to.getRow() > from.getRow()) nextRow = from.getRow() + i;
+            else nextRow = from.getRow() - i;
+            if (pieceLoc(nextCol, nextRow) != null) return false;
+        }
+        return true;
+    }
+
+    public boolean canMove(Square from, Square to) {
+        ChessPiece movingPiece = pieceLoc(from);
+        if (movingPiece == null) {
+            return false;
+        }
+        if (from.getCol() == to.getCol() && from.getRow() == to.getRow()) {
+            return false;
+        }
+        if (to.getCol() < 0 || to.getCol() > 7 || to.getRow() < 0 || to.getRow() > 8) {
+            return false;
+        }
+        switch(movingPiece.type) {
+            case PAWN:
+                 return canPawnMove(from, to);
+            case KNIGHT:
+                return canKnightMove(from, to);
+            case BISHOP:
+                return canBishopMove(from, to);
+            case ROOK:
+                return canRookMove(from, to);
+            case QUEEN:
+                return canQueenMove(from, to);
+            case KING:
+                return canKingMove(from, to);
+        }
+        return true;
+    }
+
+    public void movePiece(Square from, Square to) {
+        if(canMove(from, to)) {
+            movePiece(from.getCol(), from.getRow(), to.getCol(), to.getRow());
+        }
+    }
+    private void movePiece(int fromCol, int fromRow, int toCol, int toRow) {
         if (fromCol == toCol && fromRow == toRow) return;
 
         ChessPiece movingPiece = pieceLoc(fromCol, fromRow);
@@ -21,14 +142,14 @@ public class BoardModel {
             if (movingPiece.player == removePiece.player) {
                 return;
             }
-            pieces.remove(removePiece);
         } catch (Exception ex) {
             // do nothing
         }
-
-        pieces.remove(removePiece);
-        pieces.remove(movingPiece);
-        pieces.add(new ChessPiece(toCol, toRow, movingPiece.player, movingPiece.type, movingPiece.resID));
+        if (movingPiece != null) {
+            pieces.remove(removePiece);
+            pieces.remove(movingPiece);
+            pieces.add(new ChessPiece(toCol, toRow, movingPiece.player, movingPiece.type, movingPiece.resID));
+        }
 
     }
 
@@ -57,7 +178,12 @@ public class BoardModel {
         pieces.add(new ChessPiece(4, 0, ChessPlayer.WHITE, PieceType.KING, R.drawable.wk));
         pieces.add(new ChessPiece(4, 7, ChessPlayer.BLACK, PieceType.KING, R.drawable.bk));
     }
-    public ChessPiece pieceLoc(int col, int row) {
+
+    public ChessPiece pieceLoc(Square square) {
+        return pieceLoc(square.getCol(), square.getRow());
+    }
+
+    private ChessPiece pieceLoc(int col, int row) {
         for (ChessPiece piece : pieces) {
             if(col == piece.col && row == piece.row) {
                 return piece;
@@ -65,47 +191,67 @@ public class BoardModel {
         }
         return null;
     }
+
+    public String pgnBoard() {
+        StringBuilder desc = new StringBuilder(" \n");
+        desc.append("  a b c d e f g h\n");
+        // i determines rows of model
+        for (int i = 7; i >= 0; i--) {
+            desc.append(i + 1);
+            desc.append(boardRow(i));
+            desc.append(" ").append(i + 1);
+            desc.append("\n");
+        }
+        desc.append("  a b c d e f g h");
+        return desc.toString();
+    }
     public String stringBoard() {
         StringBuilder desc = new StringBuilder(" \n");
         // i determines rows of model
         for (int i = 7; i >= 0; i--) {
             desc.append(i);
-            // j determines columns of model
-            for (int j = 0; j < 8; j++) {
-                ChessPiece piece = pieceLoc(j, i);
-                if (piece == null) {
-                    desc.append(" .");
-                } else {
-                    desc.append(" ");
-                    if(piece.getType() == PieceType.KING) {
-                        if (piece.player == ChessPlayer.WHITE) desc.append("k");
-                        else desc.append("K");
-                    }
-                    if(piece.getType() == PieceType.QUEEN) {
-                        if (piece.player == ChessPlayer.WHITE) desc.append("q");
-                        else desc.append("Q");
-                    }
-                    if(piece.getType() == PieceType.ROOK) {
-                        if (piece.player == ChessPlayer.WHITE) desc.append("r");
-                        else desc.append("R");
-                    }
-                    if(piece.getType() == PieceType.BISHOP) {
-                        if (piece.player == ChessPlayer.WHITE) desc.append("b");
-                        else desc.append("B");
-                    }
-                    if(piece.getType() == PieceType.KNIGHT) {
-                        if (piece.player == ChessPlayer.WHITE) desc.append("n");
-                        else desc.append("N");
-                    }
-                    if(piece.getType() == PieceType.PAWN) {
-                        if (piece.player == ChessPlayer.WHITE) desc.append("p");
-                        else desc.append("P");
-                    }
-                }
-            }
+            desc.append(boardRow(i));
             desc.append("\n");
         }
-        desc.append("  a b c d e f g h");
+        desc.append("  0 1 2 3 4 5 6 7");
+        return desc.toString();
+    }
+
+    public String boardRow(int i) {
+        StringBuilder desc = new StringBuilder("");
+            // j determines columns of model
+        for (int j = 0; j < 8; j++) {
+            ChessPiece piece = pieceLoc(i, j);
+            if (piece == null) {
+                desc.append(" .");
+            } else {
+                desc.append(" ");
+                if (piece.getType() == PieceType.KING) {
+                    if (piece.player == ChessPlayer.WHITE) desc.append("k");
+                    else desc.append("K");
+                }
+                if (piece.getType() == PieceType.QUEEN) {
+                    if (piece.player == ChessPlayer.WHITE) desc.append("q");
+                    else desc.append("Q");
+                }
+                if (piece.getType() == PieceType.ROOK) {
+                    if (piece.player == ChessPlayer.WHITE) desc.append("r");
+                    else desc.append("R");
+                }
+                if (piece.getType() == PieceType.BISHOP) {
+                    if (piece.player == ChessPlayer.WHITE) desc.append("b");
+                    else desc.append("B");
+                }
+                if (piece.getType() == PieceType.KNIGHT) {
+                    if (piece.player == ChessPlayer.WHITE) desc.append("n");
+                    else desc.append("N");
+                }
+                if (piece.getType() == PieceType.PAWN) {
+                    if (piece.player == ChessPlayer.WHITE) desc.append("p");
+                    else desc.append("P");
+                }
+            }
+        }
         return desc.toString();
     }
 }

@@ -72,7 +72,7 @@ public class BoardView extends View {
             Log.d(MainActivity.tag, "down at " + fromCol + ", " + fromRow);
 
             try {
-                movingPiece = chessDelegate.pieceLoc(fromCol, fromRow);
+                movingPiece = chessDelegate.pieceLoc(new Square(fromCol, fromRow));
                 movingPieceBitmap = bitmaps.get(movingPiece.resID);
             } catch (Exception ex) {
                 // do nothing
@@ -87,13 +87,12 @@ public class BoardView extends View {
             int col = (int) Math.floor((e.getX() - originX) / cellSize);
             int row = 7 - ((int) Math.floor((e.getY() - originY) / cellSize));
             try {
-                chessDelegate.movePiece(fromCol, fromRow, col, row);
+                chessDelegate.movePiece(new Square(fromCol, fromRow), new Square(col, row));
                 movingPieceBitmap = null;
                 fromCol = -1;
                 fromRow = -1;
-
-            } catch(Exception ex) {
-                // do nothing
+                } catch (Exception ex) {
+                    // do nothing
             }
         }
         return true;
@@ -111,7 +110,7 @@ public class BoardView extends View {
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
                 if (i != fromRow || j != fromCol) {
-                    ChessPiece piece = chessDelegate.pieceLoc(j, i);
+                    ChessPiece piece = chessDelegate.pieceLoc(new Square(j, i));
                     if (piece != null) {
                         drawPieceLoc(canvas, j, i, piece.resID);
                     }
@@ -125,7 +124,7 @@ public class BoardView extends View {
             //
         }
 
-        ChessPiece piece = chessDelegate.pieceLoc(fromCol, fromRow);
+        ChessPiece piece = chessDelegate.pieceLoc(new Square(fromCol, fromRow));
         if (piece != null) {
             Bitmap bitmap = bitmaps.get(piece.resID);
             canvas.drawBitmap(bitmap, null, new RectF(movingPieceX - cellSize / 2, movingPieceY - cellSize / 2,

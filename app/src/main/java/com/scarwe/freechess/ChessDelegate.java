@@ -1,7 +1,6 @@
 package com.scarwe.freechess;
 
 public interface ChessDelegate {
-    ChessPiece pieceLoc(int col, int row);
-
-    void movePiece(int fromCol, int fromRow, int toCol, int toRow);
+    ChessPiece pieceLoc(Square square);
+    void movePiece(Square from, Square to);
 }

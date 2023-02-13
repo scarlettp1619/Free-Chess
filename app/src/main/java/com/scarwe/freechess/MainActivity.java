@@ -3,18 +3,10 @@ package com.scarwe.freechess;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Window;
 import android.widget.Button;
 
-import java.io.IOException;
 import java.io.PrintWriter;
-import java.net.InetAddress;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.util.Scanner;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public class MainActivity extends AppCompatActivity implements ChessDelegate {
 
@@ -34,15 +26,17 @@ public class MainActivity extends AppCompatActivity implements ChessDelegate {
         boardView.chessDelegate = this;
 
         Button resetButton = findViewById(R.id.reset_button);
-        Button listenButton = findViewById(R.id.listen_button);
-        Button connectButton = findViewById(R.id.connect_button);
+        /*Button listenButton = findViewById(R.id.listen_button);
+        Button connectButton = findViewById(R.id.connect_button);*/
 
         resetButton.setOnClickListener(v -> {
             board.resetBoard();
             boardView.invalidate();
         });
 
-        listenButton.setOnClickListener(v -> {
+        System.out.println(board.pgnBoard());
+
+        /*listenButton.setOnClickListener(v -> {
             ExecutorService executor = Executors.newSingleThreadExecutor();
             executor.execute(() -> ((Runnable) () -> {
                 try {
@@ -68,11 +62,11 @@ public class MainActivity extends AppCompatActivity implements ChessDelegate {
                     throw new RuntimeException(e);
                 }
             }).run());
-        });
+        });*/
 
     }
 
-    private void receiveMove(Socket socket) throws IOException {
+    /*private void receiveMove(Socket socket) throws IOException {
         Scanner scanner = new Scanner(socket.getInputStream());
         printWriter = new PrintWriter(socket.getOutputStream(), true);
 
@@ -94,16 +88,16 @@ public class MainActivity extends AppCompatActivity implements ChessDelegate {
                 }
             }.start();
         }
+    }*/
+
+    @Override
+    public ChessPiece pieceLoc(Square square) {
+        return board.pieceLoc(square);
     }
 
     @Override
-    public ChessPiece pieceLoc(int col, int row) {
-        return board.pieceLoc(col, row);
-    }
-
-    @Override
-    public void movePiece(int fromCol, int fromRow, int toCol, int toRow) {
-        board.movePiece(fromCol, fromRow, toCol, toRow);
+    public void movePiece(Square from, Square to) {
+        board.movePiece(from, to);
         findViewById(R.id.board_view).invalidate();
         //ExecutorService executor = Executors.newSingleThreadExecutor();
         //executor.execute(() -> printWriter.println(fromCol +" "+fromRow +" "+toCol +" "+toRow));
