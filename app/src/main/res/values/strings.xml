@@ -2,5 +2,6 @@
 <resources>
     <string name="app_name">Free Chess</string>
     <string name="reset_button">Reset</string>
-    <string name="textView">Hello, World!</string>
+    <string name="listen_button">Listen</string>
+    <string name="connect_button">Connect</string>
 </resources>
