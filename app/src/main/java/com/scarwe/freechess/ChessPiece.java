@@ -11,8 +11,4 @@ public class ChessPiece {
         this.player = player;
         this.resID = resID;
     }
-
-    public PieceType getType() {
-        return type;
-    }
 }

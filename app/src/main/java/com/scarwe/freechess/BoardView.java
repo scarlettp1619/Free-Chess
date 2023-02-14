@@ -45,6 +45,7 @@ public class BoardView extends View {
     private float movingPieceX = -1f;
     private float movingPieceY = -1f;
 
+    private final BoardGame game = new BoardGame();
     public ChessDelegate chessDelegate = null;
 
     // init
@@ -99,8 +100,9 @@ public class BoardView extends View {
                 movingPieceBitmap = null;
                 fromCol = -1;
                 fromRow = -1;
-                } catch (Exception ex) {
-                    // do nothing
+                invalidate();
+            } catch (Exception ex) {
+                // do nothing
             }
         }
         return true;

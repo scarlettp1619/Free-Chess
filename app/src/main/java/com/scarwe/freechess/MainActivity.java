@@ -6,11 +6,9 @@ import android.os.Bundle;
 import android.view.Window;
 import android.widget.Button;
 
-import java.io.PrintWriter;
-
 public class MainActivity extends AppCompatActivity implements ChessDelegate {
 
-    private final BoardModel board = new BoardModel();
+    private final BoardGame board = new BoardGame();
     //private final int PORT = 8080;
     //private PrintWriter printWriter;
 
@@ -33,11 +31,10 @@ public class MainActivity extends AppCompatActivity implements ChessDelegate {
 
         resetButton.setOnClickListener(v -> {
             board.resetBoard();
-            // draws to board
+            board.whiteCastled = false;
+            board.blackCastled = false;
             boardView.invalidate();
         });
-
-        System.out.println(board.pgnBoard());
 
         /*listenButton.setOnClickListener(v -> {
             ExecutorService executor = Executors.newSingleThreadExecutor();
@@ -96,12 +93,22 @@ public class MainActivity extends AppCompatActivity implements ChessDelegate {
     // required due to interface
     @Override
     public ChessPiece pieceLoc(Square square) {
-        return board.pieceLoc(square);
+        return BoardGame.pieceLoc(square);
     }
 
     @Override
     public void movePiece(Square from, Square to) {
-        board.movePiece(from, to);
+        if (BoardGame.whitePlayer.turn) {
+            if (BoardGame.whitePlayer.movePiece(from, to)) {
+                BoardGame.whitePlayer.setTurn(false);
+                BoardGame.blackPlayer.setTurn(true);
+            }
+        } else if (BoardGame.blackPlayer.turn) {
+            if (BoardGame.blackPlayer.movePiece(from, to)) {
+                BoardGame.whitePlayer.setTurn(true);
+                BoardGame.blackPlayer.setTurn(false);
+            }
+        }
         findViewById(R.id.board_view).invalidate();
         //ExecutorService executor = Executors.newSingleThreadExecutor();
         //executor.execute(() -> printWriter.println(fromCol +" "+fromRow +" "+toCol +" "+toRow));
