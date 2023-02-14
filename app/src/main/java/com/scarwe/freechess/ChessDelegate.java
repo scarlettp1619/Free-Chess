@@ -5,5 +5,5 @@ public interface ChessDelegate {
     // required due to interface
     ChessPiece pieceLoc(Square square);
 
-    void movePiece(Square from, Square to);
+    void movePiece(Square from, Square to) throws CloneNotSupportedException;
 }

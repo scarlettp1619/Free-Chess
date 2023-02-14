@@ -97,7 +97,7 @@ public class MainActivity extends AppCompatActivity implements ChessDelegate {
     }
 
     @Override
-    public void movePiece(Square from, Square to) {
+    public void movePiece(Square from, Square to) throws CloneNotSupportedException {
         if (BoardGame.whitePlayer.turn) {
             if (BoardGame.whitePlayer.movePiece(from, to)) {
                 BoardGame.setCurrentPlayer(BoardGame.blackPlayer);

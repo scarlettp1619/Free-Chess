@@ -73,7 +73,7 @@ public class ChessPlayer {
         return canRookMove(from, to) || canBishopMove(from, to);
     }
 
-    private boolean canKingMove(Square from, Square to) {
+    private boolean canKingMove(Square from, Square to) throws CloneNotSupportedException {
         if(canCastleKingSide(from, to)) {
             return true;
         }
@@ -83,7 +83,7 @@ public class ChessPlayer {
         return Math.abs(from.getCol() - to.getCol()) <= 1 && (Math.abs(from.getRow() - to.getRow())) <= 1;
     }
 
-    private boolean canCastleKingSide(Square from, Square to) {
+    private boolean canCastleKingSide(Square from, Square to) throws CloneNotSupportedException {
         Square kingSquare;
         if (colour == 0) kingSquare = new Square(4, 0);
         else kingSquare = new Square(4, 7);
@@ -92,6 +92,9 @@ public class ChessPlayer {
                     && BoardGame.pieceLoc(new Square(from.getCol() + 2, from.getRow())) == null
                     // finds rook to castle with
                     && BoardGame.pieceLoc(new Square(from.getCol() + 3, from.getRow())).type == PieceType.ROOK
+                    && !BoardGame.pieceLoc(new Square(from.getCol() + 3, from.getRow())).hasMoved
+                    && BoardGame.pieceLoc(new Square(from.getCol() + 3, from.getRow())).type != null
+                    && !BoardGame.pieceLoc(kingSquare).hasMoved
                     && BoardGame.pieceLoc(kingSquare).type == PieceType.KING) {
                 if (to.getCol() - from.getCol() == 2) {
                     // moves rook
@@ -102,7 +105,7 @@ public class ChessPlayer {
                     if(this.colour == 1) {
                         movePiece(7, 7, 5, 7);
                         this.castled = true;
-                    };
+                    }
                     return true;
                 }
             }
@@ -110,7 +113,7 @@ public class ChessPlayer {
         return false;
     }
 
-    private boolean canCastleQueenSide(Square from, Square to) {
+    private boolean canCastleQueenSide(Square from, Square to) throws CloneNotSupportedException {
         Square kingSquare;
         if (colour == 0) kingSquare = new Square(4, 0);
         else kingSquare = new Square(4, 7);
@@ -119,6 +122,9 @@ public class ChessPlayer {
                     && BoardGame.pieceLoc(new Square(from.getCol() - 2, from.getRow())) == null
                     && BoardGame.pieceLoc(new Square(from.getCol() - 3, from.getRow())) == null
                     && BoardGame.pieceLoc(new Square(from.getCol() - 4, from.getRow())).type == PieceType.ROOK
+                    && BoardGame.pieceLoc(new Square(from.getCol() - 4, from.getRow())).type != null
+                    && !BoardGame.pieceLoc(new Square(from.getCol() - 4, from.getRow())).hasMoved
+                    && !BoardGame.pieceLoc(kingSquare).hasMoved
                     && BoardGame.pieceLoc(kingSquare).type == PieceType.KING) {
                 if (to.getCol() - from.getCol() == -2) {
                     // moves rook
@@ -129,7 +135,7 @@ public class ChessPlayer {
                     if(this.colour == 1) {
                         movePiece(0, 7, 3, 7);
                         this.castled = true;
-                    };
+                    }
                     return true;
                 }
             }
@@ -184,7 +190,7 @@ public class ChessPlayer {
     }
 
     // check if pieces are able to move, if not don't move them
-    public boolean canMove(Square from, Square to) {
+    public boolean canMove(Square from, Square to) throws CloneNotSupportedException {
         ChessPiece movingPiece = BoardGame.pieceLoc(from);
         // if you attempt to move back to own square, it won't count turn
         if (from.getCol() == to.getCol() && from.getRow() == to.getRow()) {
@@ -210,14 +216,14 @@ public class ChessPlayer {
         return true;
     }
 
-    public boolean movePiece(Square from, Square to) {
+    public boolean movePiece(Square from, Square to) throws CloneNotSupportedException {
         if (canMove(from, to) && turn) {
             return movePiece(from.getCol(), from.getRow(), to.getCol(), to.getRow());
         }
         return false;
     }
 
-    private boolean movePiece(int fromCol, int fromRow, int toCol, int toRow) {
+    private boolean movePiece(int fromCol, int fromRow, int toCol, int toRow) throws CloneNotSupportedException {
         if (fromCol == toCol && fromRow == toRow) return false;
 
         // get pieces
@@ -236,6 +242,7 @@ public class ChessPlayer {
             // ensures players can't move null squares (no pieces on them)
             BoardGame.currentPlayer.pieces.remove(removePiece);
             BoardGame.currentPlayer.pieces.remove(movingPiece);
+
             if (BoardGame.currentPlayer == BoardGame.whitePlayer) {
                 BoardGame.blackPlayer.pieces.remove(removePiece);
                 BoardGame.blackPlayer.pieces.remove(movingPiece);
@@ -243,8 +250,15 @@ public class ChessPlayer {
                 BoardGame.whitePlayer.pieces.remove(removePiece);
                 BoardGame.whitePlayer.pieces.remove(movingPiece);
             }
-            pieces.add(new ChessPiece(toCol, toRow, BoardGame.currentPlayer, movingPiece.type, movingPiece.resID));
-            System.out.println(BoardGame.pgnBoard());
+
+            ChessPiece tempPiece = (ChessPiece) movingPiece.clone();
+
+            tempPiece.col = toCol;
+            tempPiece.row = toRow;
+            tempPiece.hasMoved = true;
+
+            pieces.add(tempPiece);
+
             return true;
         }
         return false;
