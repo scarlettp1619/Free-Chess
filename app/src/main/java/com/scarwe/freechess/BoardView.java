@@ -130,7 +130,7 @@ public class BoardView extends View {
         try {
             // draws piece while moving
             canvas.drawBitmap(movingPieceBitmap, null, new RectF(movingPieceX - cellSize / 2, movingPieceY - cellSize / 2,
-                    movingPieceX + cellSize / 2, movingPieceY + cellSize / 2), paint);
+                    movingPieceX + cellSize / 2f, movingPieceY + cellSize / 2f), paint);
         } catch (Exception ex) {
             // do nothing
         }
@@ -139,8 +139,8 @@ public class BoardView extends View {
         if (piece != null) {
             // get bitmap of piece and draw
             Bitmap bitmap = bitmaps.get(piece.resID);
-            canvas.drawBitmap(bitmap, null, new RectF(movingPieceX - cellSize / 2, movingPieceY - cellSize / 2,
-                    movingPieceX + cellSize / 2, movingPieceY + cellSize / 2), paint);
+            canvas.drawBitmap(bitmap, null, new RectF(movingPieceX - cellSize / 2, movingPieceY - cellSize / 2f,
+                    movingPieceX + cellSize / 2f, movingPieceY + cellSize / 2f), paint);
         }
     }
 

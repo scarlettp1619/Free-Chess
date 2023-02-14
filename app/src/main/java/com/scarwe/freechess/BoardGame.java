@@ -8,7 +8,9 @@ public class BoardGame {
 
     static ChessPlayer whitePlayer = new ChessPlayer(0);
     static ChessPlayer blackPlayer = new ChessPlayer(1);
-    ChessPlayer currentPlayer = whitePlayer;
+    static ChessPlayer currentPlayer = whitePlayer;
+
+    static ArrayList<ChessPiece> pieces = new ArrayList<>();
 
     {
         whitePlayer.setTurn(true);
@@ -24,6 +26,9 @@ public class BoardGame {
 
         whitePlayer.setCastled(false);
         blackPlayer.setCastled(false);
+
+        pieces.addAll(whitePlayer.pieces);
+        pieces.addAll(blackPlayer.pieces);
         // draws all pieces to arraylist
         for (int i = 0; i <= 1; i++) {
             // rooks
@@ -131,8 +136,7 @@ public class BoardGame {
         }
         return desc.toString();
     }
-
-    public void setCurrentPlayer(ChessPlayer cPlayer) {
+    public static void setCurrentPlayer(ChessPlayer cPlayer) {
         currentPlayer = cPlayer;
     }
 }

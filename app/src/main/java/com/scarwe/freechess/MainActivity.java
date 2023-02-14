@@ -100,11 +100,13 @@ public class MainActivity extends AppCompatActivity implements ChessDelegate {
     public void movePiece(Square from, Square to) {
         if (BoardGame.whitePlayer.turn) {
             if (BoardGame.whitePlayer.movePiece(from, to)) {
+                BoardGame.setCurrentPlayer(BoardGame.blackPlayer);
                 BoardGame.whitePlayer.setTurn(false);
                 BoardGame.blackPlayer.setTurn(true);
             }
         } else if (BoardGame.blackPlayer.turn) {
             if (BoardGame.blackPlayer.movePiece(from, to)) {
+                BoardGame.setCurrentPlayer(BoardGame.whitePlayer);
                 BoardGame.whitePlayer.setTurn(true);
                 BoardGame.blackPlayer.setTurn(false);
             }

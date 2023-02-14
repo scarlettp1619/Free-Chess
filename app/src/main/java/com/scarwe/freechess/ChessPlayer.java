@@ -22,13 +22,13 @@ public class ChessPlayer {
 
     private boolean canPawnMove(Square from, Square to) {
         if (from.getCol() == to.getCol() && BoardGame.pieceLoc(new Square(to.getCol(), to.getRow())) == null) {
-            // check if piece is white player (can only move up)
             if (BoardGame.pieceLoc(new Square(from.getCol(), from.getRow())).player == this) {
                 if (from.getRow() == 1) return (to.getRow() == 2 || to.getRow() == 3)
                         && isClearVertically(from, to) && this.colour == 0;
                 else if (from.getRow() == 6) return (to.getRow() == 5 || to.getRow() == 4)
                         && isClearVertically(from, to) && this.colour == 1;
-                else return to.getRow() - from.getRow() == 1;
+                else if (this.colour == 0 && to.getRow() - from.getRow() == 1) return true;
+                else if (this.colour == 1 && to.getRow() - from.getRow() == -1) return true;
             }
         }
         if (from.getCol() == to.getCol() - 1 && to.getRow() - from.getRow() == 1 &&
@@ -216,6 +216,7 @@ public class ChessPlayer {
         }
         return false;
     }
+
     private boolean movePiece(int fromCol, int fromRow, int toCol, int toRow) {
         if (fromCol == toCol && fromRow == toRow) return false;
 
@@ -230,16 +231,23 @@ public class ChessPlayer {
                     return false;
                 }
             } catch (Exception ex) {
-                // do nothing
+                ex.printStackTrace();
             }
             // ensures players can't move null squares (no pieces on them)
-            if (movingPiece != null) {
-                pieces.remove(removePiece);
-                pieces.remove(movingPiece);
-                pieces.add(new ChessPiece(toCol, toRow, movingPiece.player, movingPiece.type, movingPiece.resID));
+            BoardGame.currentPlayer.pieces.remove(removePiece);
+            BoardGame.currentPlayer.pieces.remove(movingPiece);
+            if (BoardGame.currentPlayer == BoardGame.whitePlayer) {
+                BoardGame.blackPlayer.pieces.remove(removePiece);
+                BoardGame.blackPlayer.pieces.remove(movingPiece);
+            } else {
+                BoardGame.whitePlayer.pieces.remove(removePiece);
+                BoardGame.whitePlayer.pieces.remove(movingPiece);
             }
+            pieces.add(new ChessPiece(toCol, toRow, BoardGame.currentPlayer, movingPiece.type, movingPiece.resID));
+            System.out.println(BoardGame.pgnBoard());
             return true;
         }
         return false;
     }
+
 }
