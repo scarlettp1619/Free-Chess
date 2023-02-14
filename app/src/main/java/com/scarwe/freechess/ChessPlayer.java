@@ -240,17 +240,6 @@ public class ChessPlayer {
             }
             return true;
         }
-
-        System.out.println(BoardGame.pgnBoard());
         return false;
     }
-
-    private void moveKingCastle(int fromCol, int fromRow, int toCol, int toRow) {
-        ChessPiece movingPiece = BoardGame.pieceLoc(fromCol, fromRow);
-        ChessPiece removePiece = BoardGame.pieceLoc(toCol, toRow);
-        pieces.remove(removePiece);
-        pieces.remove(movingPiece);
-        pieces.add(new ChessPiece(toCol, toRow, movingPiece.player, movingPiece.type, movingPiece.resID));
-    }
-
 }
