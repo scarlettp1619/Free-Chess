@@ -98,19 +98,37 @@ public class MainActivity extends AppCompatActivity implements ChessDelegate {
 
     @Override
     public void movePiece(Square from, Square to) throws CloneNotSupportedException {
-        if (BoardGame.whitePlayer.turn) {
+        ChessPlayer white = BoardGame.whitePlayer;
+        ChessPlayer black = BoardGame.blackPlayer;
+        BoardView boardView = findViewById(R.id.board_view);
+        if (white.turn) {
             if (BoardGame.whitePlayer.movePiece(from, to)) {
                 BoardGame.setCurrentPlayer(BoardGame.blackPlayer);
                 BoardGame.whitePlayer.setTurn(false);
                 BoardGame.blackPlayer.setTurn(true);
+                BoardGame.blackPlayer.isKingChecked();
+                boardView.invalidate();
+            }
+            if (black.checked) {
+                if (black.isKingCheckmated()) {
+                    System.out.println("black checkmated");
+                    boardView.invalidate();
+                }
             }
         } else if (BoardGame.blackPlayer.turn) {
             if (BoardGame.blackPlayer.movePiece(from, to)) {
                 BoardGame.setCurrentPlayer(BoardGame.whitePlayer);
                 BoardGame.whitePlayer.setTurn(true);
                 BoardGame.blackPlayer.setTurn(false);
+                BoardGame.whitePlayer.isKingChecked();
+                boardView.invalidate();
+            }
+            if (white.checked) {
+                if (white.isKingCheckmated()) System.out.println("white checkmated");
+                boardView.invalidate();
             }
         }
+
         findViewById(R.id.board_view).invalidate();
         //ExecutorService executor = Executors.newSingleThreadExecutor();
         //executor.execute(() -> printWriter.println(fromCol +" "+fromRow +" "+toCol +" "+toRow));

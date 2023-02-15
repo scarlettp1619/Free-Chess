@@ -27,6 +27,12 @@ public class BoardGame {
         whitePlayer.setCastled(false);
         blackPlayer.setCastled(false);
 
+        whitePlayer.checked = false;
+        whitePlayer.checkmated = false;
+
+        blackPlayer.checked = false;
+        blackPlayer.checkmated = false;
+
         pieces.addAll(whitePlayer.pieces);
         pieces.addAll(blackPlayer.pieces);
         // draws all pieces to arraylist

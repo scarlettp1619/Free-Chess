@@ -15,5 +15,8 @@ public class Square {
         return row;
     }
 
-    public void setCol(int col) { this.col = col; }
+    public String getRowToString(int i)  {
+        return i > 0 && i < 27 ? String.valueOf((char)(i+64)) : null;
+    }
+
 }

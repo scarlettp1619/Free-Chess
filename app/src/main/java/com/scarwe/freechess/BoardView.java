@@ -9,16 +9,16 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.Button;
 
 import androidx.annotation.Nullable;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Locale;
 
-public class BoardView extends View {
+public class BoardView extends View{
 
     // class to paint pieces and board
     public BoardView(Context context, @Nullable AttributeSet attrs) {
@@ -28,8 +28,12 @@ public class BoardView extends View {
     private float originY = 200f;
     private float originX = 20f;
     // determines light square & dark square colours
+
     private final int lightColor = Color.parseColor("#F0D9B5");
     private final int darkColor = Color.parseColor("#B58863");
+
+    private final int legalLightColor = Color.parseColor("#F0B095");
+    private final int legalDarkColor = Color.parseColor("#C47358");
 
     // loads all piece images (will soon be replaced with config)
     private static final int[] images = {R.drawable.bb, R.drawable.bk, R.drawable.bn, R.drawable.bp,
@@ -45,7 +49,6 @@ public class BoardView extends View {
     private float movingPieceX = -1f;
     private float movingPieceY = -1f;
 
-    private final BoardGame game = new BoardGame();
     public ChessDelegate chessDelegate = null;
 
     // init
@@ -116,17 +119,41 @@ public class BoardView extends View {
         originY = (getHeight() - boardSize) / 2f;
     }
 
-    private void drawPieces(Canvas canvas) {
+    private void drawPieces(Canvas canvas){
+        ChessPiece piece;
+
+        piece = chessDelegate.pieceLoc(new Square(fromCol, fromRow));
+
+        if (piece != null) {
+            ArrayList<Square> legalSquares;
+            try {
+                legalSquares = piece.generateLegalSquares(new Square(piece.col, piece.row));
+                for (Square s : legalSquares) {
+                    drawLegalMoves(canvas, s.getRow(), s.getCol());
+                }
+            } catch (CloneNotSupportedException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        if (piece != null) {
+            // get bitmap of piece and draw
+            Bitmap bitmap = bitmaps.get(piece.resID);
+            canvas.drawBitmap(bitmap, null, new RectF(movingPieceX - cellSize / 2, movingPieceY - cellSize / 2f,
+                    movingPieceX + cellSize / 2f, movingPieceY + cellSize / 2f), paint);
+        }
+
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
                 if (i != fromRow || j != fromCol) {
-                    ChessPiece piece = chessDelegate.pieceLoc(new Square(j, i));
+                    piece = chessDelegate.pieceLoc(new Square(j, i));
                     if (piece != null) {
                         drawPieceLoc(canvas, j, i, piece.resID);
                     }
                 }
             }
         }
+
         try {
             // draws piece while moving
             canvas.drawBitmap(movingPieceBitmap, null, new RectF(movingPieceX - cellSize / 2, movingPieceY - cellSize / 2,
@@ -135,16 +162,9 @@ public class BoardView extends View {
             // do nothing
         }
 
-        ChessPiece piece = chessDelegate.pieceLoc(new Square(fromCol, fromRow));
-        if (piece != null) {
-            // get bitmap of piece and draw
-            Bitmap bitmap = bitmaps.get(piece.resID);
-            canvas.drawBitmap(bitmap, null, new RectF(movingPieceX - cellSize / 2, movingPieceY - cellSize / 2f,
-                    movingPieceX + cellSize / 2f, movingPieceY + cellSize / 2f), paint);
-        }
     }
 
-    private void drawPieceLoc(Canvas canvas, int col, int row, int resID) {
+    private void drawPieceLoc(Canvas canvas, int col, int row, int resID){
         Bitmap bitmap = bitmaps.get(resID);
         canvas.drawBitmap(bitmap, null, new RectF(originX + col * cellSize, originY + (7 - row) * cellSize,
                 originX + (col + 1) * cellSize, originY + ((7 - row) + 1) * cellSize), paint);
@@ -163,6 +183,13 @@ public class BoardView extends View {
         paint.setAntiAlias(true);
         paint.setFilterBitmap(true);
         paint.setDither(true);
+    }
+
+    private void drawLegalMoves(Canvas canvas, int j, int i) {
+        if ((i + j) % 2 == 0) paint.setColor(legalDarkColor);
+        else paint.setColor(legalLightColor);
+        canvas.drawRect(originX + i * cellSize, originY + (7 - j) * cellSize,
+                originX + (i + 1) * cellSize, originY + ((7 - j) + 1) * cellSize, paint);
     }
 
     private void loadImages() {
