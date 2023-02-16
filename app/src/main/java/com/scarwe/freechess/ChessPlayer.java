@@ -159,16 +159,16 @@ public class ChessPlayer {
                         && BoardGame.pieceLoc(new Square(from.getCol() + 3, from.getRow())).type != null
                         && !BoardGame.pieceLoc(kingSquare).hasMoved
                         && BoardGame.pieceLoc(kingSquare).type == PieceType.KING) {
-                    {
                         for (ChessPiece p : tempPieces) {
                             for (Square s : p.legalSquares) {
-                                if (s.col == from.getCol() + 1 || s.col == from.getCol() + 2) {
+                                if (s.col == from.getCol() + 1 && s.row == from.getRow()
+                                        || s.col == from.getCol() + 2 && s.row == from.getRow()) {
+                                    System.out.println("aahhh");
                                     return false;
                                 }
                             }
                         }
-                        return to.getCol() - from.getCol() == -2;
-                    }
+                    return to.getCol() - from.getCol() == 2;
                 }
             }
         } catch (Exception ex) {
@@ -224,13 +224,14 @@ public class ChessPlayer {
                         && BoardGame.pieceLoc(kingSquare).type == PieceType.KING) {
                     for (ChessPiece p : tempPieces) {
                         for (Square s : p.legalSquares) {
-                            if (s.col == from.getCol() - 1 || s.col == from.getCol() - 2
-                            || s.col == from.getCol() - 3) {
+                            if (s.col == from.getCol() - 1 && s.row == from.getRow()
+                                    || s.col == from.getCol() - 2 && s.row == from.getRow()
+                            || s.col == from.getCol() - 3 && s.row == from.getRow()) {
                                 return false;
                             }
                         }
                     }
-                        return to.getCol() - from.getCol() == -2;
+                    return to.getCol() - from.getCol() == -2;
                 }
             }
         } catch (Exception ex) {
@@ -363,6 +364,7 @@ public class ChessPlayer {
             p.legalSquares.clear();
             p.legalSquares.addAll(newLegalMoves);
         }
+        System.out.println(Integer.toString(colour) + castled);
 
         float endTime = System.nanoTime();
         float totalTime = endTime - startTime;
@@ -422,11 +424,13 @@ public class ChessPlayer {
         ChessPiece removePiece = BoardGame.pieceLoc(toCol, toRow);
 
         if (movingPiece.player == this) {
-            if (removePiece != null) {
+            try {
                 // players can't capture their own pieces
                 if (movingPiece.player == removePiece.player) {
                     return false;
                 }
+            } catch (Exception ex) {
+
             }
             // ensures players can't move null squares (no pieces on them)
             BoardGame.currentPlayer.pieces.remove(removePiece);
@@ -458,13 +462,13 @@ public class ChessPlayer {
                     if (!testMove) p.sinceMoved += 1;
                 }
             }
-            if (tempPiece.type == PieceType.KING && toCol - fromCol == 2) {
+            if (tempPiece.type == PieceType.KING && toCol - fromCol == 2 && !testMove) {
                 if (!testMove) castled = true;
                 if (this.colour == 0) movePiece(7, 0, 5, 0, false); // rook
                 if (this.colour == 1) movePiece(7, 7, 5, 7, false);
             }
 
-            if (tempPiece.type == PieceType.KING && toCol - fromCol == -2) {
+            if (tempPiece.type == PieceType.KING && toCol - fromCol == -2 && !testMove) {
                 if (!testMove) {
                     castled = true;
                 }

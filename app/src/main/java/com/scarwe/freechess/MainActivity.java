@@ -140,7 +140,6 @@ public class MainActivity extends Activity implements ChessDelegate {
                     for (ChessPiece p : black.pieces) {
                         if (p.legalSquares.size() != 0) {
                             checkmated = false;
-                            break;
                         }
                     }
                     if (checkmated) {
@@ -150,7 +149,6 @@ public class MainActivity extends Activity implements ChessDelegate {
                     for (ChessPiece p : black.pieces) {
                         if (p.legalSquares.size() != 0) {
                             stalemated = false;
-                            break;
                         }
                     }
                     if (stalemated) {
@@ -175,7 +173,6 @@ public class MainActivity extends Activity implements ChessDelegate {
                     for (ChessPiece p : white.pieces) {
                         if (p.legalSquares.size() != 0) {
                             checkmated = false;
-                            break;
                         }
                     }
                     if (checkmated) {
@@ -185,7 +182,6 @@ public class MainActivity extends Activity implements ChessDelegate {
                     for (ChessPiece p : white.pieces) {
                         if (p.legalSquares.size() != 0) {
                             stalemated = false;
-                            break;
                         }
                     }
                     if (stalemated) {
