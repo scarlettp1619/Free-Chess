@@ -2,15 +2,17 @@ package com.scarwe.freechess;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.Activity;
 import android.content.res.AssetFileDescriptor;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Window;
 import android.widget.Button;
 
 import java.io.IOException;
 
-public class MainActivity extends AppCompatActivity implements ChessDelegate {
+public class MainActivity extends Activity implements ChessDelegate {
 
     private final BoardGame board = new BoardGame();
     //private final int PORT = 8080;
@@ -25,8 +27,15 @@ public class MainActivity extends AppCompatActivity implements ChessDelegate {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        this.supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
+        //this.supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
         super.onCreate(savedInstanceState);
+
+        Thread.setDefaultUncaughtExceptionHandler(new Thread.UncaughtExceptionHandler() {
+            public void uncaughtException(Thread paramThread, Throwable paramThrowable) {
+                Log.e("Error"+Thread.currentThread().getStackTrace()[2],paramThrowable.getLocalizedMessage());
+            }
+        });
+
         setContentView(R.layout.activity_main);
 
         // finds the board view by its ID
@@ -131,6 +140,7 @@ public class MainActivity extends AppCompatActivity implements ChessDelegate {
                     for (ChessPiece p : black.pieces) {
                         if (p.legalSquares.size() != 0) {
                             checkmated = false;
+                            break;
                         }
                     }
                     if (checkmated) {
@@ -140,6 +150,7 @@ public class MainActivity extends AppCompatActivity implements ChessDelegate {
                     for (ChessPiece p : black.pieces) {
                         if (p.legalSquares.size() != 0) {
                             stalemated = false;
+                            break;
                         }
                     }
                     if (stalemated) {
@@ -164,6 +175,7 @@ public class MainActivity extends AppCompatActivity implements ChessDelegate {
                     for (ChessPiece p : white.pieces) {
                         if (p.legalSquares.size() != 0) {
                             checkmated = false;
+                            break;
                         }
                     }
                     if (checkmated) {
@@ -173,6 +185,7 @@ public class MainActivity extends AppCompatActivity implements ChessDelegate {
                     for (ChessPiece p : white.pieces) {
                         if (p.legalSquares.size() != 0) {
                             stalemated = false;
+                            break;
                         }
                     }
                     if (stalemated) {

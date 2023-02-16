@@ -355,14 +355,9 @@ public class ChessPlayer {
             newLegalMoves.clear();
             for (Square s : legalSquares) {
                 if (movePiece(new Square(p.col, p.row), s, true)) {
-                    isKingChecked();
-                    if (!checked) {
-                        newLegalMoves.add(s);
-                        resetPieces();
-                    } else {
-                        resetPieces();
-                    }
-                    //System.out.println(p.type + " " + s.getRowToString(s.col + 1) + (s.row + 1) + " " + colour);
+                    newLegalMoves.add(s);
+                    resetPieces();
+                    System.out.println(p.type + " " + s.getRowToString(s.col + 1) + (s.row + 1) + " " + colour);
                 }
             }
             p.legalSquares.clear();
@@ -427,13 +422,11 @@ public class ChessPlayer {
         ChessPiece removePiece = BoardGame.pieceLoc(toCol, toRow);
 
         if (movingPiece.player == this) {
-            try {
+            if (removePiece != null) {
                 // players can't capture their own pieces
                 if (movingPiece.player == removePiece.player) {
                     return false;
                 }
-            } catch (Exception ex) {
-                // do nothing
             }
             // ensures players can't move null squares (no pieces on them)
             BoardGame.currentPlayer.pieces.remove(removePiece);
