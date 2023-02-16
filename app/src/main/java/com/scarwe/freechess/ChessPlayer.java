@@ -3,6 +3,7 @@ package com.scarwe.freechess;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
@@ -225,22 +226,26 @@ public class ChessPlayer {
     }
 
     public void isKingChecked() throws CloneNotSupportedException {
-        ArrayList<Square> opponentLegalMoves = new ArrayList<>();
+        LinkedHashSet<Square> opponentLegalMoves = new LinkedHashSet<>();
         checked = false;
         if (colour == 0) {
             for (ChessPiece p : BoardGame.blackPlayer.pieces) {
                 Square tempSquare = new Square(p.col, p.row);
-                opponentLegalMoves.addAll(p.generateLegalSquares(tempSquare));
+                p.generateLegalSquares(tempSquare);
+                opponentLegalMoves = p.legalSquares;
             }
         } else {
             for (ChessPiece p : BoardGame.whitePlayer.pieces) {
                 Square tempSquare = new Square(p.col, p.row);
-                opponentLegalMoves.addAll(p.generateLegalSquares(tempSquare));
+                p.generateLegalSquares(tempSquare);
+                opponentLegalMoves = p.legalSquares;
             }
         }
+        Square[] squareSet = new Square[opponentLegalMoves.size()];
+        squareSet = opponentLegalMoves.toArray(squareSet);
         for (int i = 0; i < opponentLegalMoves.size(); i++) {
-            int col = opponentLegalMoves.get(i).getCol();
-            int row = opponentLegalMoves.get(i).getRow();
+            int col = squareSet[i].getCol();
+            int row = squareSet[i].getRow();
             ChessPiece tempPiece = BoardGame.pieceLoc(new Square(col, row));
             if (tempPiece != null && tempPiece.type == PieceType.KING && tempPiece.player.colour == this.colour) {
                 checked = true;
@@ -250,40 +255,38 @@ public class ChessPlayer {
     }
 
     public boolean isKingCheckmated() throws CloneNotSupportedException {
-        HashMap<ChessPiece, ArrayList<Square>> legalMoves = new HashMap<>();
+        float startTime = System.nanoTime();
+        HashMap<ChessPiece, LinkedHashSet<Square>> legalMoves = new HashMap<>();
         ArrayList<ChessPiece> tempPieces;
         checkmated = true;
         if (colour == 0) tempPieces = BoardGame.whitePlayer.pieces;
         else tempPieces = BoardGame.blackPlayer.pieces;
         for (ChessPiece p : tempPieces) {
             Square tempSquare = new Square(p.col, p.row);
-            legalMoves.put(p, p.generateLegalSquares(tempSquare));
+            p.generateLegalSquares(tempSquare);
+            legalMoves.put(p, p.legalSquares);
             legalMoves.entrySet().removeIf(ent -> ent.getValue().isEmpty());
         }
-        for (Map.Entry<ChessPiece, ArrayList<Square>> entry : legalMoves.entrySet()) {
-            if (!checkmated) {
-                break;
-            }
+        for (Map.Entry<ChessPiece, LinkedHashSet<Square>> entry : legalMoves.entrySet()) {
             ChessPiece p = entry.getKey();
-            ArrayList<Square> legalSquares = entry.getValue();
+            LinkedHashSet<Square> legalSquares = entry.getValue();
             for (Square s : legalSquares) {
-                System.out.println(s.getRowToString(s.col + 1) + (s.row + 1));
                 if (movePiece(new Square(p.col, p.row), s)) {
-                    if (!checkmated) {
-                        break;
-                    }
                     isKingChecked();
                     if (!checked) {
+                        System.out.println(p.type + " " + s.getRowToString(s.col + 1) + (s.row + 1));
+                        checkmated = false;
                         BoardGame.whitePlayer.pieces.clear();
                         BoardGame.blackPlayer.pieces.clear();
                         BoardGame.whitePlayer.pieces.addAll(tempWhitePieces);
                         BoardGame.blackPlayer.pieces.addAll(tempBlackPieces);
-                        checkmated = false;
-                        break;
                     }
                 }
             }
         }
+        float endTime = System.nanoTime();
+        float totalTime = endTime - startTime;
+        System.out.println("it took " + (totalTime/1000000000) + " seconds to calculate legal moves");
         return checkmated;
     }
 

@@ -125,10 +125,9 @@ public class BoardView extends View{
         piece = chessDelegate.pieceLoc(new Square(fromCol, fromRow));
 
         if (piece != null) {
-            ArrayList<Square> legalSquares;
             try {
-                legalSquares = piece.generateLegalSquares(new Square(piece.col, piece.row));
-                for (Square s : legalSquares) {
+                piece.generateLegalSquares(new Square(piece.col, piece.row));
+                for (Square s : piece.legalSquares) {
                     drawLegalMoves(canvas, s.getRow(), s.getCol());
                 }
             } catch (CloneNotSupportedException e) {
