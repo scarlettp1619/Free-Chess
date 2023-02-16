@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Objects;
 
 public class ChessPlayer {
 
@@ -139,8 +140,16 @@ public class ChessPlayer {
 
     public boolean canCastleKingSide(Square from, Square to) {
         Square kingSquare;
-        if (colour == 0) kingSquare = new Square(4, 0);
-        else kingSquare = new Square(4, 7);
+        ArrayList<ChessPiece> tempPieces;
+        boolean canCastle = true;
+        if (colour == 0) {
+            kingSquare = new Square(4, 0);
+            tempPieces = BoardGame.blackPlayer.pieces;
+        }
+        else {
+            kingSquare = new Square(4, 7);
+            tempPieces = BoardGame.whitePlayer.pieces;
+        }
         try {
             if (BoardGame.pieceLoc(new Square(from.getCol(), from.getRow())).player == this && !castled) {
                 if (BoardGame.pieceLoc(new Square(from.getCol() + 1, from.getRow())) == null
@@ -150,7 +159,16 @@ public class ChessPlayer {
                         && BoardGame.pieceLoc(new Square(from.getCol() + 3, from.getRow())).type != null
                         && !BoardGame.pieceLoc(kingSquare).hasMoved
                         && BoardGame.pieceLoc(kingSquare).type == PieceType.KING) {
-                    return to.getCol() - from.getCol() == 2;
+                    {
+                        for (ChessPiece p : tempPieces) {
+                            for (Square s : p.legalSquares) {
+                                if (s.col == from.getCol() + 1 || s.col == from.getCol() + 2) {
+                                    return false;
+                                }
+                            }
+                        }
+                        return to.getCol() - from.getCol() == -2;
+                    }
                 }
             }
         } catch (Exception ex) {
@@ -163,6 +181,7 @@ public class ChessPlayer {
         Square kingSquare;
         if (colour == 0) kingSquare = new Square(4, 0);
         else kingSquare = new Square(4, 7);
+
         try {
             if (BoardGame.pieceLoc(new Square(from.getCol(), from.getRow())).player == this && !castled) {
                 if (BoardGame.pieceLoc(new Square(from.getCol() + 1, from.getRow())) == null
@@ -183,8 +202,16 @@ public class ChessPlayer {
 
     public boolean canCastleQueenSide(Square from, Square to) {
         Square kingSquare;
-        if (colour == 0) kingSquare = new Square(4, 0);
-        else kingSquare = new Square(4, 7);
+        ArrayList<ChessPiece> tempPieces;
+        boolean canCastle = true;
+        if (colour == 0) {
+            kingSquare = new Square(4, 0);
+            tempPieces = BoardGame.blackPlayer.pieces;
+        }
+        else {
+            kingSquare = new Square(4, 7);
+            tempPieces = BoardGame.whitePlayer.pieces;
+        }
         try {
             if (BoardGame.pieceLoc(new Square(from.getCol(), from.getRow())).player == this && !castled) {
                 if (BoardGame.pieceLoc(new Square(from.getCol() - 1, from.getRow())) == null
@@ -195,7 +222,15 @@ public class ChessPlayer {
                         && !BoardGame.pieceLoc(new Square(from.getCol() - 4, from.getRow())).hasMoved
                         && !BoardGame.pieceLoc(kingSquare).hasMoved
                         && BoardGame.pieceLoc(kingSquare).type == PieceType.KING) {
-                    return to.getCol() - from.getCol() == -2;
+                    for (ChessPiece p : tempPieces) {
+                        for (Square s : p.legalSquares) {
+                            if (s.col == from.getCol() - 1 || s.col == from.getCol() - 2
+                            || s.col == from.getCol() - 3) {
+                                return false;
+                            }
+                        }
+                    }
+                        return to.getCol() - from.getCol() == -2;
                 }
             }
         } catch (Exception ex) {
@@ -224,7 +259,7 @@ public class ChessPlayer {
         } catch (Exception ex) {
             // do a little bit
         }
-        return 1;
+        return -1;
     }
 
     // isClear methods ensure pieces can't jump over one another
@@ -324,6 +359,8 @@ public class ChessPlayer {
                     if (!checked) {
                         newLegalMoves.add(s);
                         resetPieces();
+                    } else {
+                        resetPieces();
                     }
                     //System.out.println(p.type + " " + s.getRowToString(s.col + 1) + (s.row + 1) + " " + colour);
                 }
@@ -334,7 +371,7 @@ public class ChessPlayer {
 
         float endTime = System.nanoTime();
         float totalTime = endTime - startTime;
-        System.out.println("it took " + (totalTime/1000000000) + " seconds to calculate legal moves");
+        System.out.println((totalTime/1000000000) + " seconds to calculate legal moves");
     }
 
     // check if pieces are able to move, if not don't move them
@@ -446,21 +483,28 @@ public class ChessPlayer {
                 }
             }
 
-            if (tempPiece.type == PieceType.PAWN && fromCol - toCol == 1 && Math.abs(toRow - fromRow) == 1 && !testMove) {
-                ChessPiece removeEnPassant = BoardGame.pieceLoc(fromCol - 1, fromRow);
-                if (removeEnPassant.type == PieceType.PAWN && removeEnPassant.player != BoardGame.currentPlayer) {
+            try {
+                if (tempPiece.type == PieceType.PAWN && Math.abs(toCol - fromCol) == 1 && toRow - fromRow == 1 && !testMove
+                        && BoardGame.pieceLoc(toCol, fromRow).type == PieceType.PAWN) {
+                    ChessPiece removeEnPassant = BoardGame.pieceLoc(fromCol - 1, fromRow);
                     BoardGame.whitePlayer.pieces.remove(removeEnPassant);
                     BoardGame.blackPlayer.pieces.remove(removeEnPassant);
                 }
+            } catch (Exception ex) {
+
             }
 
-            if (tempPiece.type == PieceType.PAWN && fromCol - toCol == -1 && Math.abs(toRow - fromRow) == 1 && !testMove) {
-                ChessPiece removeEnPassant = BoardGame.pieceLoc(fromCol + 1, fromRow);
-                if (removeEnPassant.type == PieceType.PAWN && removeEnPassant.player != BoardGame.currentPlayer) {
+            try {
+                if (tempPiece.type == PieceType.PAWN && Math.abs(toCol - fromCol) == 1 && toRow - fromRow == -1 && !testMove
+                        && BoardGame.pieceLoc(toCol, fromRow).type == PieceType.PAWN) {
+                    ChessPiece removeEnPassant = BoardGame.pieceLoc(fromCol + 1, fromRow);
                     BoardGame.whitePlayer.pieces.remove(removeEnPassant);
                     BoardGame.blackPlayer.pieces.remove(removeEnPassant);
                 }
+            } catch (Exception ex) {
+
             }
+
             return true;
         }
 

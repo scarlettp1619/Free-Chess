@@ -154,11 +154,11 @@ public class MainActivity extends AppCompatActivity implements ChessDelegate {
                 BoardGame.blackPlayer.setTurn(false);
                 white.findLegalMoves();
                 white.isKingChecked();
+                boardView.invalidate();
                 if (player == null) {
                     player = MediaPlayer.create(this, R.raw.move);
                 }
                 player.start();
-                boardView.invalidate();
                 if (white.checked) {
                     System.out.println("white checked");
                     for (ChessPiece p : white.pieces) {

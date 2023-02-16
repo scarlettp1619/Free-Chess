@@ -12,6 +12,7 @@ public class ChessPiece implements Cloneable{
     public int sinceMoved = -1;
     public int currentMove = 0;
     public boolean hasMoved = false;
+    boolean enPassant = false;
     LinkedHashSet<Square> legalSquares = new LinkedHashSet<>();
 
     public ChessPiece(int col, int row, ChessPlayer player, PieceType type, int resID) {
@@ -33,9 +34,9 @@ public class ChessPiece implements Cloneable{
             int colModifierRight, colModifierLeft;
             colModifierRight = player.canCastleKingSideTest(currentSquare);
             colModifierLeft = player.canCastleQueenSideTest(currentSquare);
-            for (int i = this.row - 1; i <= this.row + 1; i++) {
-                for (int j = this.col - colModifierLeft; j <= this.col + colModifierRight; j++) {
-                    if (j > 7 || j < -1 || i > 7 || i < -1) break;
+            for (int i = this.row + colModifierLeft ; i <= this.row + colModifierRight; i++) {
+                for (int j = this.col - 3; j <= this.col + 3; j++) {
+                    if (j > 7 || j < 0 || i > 7 || i < 0) break;
                     Square testSquare = new Square(j, i);
                     if (player.canMove(currentSquare, testSquare)) {
                         currentSquares.add(testSquare);
@@ -43,7 +44,6 @@ public class ChessPiece implements Cloneable{
                     for (ChessPiece piece : player.pieces) {
                         if (testSquare.col == piece.col && testSquare.row == piece.row) {
                             currentSquares.remove(testSquare);
-                            break;
                         }
                     }
                 }
@@ -66,7 +66,7 @@ public class ChessPiece implements Cloneable{
                     }
                 }
             }
-        }else if (type != null){
+        } else if (type != null){
             for (int i = 0; i <= 7; i++) {
                 for (int j = 0; j <= 7; j++) {
                     Square testSquare = new Square(j, i);
