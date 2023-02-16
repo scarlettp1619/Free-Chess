@@ -276,10 +276,7 @@ public class ChessPlayer {
                     if (!checked) {
                         System.out.println(p.type + " " + s.getRowToString(s.col + 1) + (s.row + 1));
                         checkmated = false;
-                        BoardGame.whitePlayer.pieces.clear();
-                        BoardGame.blackPlayer.pieces.clear();
-                        BoardGame.whitePlayer.pieces.addAll(tempWhitePieces);
-                        BoardGame.blackPlayer.pieces.addAll(tempBlackPieces);
+                        resetPieces();
                     }
                 }
             }
@@ -320,17 +317,11 @@ public class ChessPlayer {
 
     public boolean movePiece(Square from, Square to) throws CloneNotSupportedException {
         if (canMove(from, to) && turn) {
-            tempWhitePieces.clear();
-            tempBlackPieces.clear();
-            tempWhitePieces.addAll(BoardGame.whitePlayer.pieces);
-            tempBlackPieces.addAll(BoardGame.blackPlayer.pieces);
+            clearTempPieces();
             if (movePiece(from.getCol(), from.getRow(), to.getCol(), to.getRow())) {
                 isKingChecked();
                 if (checked) {
-                    BoardGame.whitePlayer.pieces.clear();
-                    BoardGame.blackPlayer.pieces.clear();
-                    BoardGame.whitePlayer.pieces.addAll(tempWhitePieces);
-                    BoardGame.blackPlayer.pieces.addAll(tempBlackPieces);
+                    resetPieces();
                     return false;
                 } else {
                     return true;
@@ -414,6 +405,20 @@ public class ChessPlayer {
         }
 
         return false;
+    }
+
+    public void resetPieces() {
+        BoardGame.whitePlayer.pieces.clear();
+        BoardGame.blackPlayer.pieces.clear();
+        BoardGame.whitePlayer.pieces.addAll(tempWhitePieces);
+        BoardGame.blackPlayer.pieces.addAll(tempBlackPieces);
+    }
+
+    public void clearTempPieces() {
+        tempWhitePieces.clear();
+        tempBlackPieces.clear();
+        tempWhitePieces.addAll(BoardGame.whitePlayer.pieces);
+        tempBlackPieces.addAll(BoardGame.blackPlayer.pieces);
     }
 
     public boolean getCastled() {
