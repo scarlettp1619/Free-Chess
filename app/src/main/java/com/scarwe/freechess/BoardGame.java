@@ -10,6 +10,8 @@ public class BoardGame {
     static ChessPlayer blackPlayer = new ChessPlayer(1);
     static ChessPlayer currentPlayer = whitePlayer;
 
+    static int gameMove = 0;
+
     static ArrayList<ChessPiece> pieces = new ArrayList<>();
 
     {
@@ -23,6 +25,9 @@ public class BoardGame {
 
         whitePlayer.setTurn(true);
         blackPlayer.setTurn(false);
+
+        gameMove = 0;
+        currentPlayer = whitePlayer;
 
         whitePlayer.setCastled(false);
         blackPlayer.setCastled(false);

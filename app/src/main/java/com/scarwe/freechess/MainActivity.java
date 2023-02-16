@@ -2,9 +2,13 @@ package com.scarwe.freechess;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.res.AssetFileDescriptor;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.view.Window;
 import android.widget.Button;
+
+import java.io.IOException;
 
 public class MainActivity extends AppCompatActivity implements ChessDelegate {
 
@@ -14,6 +18,10 @@ public class MainActivity extends AppCompatActivity implements ChessDelegate {
 
     // tag for console logging
     public static String tag = "MainActivity";
+    MediaPlayer player;
+
+    public MainActivity() throws IOException {
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,35 +105,80 @@ public class MainActivity extends AppCompatActivity implements ChessDelegate {
     }
 
     @Override
-    public void movePiece(Square from, Square to) throws CloneNotSupportedException {
+    public void movePiece(Square from, Square to) throws CloneNotSupportedException, IOException {
+        boolean checkmated = true;
+        boolean stalemated = true;
         ChessPlayer white = BoardGame.whitePlayer;
         ChessPlayer black = BoardGame.blackPlayer;
         BoardView boardView = findViewById(R.id.board_view);
         if (white.turn) {
-            if (BoardGame.whitePlayer.movePiece(from, to)) {
+            if (BoardGame.whitePlayer.movePiece(from, to, false)) {
+                if (BoardGame.gameMove == 0) {
+                    BoardGame.gameMove++;
+                }
                 BoardGame.setCurrentPlayer(BoardGame.blackPlayer);
                 BoardGame.whitePlayer.setTurn(false);
                 BoardGame.blackPlayer.setTurn(true);
-                BoardGame.blackPlayer.isKingChecked();
+                black.findLegalMoves();
+                black.isKingChecked();
                 boardView.invalidate();
-            }
-            if (black.checked) {
-                if (black.isKingCheckmated()) {
-                    System.out.println("black checkmated");
-                    boardView.invalidate();
+                if (player == null ) {
+                    player = MediaPlayer.create(this, R.raw.move);
+                }
+                player.start();
+                if (black.checked) {
+                    System.out.println("black checked");
+                    for (ChessPiece p : black.pieces) {
+                        if (p.legalSquares.size() != 0) {
+                            checkmated = false;
+                        }
+                    }
+                    if (checkmated) {
+                        System.out.println("black checkmated");
+                    }
+                } else {
+                    for (ChessPiece p : black.pieces) {
+                        if (p.legalSquares.size() != 0) {
+                            stalemated = false;
+                        }
+                    }
+                    if (stalemated) {
+                        System.out.println("black stalemated");
+                    }
                 }
             }
         } else if (BoardGame.blackPlayer.turn) {
-            if (BoardGame.blackPlayer.movePiece(from, to)) {
+            if (BoardGame.blackPlayer.movePiece(from, to, false)) {
                 BoardGame.setCurrentPlayer(BoardGame.whitePlayer);
                 BoardGame.whitePlayer.setTurn(true);
                 BoardGame.blackPlayer.setTurn(false);
-                BoardGame.whitePlayer.isKingChecked();
+                white.findLegalMoves();
+                white.isKingChecked();
+                if (player == null) {
+                    player = MediaPlayer.create(this, R.raw.move);
+                }
+                player.start();
                 boardView.invalidate();
-            }
-            if (white.checked) {
-                if (white.isKingCheckmated()) System.out.println("white checkmated");
-                boardView.invalidate();
+                if (white.checked) {
+                    System.out.println("white checked");
+                    for (ChessPiece p : white.pieces) {
+                        if (p.legalSquares.size() != 0) {
+                            checkmated = false;
+                        }
+                    }
+                    if (checkmated) {
+                        System.out.println("white checkmated");
+                    }
+                } else {
+                    for (ChessPiece p : white.pieces) {
+                        if (p.legalSquares.size() != 0) {
+                            stalemated = false;
+                        }
+                    }
+                    if (stalemated) {
+                        System.out.println("white stalemated");
+                    }
+                }
             }
         }
 

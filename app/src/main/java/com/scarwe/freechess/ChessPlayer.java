@@ -1,20 +1,15 @@
 package com.scarwe.freechess;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
-import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
 
 public class ChessPlayer {
 
     public boolean turn = false;
     public boolean checked = false;
     public boolean checkmated = false;
-    public boolean stalemated = false;
     private boolean castled = false;
 
     public int colour;
@@ -77,61 +72,61 @@ public class ChessPlayer {
                 else if (from.getRow() == 6) return (to.getRow() == 5 || to.getRow() == 4)
                         && isClearVertically(from, to) && this.colour == 1;
                 else if (this.colour == 0 && to.getRow() - from.getRow() == 1) return true;
-                else if (this.colour == 1 && to.getRow() - from.getRow() == -1) return true;
+                else return this.colour == 1 && to.getRow() - from.getRow() == -1;
             }
         }
-        if (from.getCol() == to.getCol() - 1 && to.getRow() - from.getRow() == 1 &&
+        else if (from.getCol() == to.getCol() - 1 && to.getRow() - from.getRow() == 1 &&
                 BoardGame.pieceLoc(new Square(to.getCol(), to.getRow())) != null
                 && BoardGame.pieceLoc(new Square(from.getCol(), from.getRow())).player.colour == 0) {
             return true;
         }
-        if (from.getCol() == to.getCol() + 1 && to.getRow() - from.getRow() == 1 &&
+        else if (from.getCol() == to.getCol() + 1 && to.getRow() - from.getRow() == 1 &&
                 BoardGame.pieceLoc(new Square(to.getCol(), to.getRow())) != null &&
                 BoardGame.pieceLoc(new Square(from.getCol(), from.getRow())).player.colour == 0) {
             return true;
         }
-        if (from.getCol() == to.getCol() - 1 && to.getRow() - from.getRow() == -1 &&
+        else if (from.getCol() == to.getCol() - 1 && to.getRow() - from.getRow() == -1 &&
                 BoardGame.pieceLoc(new Square(to.getCol(), to.getRow())) != null &&
                 BoardGame.pieceLoc(new Square(from.getCol(), from.getRow())).player.colour == 1) {
             return true;
-        }
-        return from.getCol() == to.getCol() + 1 && to.getRow() - from.getRow() == -1 &&
+        } else return from.getCol() == to.getCol() + 1 && to.getRow() - from.getRow() == -1 &&
                 BoardGame.pieceLoc(new Square(to.getCol(), to.getRow())) != null
                 && BoardGame.pieceLoc(new Square(from.getCol(), from.getRow())).player.colour == 1;
+        return false;
     }
 
-    private boolean canPawnMove(Square from, Square to) {
+    public boolean canPawnMove(Square from, Square to) {
         return canPawnRegularMove(from, to) || canEnPassant(from, to);
     }
 
-    private boolean canKnightMove(Square from, Square to) {
+    public boolean canKnightMove(Square from, Square to) {
         // calculate possible steps
         return Math.abs(from.getCol() - to.getCol()) == 2 && Math.abs(from.getRow() - to.getRow()) == 1
                 || Math.abs(from.getCol() - to.getCol()) == 1 && Math.abs(from.getRow() - to.getRow()) == 2;
     }
 
-    private boolean canBishopMove(Square from, Square to) {
+    public boolean canBishopMove(Square from, Square to) {
         if (Math.abs(from.getCol() - to.getCol()) == Math.abs(from.getRow() - to.getRow())) {
             return isClearDiagonally(from, to);
         }
         return false;
     }
 
-    private boolean canRookMove(Square from, Square to) {
+    public boolean canRookMove(Square from, Square to) {
         return from.getCol() == to.getCol() && isClearVertically(from, to) ||
                 from.getRow() == to.getRow() && isClearHorizontally(from, to);
     }
 
-    private boolean canQueenMove(Square from, Square to) {
+    public boolean canQueenMove(Square from, Square to) {
         return canRookMove(from, to) || canBishopMove(from, to);
     }
 
-    private boolean canKingMove(Square from, Square to){
+    public boolean canKingMove(Square from, Square to){
         if(canQueenMove(from, to)) {
             if(canCastleKingSide(from, to)) {
                 return true;
             }
-            if(canCastleQueenSide(from, to)) {
+            else if(canCastleQueenSide(from, to)) {
                 return true;
             }
             return Math.abs(from.row - to.row) == 1 &&
@@ -142,45 +137,98 @@ public class ChessPlayer {
         return false;
     }
 
-    private boolean canCastleKingSide(Square from, Square to) {
+    public boolean canCastleKingSide(Square from, Square to) {
         Square kingSquare;
         if (colour == 0) kingSquare = new Square(4, 0);
         else kingSquare = new Square(4, 7);
-        if (BoardGame.pieceLoc(new Square(from.getCol(), from.getRow())).player == this && !castled) {
-            if (BoardGame.pieceLoc(new Square(from.getCol() + 1, from.getRow())) == null
-                    && BoardGame.pieceLoc(new Square(from.getCol() + 2, from.getRow())) == null
-                    && BoardGame.pieceLoc(new Square(from.getCol() + 3, from.getRow())).type == PieceType.ROOK
-                    && !BoardGame.pieceLoc(new Square(from.getCol() + 3, from.getRow())).hasMoved
-                    && BoardGame.pieceLoc(new Square(from.getCol() + 3, from.getRow())).type != null
-                    && !BoardGame.pieceLoc(kingSquare).hasMoved
-                    && BoardGame.pieceLoc(kingSquare).type == PieceType.KING) {
-                return to.getCol() - from.getCol() == 2;
+        try {
+            if (BoardGame.pieceLoc(new Square(from.getCol(), from.getRow())).player == this && !castled) {
+                if (BoardGame.pieceLoc(new Square(from.getCol() + 1, from.getRow())) == null
+                        && BoardGame.pieceLoc(new Square(from.getCol() + 2, from.getRow())) == null
+                        && BoardGame.pieceLoc(new Square(from.getCol() + 3, from.getRow())).type == PieceType.ROOK
+                        && !BoardGame.pieceLoc(new Square(from.getCol() + 3, from.getRow())).hasMoved
+                        && BoardGame.pieceLoc(new Square(from.getCol() + 3, from.getRow())).type != null
+                        && !BoardGame.pieceLoc(kingSquare).hasMoved
+                        && BoardGame.pieceLoc(kingSquare).type == PieceType.KING) {
+                    return to.getCol() - from.getCol() == 2;
+                }
             }
+        } catch (Exception ex) {
+            // do a little bit
         }
         return false;
     }
 
-    private boolean canCastleQueenSide(Square from, Square to) {
+    public int canCastleKingSideTest(Square from) {
         Square kingSquare;
         if (colour == 0) kingSquare = new Square(4, 0);
         else kingSquare = new Square(4, 7);
-        if (BoardGame.pieceLoc(new Square(from.getCol(), from.getRow())).player == this && !castled) {
-            if (BoardGame.pieceLoc(new Square(from.getCol() - 1, from.getRow())) == null
-                    && BoardGame.pieceLoc(new Square(from.getCol() - 2, from.getRow())) == null
-                    && BoardGame.pieceLoc(new Square(from.getCol() - 3, from.getRow())) == null
-                    && BoardGame.pieceLoc(new Square(from.getCol() - 4, from.getRow())).type == PieceType.ROOK
-                    && BoardGame.pieceLoc(new Square(from.getCol() - 4, from.getRow())).type != null
-                    && !BoardGame.pieceLoc(new Square(from.getCol() - 4, from.getRow())).hasMoved
-                    && !BoardGame.pieceLoc(kingSquare).hasMoved
-                    && BoardGame.pieceLoc(kingSquare).type == PieceType.KING) {
-                return to.getCol() - from.getCol() == -2;
+        try {
+            if (BoardGame.pieceLoc(new Square(from.getCol(), from.getRow())).player == this && !castled) {
+                if (BoardGame.pieceLoc(new Square(from.getCol() + 1, from.getRow())) == null
+                        && BoardGame.pieceLoc(new Square(from.getCol() + 2, from.getRow())) == null
+                        && BoardGame.pieceLoc(new Square(from.getCol() + 3, from.getRow())).type == PieceType.ROOK
+                        && !BoardGame.pieceLoc(new Square(from.getCol() + 3, from.getRow())).hasMoved
+                        && BoardGame.pieceLoc(new Square(from.getCol() + 3, from.getRow())).type != null
+                        && !BoardGame.pieceLoc(kingSquare).hasMoved
+                        && BoardGame.pieceLoc(kingSquare).type == PieceType.KING) {
+                    return 2;
+                }
             }
+        } catch (Exception ex) {
+            // do a little bit
+        }
+        return 1;
+    }
+
+    public boolean canCastleQueenSide(Square from, Square to) {
+        Square kingSquare;
+        if (colour == 0) kingSquare = new Square(4, 0);
+        else kingSquare = new Square(4, 7);
+        try {
+            if (BoardGame.pieceLoc(new Square(from.getCol(), from.getRow())).player == this && !castled) {
+                if (BoardGame.pieceLoc(new Square(from.getCol() - 1, from.getRow())) == null
+                        && BoardGame.pieceLoc(new Square(from.getCol() - 2, from.getRow())) == null
+                        && BoardGame.pieceLoc(new Square(from.getCol() - 3, from.getRow())) == null
+                        && BoardGame.pieceLoc(new Square(from.getCol() - 4, from.getRow())).type == PieceType.ROOK
+                        && BoardGame.pieceLoc(new Square(from.getCol() - 4, from.getRow())).type != null
+                        && !BoardGame.pieceLoc(new Square(from.getCol() - 4, from.getRow())).hasMoved
+                        && !BoardGame.pieceLoc(kingSquare).hasMoved
+                        && BoardGame.pieceLoc(kingSquare).type == PieceType.KING) {
+                    return to.getCol() - from.getCol() == -2;
+                }
+            }
+        } catch (Exception ex) {
+            // do a little bit
         }
         return false;
+    }
+
+    public int canCastleQueenSideTest(Square from) {
+        Square kingSquare;
+        if (colour == 0) kingSquare = new Square(4, 0);
+        else kingSquare = new Square(4, 7);
+        try {
+            if (BoardGame.pieceLoc(new Square(from.getCol(), from.getRow())).player == this && !castled) {
+                if (BoardGame.pieceLoc(new Square(from.getCol() - 1, from.getRow())) == null
+                        && BoardGame.pieceLoc(new Square(from.getCol() - 2, from.getRow())) == null
+                        && BoardGame.pieceLoc(new Square(from.getCol() - 3, from.getRow())) == null
+                        && BoardGame.pieceLoc(new Square(from.getCol() - 4, from.getRow())).type == PieceType.ROOK
+                        && BoardGame.pieceLoc(new Square(from.getCol() - 4, from.getRow())).type != null
+                        && !BoardGame.pieceLoc(new Square(from.getCol() - 4, from.getRow())).hasMoved
+                        && !BoardGame.pieceLoc(kingSquare).hasMoved
+                        && BoardGame.pieceLoc(kingSquare).type == PieceType.KING) {
+                    return -2;
+                }
+            }
+        } catch (Exception ex) {
+            // do a little bit
+        }
+        return 1;
     }
 
     // isClear methods ensure pieces can't jump over one another
-    private boolean isClearVertically(Square from, Square to) {
+    public boolean isClearVertically(Square from, Square to) {
         if(from.getCol() != to.getCol()) return false;
         int gap = Math.abs(from.getRow() - to.getRow()) - 1;
         if(gap == 0) return true;
@@ -196,7 +244,7 @@ public class ChessPlayer {
 
     }
 
-    private boolean isClearHorizontally(Square from, Square to) {
+    public boolean isClearHorizontally(Square from, Square to) {
         if(from.getRow() != to.getRow()) return false;
         int gap = Math.abs(from.getCol() - to.getCol()) - 1;
         if(gap == 0) return true;
@@ -232,13 +280,13 @@ public class ChessPlayer {
             for (ChessPiece p : BoardGame.blackPlayer.pieces) {
                 Square tempSquare = new Square(p.col, p.row);
                 p.generateLegalSquares(tempSquare);
-                opponentLegalMoves = p.legalSquares;
+                opponentLegalMoves.addAll(p.legalSquares);
             }
         } else {
             for (ChessPiece p : BoardGame.whitePlayer.pieces) {
                 Square tempSquare = new Square(p.col, p.row);
                 p.generateLegalSquares(tempSquare);
-                opponentLegalMoves = p.legalSquares;
+                opponentLegalMoves.addAll(p.legalSquares);
             }
         }
         Square[] squareSet = new Square[opponentLegalMoves.size()];
@@ -250,41 +298,43 @@ public class ChessPlayer {
             if (tempPiece != null && tempPiece.type == PieceType.KING && tempPiece.player.colour == this.colour) {
                 checked = true;
             }
-            //System.out.println(opponentLegalMoves.get(i).getRowToString(col + 1) + (row + 1));
         }
     }
 
-    public boolean isKingCheckmated() throws CloneNotSupportedException {
+    public void findLegalMoves() throws CloneNotSupportedException {
         float startTime = System.nanoTime();
         HashMap<ChessPiece, LinkedHashSet<Square>> legalMoves = new HashMap<>();
+        LinkedHashSet<Square> newLegalMoves = new LinkedHashSet<>();
         ArrayList<ChessPiece> tempPieces;
-        checkmated = true;
         if (colour == 0) tempPieces = BoardGame.whitePlayer.pieces;
         else tempPieces = BoardGame.blackPlayer.pieces;
+
         for (ChessPiece p : tempPieces) {
-            Square tempSquare = new Square(p.col, p.row);
-            p.generateLegalSquares(tempSquare);
             legalMoves.put(p, p.legalSquares);
             legalMoves.entrySet().removeIf(ent -> ent.getValue().isEmpty());
         }
+
         for (Map.Entry<ChessPiece, LinkedHashSet<Square>> entry : legalMoves.entrySet()) {
             ChessPiece p = entry.getKey();
             LinkedHashSet<Square> legalSquares = entry.getValue();
+            newLegalMoves.clear();
             for (Square s : legalSquares) {
-                if (movePiece(new Square(p.col, p.row), s)) {
+                if (movePiece(new Square(p.col, p.row), s, true)) {
                     isKingChecked();
                     if (!checked) {
-                        System.out.println(p.type + " " + s.getRowToString(s.col + 1) + (s.row + 1));
-                        checkmated = false;
+                        newLegalMoves.add(s);
                         resetPieces();
                     }
+                    //System.out.println(p.type + " " + s.getRowToString(s.col + 1) + (s.row + 1) + " " + colour);
                 }
             }
+            p.legalSquares.clear();
+            p.legalSquares.addAll(newLegalMoves);
         }
+
         float endTime = System.nanoTime();
         float totalTime = endTime - startTime;
         System.out.println("it took " + (totalTime/1000000000) + " seconds to calculate legal moves");
-        return checkmated;
     }
 
     // check if pieces are able to move, if not don't move them
@@ -295,7 +345,7 @@ public class ChessPlayer {
         if (from.getCol() == to.getCol() && from.getRow() == to.getRow()) {
             return false;
         }
-        if (to.getCol() < 0 || to.getCol() > 7 || to.getRow() < 0 || to.getRow() > 8) {
+        if (to.getCol() < 0 || to.getCol() > 7 || to.getRow() < 0 || to.getRow() > 7) {
             return false;
         }
         switch (movingPiece.type) {
@@ -315,10 +365,10 @@ public class ChessPlayer {
         return false;
     }
 
-    public boolean movePiece(Square from, Square to) throws CloneNotSupportedException {
+    public boolean movePiece(Square from, Square to, boolean testMove) throws CloneNotSupportedException {
         if (canMove(from, to) && turn) {
             clearTempPieces();
-            if (movePiece(from.getCol(), from.getRow(), to.getCol(), to.getRow())) {
+            if (movePiece(from.getCol(), from.getRow(), to.getCol(), to.getRow(), testMove)) {
                 isKingChecked();
                 if (checked) {
                     resetPieces();
@@ -328,10 +378,10 @@ public class ChessPlayer {
                 }
             }
         }
-        return true;
+        return false;
     }
 
-    private boolean movePiece(int fromCol, int fromRow, int toCol, int toRow) throws CloneNotSupportedException {
+    private boolean movePiece(int fromCol, int fromRow, int toCol, int toRow, boolean testMove) throws CloneNotSupportedException {
 
         if (fromCol == toCol && fromRow == toRow) return false;
 
@@ -370,36 +420,46 @@ public class ChessPlayer {
 
             for (ChessPiece p : BoardGame.whitePlayer.pieces) {
                 if (p.type == PieceType.PAWN && p.currentMove == 1) {
-                    p.sinceMoved += 1;
+                    if (!testMove) p.sinceMoved += 1;
                 }
             }
             for (ChessPiece p : BoardGame.blackPlayer.pieces) {
                 if (p.type == PieceType.PAWN && p.currentMove == 1) {
-                    p.sinceMoved += 1;
+                    if (!testMove) p.sinceMoved += 1;
                 }
             }
             if (tempPiece.type == PieceType.KING && toCol - fromCol == 2) {
-                castled = true;
-                if (this.colour == 0) movePiece(7, 0, 5, 0); // rook
-                if (this.colour == 1) movePiece(7, 7, 5, 7);
+                if (!testMove) castled = true;
+                if (this.colour == 0) movePiece(7, 0, 5, 0, false); // rook
+                if (this.colour == 1) movePiece(7, 7, 5, 7, false);
             }
 
             if (tempPiece.type == PieceType.KING && toCol - fromCol == -2) {
-                castled = true;
-                if (this.colour == 0) movePiece(0, 0, 3, 0); // rook
-                if (this.colour == 1) movePiece(0, 7, 3, 7);
+                if (!testMove) {
+                    castled = true;
+                }
+                if (this.colour == 0) {
+                    movePiece(0, 0, 3, 0, false); // rook
+                }
+                if (this.colour == 1) {
+                    movePiece(0, 7, 3, 7, false);
+                }
             }
 
-            if (tempPiece.type == PieceType.PAWN && fromCol - toCol == 1 && Math.abs(toRow - fromRow) == 1) {
+            if (tempPiece.type == PieceType.PAWN && fromCol - toCol == 1 && Math.abs(toRow - fromRow) == 1 && !testMove) {
                 ChessPiece removeEnPassant = BoardGame.pieceLoc(fromCol - 1, fromRow);
-                BoardGame.whitePlayer.pieces.remove(removeEnPassant);
-                BoardGame.blackPlayer.pieces.remove(removeEnPassant);
+                if (removeEnPassant.type == PieceType.PAWN && removeEnPassant.player != BoardGame.currentPlayer) {
+                    BoardGame.whitePlayer.pieces.remove(removeEnPassant);
+                    BoardGame.blackPlayer.pieces.remove(removeEnPassant);
+                }
             }
 
-            if (tempPiece.type == PieceType.PAWN && fromCol - toCol == -1 && Math.abs(toRow - fromRow) == 1) {
+            if (tempPiece.type == PieceType.PAWN && fromCol - toCol == -1 && Math.abs(toRow - fromRow) == 1 && !testMove) {
                 ChessPiece removeEnPassant = BoardGame.pieceLoc(fromCol + 1, fromRow);
-                BoardGame.whitePlayer.pieces.remove(removeEnPassant);
-                BoardGame.blackPlayer.pieces.remove(removeEnPassant);
+                if (removeEnPassant.type == PieceType.PAWN && removeEnPassant.player != BoardGame.currentPlayer) {
+                    BoardGame.whitePlayer.pieces.remove(removeEnPassant);
+                    BoardGame.blackPlayer.pieces.remove(removeEnPassant);
+                }
             }
             return true;
         }

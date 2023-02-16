@@ -8,13 +8,12 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
+import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 
 import androidx.annotation.Nullable;
-
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Locale;
 
@@ -32,8 +31,11 @@ public class BoardView extends View{
     private final int lightColor = Color.parseColor("#F0D9B5");
     private final int darkColor = Color.parseColor("#B58863");
 
-    private final int legalLightColor = Color.parseColor("#F0B095");
-    private final int legalDarkColor = Color.parseColor("#C47358");
+    private final String legalLightColor = "#F0B095";
+    private final String legalDarkColor = "#C47358";
+
+    private final String nonPlayerLightColor  = "#C4B4A2";
+    private final String nonPlayerDarkColor = "#A17D69";
 
     // loads all piece images (will soon be replaced with config)
     private static final int[] images = {R.drawable.bb, R.drawable.bk, R.drawable.bn, R.drawable.bp,
@@ -42,6 +44,7 @@ public class BoardView extends View{
 
     private final HashMap<Integer, Bitmap> bitmaps = new HashMap<>();
     private final Paint paint = new Paint();
+    private final TextPaint textPaint = new TextPaint();
 
     private Bitmap movingPieceBitmap;
     private int fromCol = -1;
@@ -125,15 +128,23 @@ public class BoardView extends View{
         piece = chessDelegate.pieceLoc(new Square(fromCol, fromRow));
 
         if (piece != null) {
-            try {
-                piece.generateLegalSquares(new Square(piece.col, piece.row));
-                for (Square s : piece.legalSquares) {
-                    drawLegalMoves(canvas, s.getRow(), s.getCol());
+            if (BoardGame.gameMove == 0) {
+                try {
+                    piece.generateLegalSquares(new Square(piece.col, piece.row));
+                } catch (CloneNotSupportedException e) {
+                    throw new RuntimeException(e);
                 }
-            } catch (CloneNotSupportedException e) {
-                throw new RuntimeException(e);
+            }
+            for (Square s : piece.legalSquares) {
+                if (piece.player != BoardGame.currentPlayer) {
+                    drawLegalMoves(canvas, s.getRow(), s.getCol(), nonPlayerLightColor, nonPlayerDarkColor);
+                } else {
+                    drawLegalMoves(canvas, s.getRow(), s.getCol(), legalLightColor, legalDarkColor);
+                }
             }
         }
+
+        drawNotation(canvas);
 
         if (piece != null) {
             // get bitmap of piece and draw
@@ -160,7 +171,6 @@ public class BoardView extends View{
         } catch (Exception ex) {
             // do nothing
         }
-
     }
 
     private void drawPieceLoc(Canvas canvas, int col, int row, int resID){
@@ -184,9 +194,34 @@ public class BoardView extends View{
         paint.setDither(true);
     }
 
-    private void drawLegalMoves(Canvas canvas, int j, int i) {
-        if ((i + j) % 2 == 0) paint.setColor(legalDarkColor);
-        else paint.setColor(legalLightColor);
+    private void drawNotation(Canvas canvas) {
+        for (int i = 0; i < 8; i++) {
+            if (i % 2 == 0) {
+                textPaint.setColor(Color.parseColor("#F9E2BD")); // dark square
+            } else {
+                textPaint.setColor(Color.parseColor("#9A7455"));
+            }
+            textPaint.setFakeBoldText(true);
+            textPaint.setTextSize(cellSize / 5);
+            canvas.drawText(intToString(i + 1).toLowerCase(Locale.ROOT), i * cellSize +
+                    (cellSize / 16), (float) (cellSize + cellSize * 6.93), textPaint);
+        }
+
+        for (int i = 0; i < 8; i++) {
+            if (i % 2 == 0) {
+                textPaint.setColor(Color.parseColor("#F9E2BD")); // dark square
+            } else {
+                textPaint.setColor(Color.parseColor("#9A7455"));
+            }
+            textPaint.setFakeBoldText(true);
+            textPaint.setTextSize(cellSize / 5);
+            canvas.drawText(Integer.toString(8 - (i)), (float) (cellSize + cellSize * 6.817), (float) (i * cellSize + cellSize / 4.3), textPaint);
+        }
+    }
+
+    private void drawLegalMoves(Canvas canvas, int j, int i, String lightColor, String darkColor) {
+        if ((i + j) % 2 == 0) paint.setColor(Color.parseColor(darkColor));
+        else paint.setColor(Color.parseColor(lightColor));
         canvas.drawRect(originX + i * cellSize, originY + (7 - j) * cellSize,
                 originX + (i + 1) * cellSize, originY + ((7 - j) + 1) * cellSize, paint);
     }
@@ -195,5 +230,9 @@ public class BoardView extends View{
         for (int i : images) {
             bitmaps.put(i, BitmapFactory.decodeResource(getResources(), i));
         }
+    }
+
+    public String intToString(int i)  {
+        return i > 0 && i < 27 ? String.valueOf((char)(i+64)) : null;
     }
 }
