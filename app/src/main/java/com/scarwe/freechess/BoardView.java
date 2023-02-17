@@ -100,7 +100,6 @@ public class BoardView extends View{
                 movingPieceBitmap = null;
                 fromCol = -1;
                 fromRow = -1;
-                invalidate();
             } catch (Exception ex) {
                 // do nothing
             }
@@ -173,8 +172,12 @@ public class BoardView extends View{
 
     private void drawPieceLoc(Canvas canvas, int col, int row, int resID){
         Bitmap bitmap = bitmaps.get(resID);
-        canvas.drawBitmap(bitmap, null, new RectF(originX + col * cellSize, originY + (7 - row) * cellSize,
-                originX + (col + 1) * cellSize, originY + ((7 - row) + 1) * cellSize), paint);
+        try {
+            canvas.drawBitmap(bitmap, null, new RectF(originX + col * cellSize, originY + (7 - row) * cellSize,
+                    originX + (col + 1) * cellSize, originY + ((7 - row) + 1) * cellSize), paint);
+        } catch (Exception ex) {
+            // do nothing
+        }
     }
 
     private void drawBoard(Canvas canvas) {

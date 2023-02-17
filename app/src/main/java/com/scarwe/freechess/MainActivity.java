@@ -13,10 +13,8 @@ public class MainActivity extends Activity implements ChessDelegate {
     MediaPlayer player;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        Thread.setDefaultUncaughtExceptionHandler((paramThread, paramThrowable) -> System.exit(2));
 
         setContentView(R.layout.activity_main);
 
@@ -43,81 +41,82 @@ public class MainActivity extends Activity implements ChessDelegate {
 
     @Override
     public void movePiece(Square from, Square to) throws CloneNotSupportedException {
-        boolean checkmated = true;
-        boolean stalemated = true;
-        ChessPlayer white = BoardGame.whitePlayer;
-        ChessPlayer black = BoardGame.blackPlayer;
-        BoardView boardView = findViewById(R.id.board_view);
-        if (white.turn) {
-            if (BoardGame.whitePlayer.movePiece(from, to, false)) {
-                if (BoardGame.gameMove == 0) {
-                    BoardGame.gameMove++;
-                }
-                BoardGame.setCurrentPlayer(BoardGame.blackPlayer);
-                BoardGame.whitePlayer.setTurn(false);
-                BoardGame.blackPlayer.setTurn(true);
-                black.findLegalMoves();
-                black.isKingChecked();
-                boardView.invalidate();
-                if (player == null ) {
-                    player = MediaPlayer.create(this, R.raw.move);
-                }
-                player.start();
-                if (black.checked) {
-                    System.out.println("black checked");
-                    for (ChessPiece p : black.pieces) {
-                        if (p.legalSquares.size() != 0) {
-                            checkmated = false;
+        try {
+            boolean checkmated = true;
+            boolean stalemated = true;
+            ChessPlayer white = BoardGame.whitePlayer;
+            ChessPlayer black = BoardGame.blackPlayer;
+            if (white.turn) {
+                if (BoardGame.whitePlayer.movePiece(from, to, false)) {
+                    if (BoardGame.gameMove == 0) {
+                        BoardGame.gameMove++;
+                    }
+                    BoardGame.setCurrentPlayer(BoardGame.blackPlayer);
+                    BoardGame.whitePlayer.setTurn(false);
+                    BoardGame.blackPlayer.setTurn(true);
+                    black.findLegalMoves();
+                    black.isKingChecked();
+                    if (player == null) {
+                        player = MediaPlayer.create(this, R.raw.move);
+                    }
+                    player.start();
+                    if (black.checked) {
+                        System.out.println("black checked");
+                        for (ChessPiece p : black.pieces) {
+                            if (p.legalSquares.size() != 0) {
+                                checkmated = false;
+                            }
+                        }
+                        if (checkmated) {
+                            System.out.println("black checkmated");
+                        }
+                    } else {
+                        for (ChessPiece p : black.pieces) {
+                            if (p.legalSquares.size() != 0) {
+                                stalemated = false;
+                            }
+                        }
+                        if (stalemated) {
+                            System.out.println("black stalemated");
                         }
                     }
-                    if (checkmated) {
-                        System.out.println("black checkmated");
+                }
+            } else if (BoardGame.blackPlayer.turn) {
+                if (BoardGame.blackPlayer.movePiece(from, to, false)) {
+                    BoardGame.setCurrentPlayer(BoardGame.whitePlayer);
+                    BoardGame.whitePlayer.setTurn(true);
+                    BoardGame.blackPlayer.setTurn(false);
+                    white.findLegalMoves();
+                    white.isKingChecked();
+                    if (player == null) {
+                        player = MediaPlayer.create(this, R.raw.move);
                     }
-                } else {
-                    for (ChessPiece p : black.pieces) {
-                        if (p.legalSquares.size() != 0) {
-                            stalemated = false;
+                    player.start();
+                    if (white.checked) {
+                        System.out.println("white checked");
+                        for (ChessPiece p : white.pieces) {
+                            if (p.legalSquares.size() != 0) {
+                                checkmated = false;
+                            }
                         }
-                    }
-                    if (stalemated) {
-                        System.out.println("black stalemated");
+                        if (checkmated) {
+                            System.out.println("white checkmated");
+                        }
+                    } else {
+                        for (ChessPiece p : white.pieces) {
+                            if (p.legalSquares.size() != 0) {
+                                stalemated = false;
+                            }
+                        }
+                        if (stalemated) {
+                            System.out.println("white stalemated");
+                        }
                     }
                 }
             }
-        } else if (BoardGame.blackPlayer.turn) {
-            if (BoardGame.blackPlayer.movePiece(from, to, false)) {
-                BoardGame.setCurrentPlayer(BoardGame.whitePlayer);
-                BoardGame.whitePlayer.setTurn(true);
-                BoardGame.blackPlayer.setTurn(false);
-                white.findLegalMoves();
-                white.isKingChecked();
-                boardView.invalidate();
-                if (player == null) {
-                    player = MediaPlayer.create(this, R.raw.move);
-                }
-                player.start();
-                if (white.checked) {
-                    System.out.println("white checked");
-                    for (ChessPiece p : white.pieces) {
-                        if (p.legalSquares.size() != 0) {
-                            checkmated = false;
-                        }
-                    }
-                    if (checkmated) {
-                        System.out.println("white checkmated");
-                    }
-                } else {
-                    for (ChessPiece p : white.pieces) {
-                        if (p.legalSquares.size() != 0) {
-                            stalemated = false;
-                        }
-                    }
-                    if (stalemated) {
-                        System.out.println("white stalemated");
-                    }
-                }
-            }
+            findViewById(R.id.board_view).invalidate();
+        } catch (Exception ex) {
+            ex.printStackTrace();
         }
-        findViewById(R.id.board_view).invalidate();
     }
 }

@@ -6,7 +6,7 @@
     <supports-screens
         android:largeScreens="true"
         android:normalScreens="true"
-        android:smallScreens="false"
+        android:smallScreens="true"
         android:xlargeScreens="true"/>
 
     <uses-permission android:name="android.permission.INTERNET" />
@@ -21,7 +21,8 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Labs"
         android:hardwareAccelerated="false"
-        tools:targetApi="31">
+        android:largeHeap="true"
+        tools:targetApi="33">
         <activity
             android:name=".SecondActivity"
             android:exported="false" />

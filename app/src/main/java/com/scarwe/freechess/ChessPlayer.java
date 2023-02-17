@@ -94,7 +94,7 @@ public class ChessPlayer {
     }
 
     public boolean canPawnMove(Square from, Square to) {
-        return canPawnRegularMove(from, to) || canEnPassant(from, to);
+        return canPawnRegularMove(from, to)/* || canEnPassant(from, to)*/;
     }
 
     public boolean canKnightMove(Square from, Square to) {
@@ -121,12 +121,12 @@ public class ChessPlayer {
 
     public boolean canKingMove(Square from, Square to){
         if(canQueenMove(from, to)) {
-            if(canCastleKingSide(from, to)) {
+            /*if(canCastleKingSide(from, to)) {
                 return true;
             }
             if(canCastleQueenSide(from, to)) {
                 return true;
-            }
+            }*/
             return Math.abs(from.row - to.row) == 1 &&
                     (Math.abs(from.row - to.row) == 0 || Math.abs(from.row - to.row) == 1) ||
                     Math.abs(from.col - to.col) == 1 &&
@@ -374,44 +374,52 @@ public class ChessPlayer {
 
     // check if pieces are able to move, if not don't move them
     public boolean canMove(Square from, Square to){
-        ChessPiece movingPiece = BoardGame.pieceLoc(from);
+        try {
+            ChessPiece movingPiece = BoardGame.pieceLoc(from);
 
-        // if you attempt to move back to own square, it won't count turn
-        if (from.getCol() == to.getCol() && from.getRow() == to.getRow()) {
-            return false;
-        }
-        if (to.getCol() < 0 || to.getCol() > 7 || to.getRow() < 0 || to.getRow() > 7) {
-            return false;
-        }
-        switch (movingPiece.type) {
-            case PAWN:
-                return canPawnMove(from, to);
-            case KNIGHT:
-                return canKnightMove(from, to);
-            case BISHOP:
-                return canBishopMove(from, to);
-            case ROOK:
-                return canRookMove(from, to);
-            case QUEEN:
-                return canQueenMove(from, to);
-            case KING:
-                return canKingMove(from, to);
+            // if you attempt to move back to own square, it won't count turn
+            if (from.getCol() == to.getCol() && from.getRow() == to.getRow()) {
+                return false;
+            }
+            if (to.getCol() < 0 || to.getCol() > 7 || to.getRow() < 0 || to.getRow() > 7) {
+                return false;
+            }
+            switch (movingPiece.type) {
+                case PAWN:
+                    return canPawnMove(from, to);
+                case KNIGHT:
+                    return canKnightMove(from, to);
+                case BISHOP:
+                    return canBishopMove(from, to);
+                case ROOK:
+                    return canRookMove(from, to);
+                case QUEEN:
+                    return canQueenMove(from, to);
+                case KING:
+                    return canKingMove(from, to);
+            }
+        } catch  (Exception ex) {
+            //
         }
         return false;
     }
 
     public boolean movePiece(Square from, Square to, boolean testMove) throws CloneNotSupportedException {
-        if (canMove(from, to) && turn) {
-            clearTempPieces();
-            if (movePiece(from.getCol(), from.getRow(), to.getCol(), to.getRow(), testMove)) {
-                isKingChecked();
-                if (checked) {
-                    resetPieces();
-                    return false;
-                } else {
-                    return true;
+        try {
+            if (canMove(from, to) && turn) {
+                clearTempPieces();
+                if (movePiece(from.getCol(), from.getRow(), to.getCol(), to.getRow(), testMove)) {
+                    isKingChecked();
+                    if (checked) {
+                        resetPieces();
+                        return false;
+                    } else {
+                        return true;
+                    }
                 }
             }
+        } catch (Exception ex) {
+            //
         }
         return false;
     }
@@ -454,6 +462,7 @@ public class ChessPlayer {
             tempPiece.currentMove += 1;
             pieces.add(tempPiece);
 
+            /*
             for (ChessPiece p : BoardGame.whitePlayer.pieces) {
                 if (p.type == PieceType.PAWN && p.currentMove == 1) {
                     if (!testMove) p.sinceMoved += 1;
@@ -498,7 +507,7 @@ public class ChessPlayer {
                 }
             } catch (Exception ex) {
                 //
-            }
+            }*/
 
             return true;
         }
