@@ -31,12 +31,6 @@ public class BoardView extends View{
     private final int lightColor = Color.parseColor("#F0D9B5");
     private final int darkColor = Color.parseColor("#B58863");
 
-    private final String legalLightColor = "#F0B095";
-    private final String legalDarkColor = "#C47358";
-
-    private final String nonPlayerLightColor  = "#C4B4A2";
-    private final String nonPlayerDarkColor = "#A17D69";
-
     // loads all piece images (will soon be replaced with config)
     private static final int[] images = {R.drawable.bb, R.drawable.bk, R.drawable.bn, R.drawable.bp,
             R.drawable.bq, R.drawable.br, R.drawable.wb, R.drawable.wk, R.drawable.wn, R.drawable.wp,
@@ -137,8 +131,12 @@ public class BoardView extends View{
             }
             for (Square s : piece.legalSquares) {
                 if (piece.player != BoardGame.currentPlayer) {
+                    String nonPlayerLightColor = "#C4B4A2";
+                    String nonPlayerDarkColor = "#A17D69";
                     drawLegalMoves(canvas, s.getRow(), s.getCol(), nonPlayerLightColor, nonPlayerDarkColor);
                 } else {
+                    String legalLightColor = "#F0B095";
+                    String legalDarkColor = "#C47358";
                     drawLegalMoves(canvas, s.getRow(), s.getCol(), legalLightColor, legalDarkColor);
                 }
             }

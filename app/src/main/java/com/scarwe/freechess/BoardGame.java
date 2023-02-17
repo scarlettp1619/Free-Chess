@@ -111,7 +111,7 @@ public class BoardGame {
     }
 
     public static String boardRow(int i) {
-        StringBuilder desc = new StringBuilder("");
+        StringBuilder desc = new StringBuilder();
             // j determines columns of model
         for (int j = 0; j < 8; j++) {
             ChessPiece piece = pieceLoc(j, i);
