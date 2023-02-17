@@ -45,12 +45,12 @@ public class ChessPlayer {
         Square square = new Square(from.getCol() + movementCol, from.getRow());
 
         try {
-            if ((BoardGame.pieceLoc(square).player.colour != this.colour)
-            && (BoardGame.pieceLoc(square).type == PieceType.PAWN)
-            && (BoardGame.pieceLoc(new Square(from.getCol() + movementCol, from.getRow() + movementRow))) == null
-            && (BoardGame.pieceLoc(square).sinceMoved == 0)
-            && (BoardGame.pieceLoc(square).currentMove == 1)
-            && (from.getRow() == enPassantRow))
+            if ((BoardGame.pieceLoc(square).getPlayer().colour != this.colour)
+                    && (BoardGame.pieceLoc(square).getType() == PieceType.PAWN)
+                    && (BoardGame.pieceLoc(new Square(from.getCol() + movementCol, from.getRow() + movementRow))) == null
+                    && (BoardGame.pieceLoc(square).getSinceMoved() == 0)
+                    && (BoardGame.pieceLoc(square).getCurrentMove() == 1)
+                    && (from.getRow() == enPassantRow))
             {
                 return (to.getRow() - from.getRow() == movementRow && to.getCol() - from.getCol() == movementCol);
             }
@@ -94,7 +94,7 @@ public class ChessPlayer {
     }
 
     public boolean canPawnMove(Square from, Square to) {
-        return canPawnRegularMove(from, to)/* || canEnPassant(from, to)*/;
+        return canPawnRegularMove(from, to) || canEnPassant(from, to);
     }
 
     public boolean canKnightMove(Square from, Square to) {
@@ -121,12 +121,12 @@ public class ChessPlayer {
 
     public boolean canKingMove(Square from, Square to){
         if(canQueenMove(from, to)) {
-            /*if(canCastleKingSide(from, to)) {
+            if(canCastleKingSide(from, to)) {
                 return true;
             }
             if(canCastleQueenSide(from, to)) {
                 return true;
-            }*/
+            }
             return Math.abs(from.row - to.row) == 1 &&
                     (Math.abs(from.row - to.row) == 0 || Math.abs(from.row - to.row) == 1) ||
                     Math.abs(from.col - to.col) == 1 &&
@@ -147,14 +147,14 @@ public class ChessPlayer {
             tempPieces = BoardGame.whitePlayer.pieces;
         }
         try {
-            if (BoardGame.pieceLoc(new Square(from.getCol(), from.getRow())).player == this) {
+            if (BoardGame.pieceLoc(new Square(from.getCol(), from.getRow())).getPlayer() == this) {
                 if (BoardGame.pieceLoc(new Square(from.getCol() + 1, from.getRow())) == null
                         && BoardGame.pieceLoc(new Square(from.getCol() + 2, from.getRow())) == null
-                        && BoardGame.pieceLoc(new Square(from.getCol() + 3, from.getRow())).type == PieceType.ROOK
-                        && !BoardGame.pieceLoc(new Square(from.getCol() + 3, from.getRow())).hasMoved
-                        && BoardGame.pieceLoc(new Square(from.getCol() + 3, from.getRow())).type != null
-                        && !BoardGame.pieceLoc(kingSquare).hasMoved
-                        && BoardGame.pieceLoc(kingSquare).type == PieceType.KING) {
+                        && BoardGame.pieceLoc(new Square(from.getCol() + 3, from.getRow())).getType() == PieceType.ROOK
+                        && !BoardGame.pieceLoc(new Square(from.getCol() + 3, from.getRow())).getHasMoved()
+                        && BoardGame.pieceLoc(new Square(from.getCol() + 3, from.getRow())).getType() != null
+                        && !BoardGame.pieceLoc(kingSquare).getHasMoved()
+                        && BoardGame.pieceLoc(kingSquare).getType() == PieceType.KING) {
                         for (ChessPiece p : tempPieces) {
                             try {
                                 for (Square s : p.legalSquares) {
@@ -182,14 +182,14 @@ public class ChessPlayer {
         else kingSquare = new Square(4, 7);
 
         try {
-            if (BoardGame.pieceLoc(new Square(from.getCol(), from.getRow())).player == this ) {
+            if (BoardGame.pieceLoc(new Square(from.getCol(), from.getRow())).getPlayer() == this ) {
                 if (BoardGame.pieceLoc(new Square(from.getCol() + 1, from.getRow())) == null
                         && BoardGame.pieceLoc(new Square(from.getCol() + 2, from.getRow())) == null
-                        && BoardGame.pieceLoc(new Square(from.getCol() + 3, from.getRow())).type == PieceType.ROOK
-                        && !BoardGame.pieceLoc(new Square(from.getCol() + 3, from.getRow())).hasMoved
-                        && BoardGame.pieceLoc(new Square(from.getCol() + 3, from.getRow())).type != null
-                        && !BoardGame.pieceLoc(kingSquare).hasMoved
-                        && BoardGame.pieceLoc(kingSquare).type == PieceType.KING) {
+                        && BoardGame.pieceLoc(new Square(from.getCol() + 3, from.getRow())).getType() == PieceType.ROOK
+                        && !BoardGame.pieceLoc(new Square(from.getCol() + 3, from.getRow())).getHasMoved()
+                        && BoardGame.pieceLoc(new Square(from.getCol() + 3, from.getRow())).getType() != null
+                        && !BoardGame.pieceLoc(kingSquare).getHasMoved()
+                        && BoardGame.pieceLoc(kingSquare).getType() == PieceType.KING) {
                     return 2;
                 }
             }
@@ -211,15 +211,15 @@ public class ChessPlayer {
             tempPieces = BoardGame.whitePlayer.pieces;
         }
         try {
-            if (BoardGame.pieceLoc(new Square(from.getCol(), from.getRow())).player == this && !castled) {
+            if (BoardGame.pieceLoc(new Square(from.getCol(), from.getRow())).getPlayer() == this) {
                 if (BoardGame.pieceLoc(new Square(from.getCol() - 1, from.getRow())) == null
                         && BoardGame.pieceLoc(new Square(from.getCol() - 2, from.getRow())) == null
                         && BoardGame.pieceLoc(new Square(from.getCol() - 3, from.getRow())) == null
-                        && BoardGame.pieceLoc(new Square(from.getCol() - 4, from.getRow())).type == PieceType.ROOK
-                        && BoardGame.pieceLoc(new Square(from.getCol() - 4, from.getRow())).type != null
-                        && !BoardGame.pieceLoc(new Square(from.getCol() - 4, from.getRow())).hasMoved
-                        && !BoardGame.pieceLoc(kingSquare).hasMoved
-                        && BoardGame.pieceLoc(kingSquare).type == PieceType.KING) {
+                        && BoardGame.pieceLoc(new Square(from.getCol() - 4, from.getRow())).getType() == PieceType.ROOK
+                        && BoardGame.pieceLoc(new Square(from.getCol() - 4, from.getRow())).getType() != null
+                        && !BoardGame.pieceLoc(new Square(from.getCol() - 4, from.getRow())).getHasMoved()
+                        && !BoardGame.pieceLoc(kingSquare).getHasMoved()
+                        && BoardGame.pieceLoc(kingSquare).getType() == PieceType.KING) {
                     for (ChessPiece p : tempPieces) {
                         try {
                             for (Square s : p.legalSquares) {
@@ -462,15 +462,15 @@ public class ChessPlayer {
             tempPiece.currentMove += 1;
             pieces.add(tempPiece);
 
-            /*
+
             for (ChessPiece p : BoardGame.whitePlayer.pieces) {
-                if (p.type == PieceType.PAWN && p.currentMove == 1) {
-                    if (!testMove) p.sinceMoved += 1;
+                if (p.getType() == PieceType.PAWN && p.getCurrentMove() == 1) {
+                    if (!testMove) p.addSinceMoved(1);
                 }
             }
             for (ChessPiece p : BoardGame.blackPlayer.pieces) {
-                if (p.type == PieceType.PAWN && p.currentMove == 1) {
-                    if (!testMove) p.sinceMoved += 1;
+                if (p.getType() == PieceType.PAWN && p.getCurrentMove() == 1) {
+                    if (!testMove) p.addSinceMoved(1);
                 }
             }
             if (tempPiece.type == PieceType.KING && toCol - fromCol == 2 && !testMove) {
@@ -486,11 +486,10 @@ public class ChessPlayer {
                     movePiece(0, 7, 3, 7, false);
                 }
             }
-
             try {
                 if (tempPiece.type == PieceType.PAWN && Math.abs(toCol - fromCol) == 1 && toRow - fromRow == 1 && !testMove
-                        && BoardGame.pieceLoc(toCol, fromRow).type == PieceType.PAWN && BoardGame.pieceLoc(toCol,fromRow).player.colour != colour) {
-                    ChessPiece removeEnPassant = BoardGame.pieceLoc(fromCol - 1, fromRow);
+                        && BoardGame.pieceLoc(toCol, fromRow).getType() == PieceType.PAWN && BoardGame.pieceLoc(toCol,fromRow).getPlayer().colour != colour) {
+                    ChessPiece removeEnPassant = BoardGame.pieceLoc(toCol, fromRow);
                     BoardGame.whitePlayer.pieces.remove(removeEnPassant);
                     BoardGame.blackPlayer.pieces.remove(removeEnPassant);
                 }
@@ -500,14 +499,14 @@ public class ChessPlayer {
 
             try {
                 if (tempPiece.type == PieceType.PAWN && Math.abs(toCol - fromCol) == 1 && toRow - fromRow == -1 && !testMove
-                        && BoardGame.pieceLoc(toCol, fromRow).type == PieceType.PAWN && BoardGame.pieceLoc(toCol,fromRow).player.colour != colour) {
-                    ChessPiece removeEnPassant = BoardGame.pieceLoc(fromCol + 1, fromRow);
+                        && BoardGame.pieceLoc(toCol, fromRow).getType() == PieceType.PAWN && BoardGame.pieceLoc(toCol,fromRow).getPlayer().colour != colour) {
+                    ChessPiece removeEnPassant = BoardGame.pieceLoc(toCol, fromRow);
                     BoardGame.whitePlayer.pieces.remove(removeEnPassant);
                     BoardGame.blackPlayer.pieces.remove(removeEnPassant);
                 }
             } catch (Exception ex) {
                 //
-            }*/
+            }
 
             return true;
         }

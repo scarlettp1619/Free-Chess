@@ -5,14 +5,14 @@ import java.util.LinkedHashSet;
 
 public class ChessPiece implements Cloneable{
 
-    ChessPlayer player;
-    PieceType type;
+    public ChessPlayer player;
+    public PieceType type;
 
-    int row, col, resID;
+    public int row, col, resID;
     public int sinceMoved = -1;
     public int currentMove = 0;
     public boolean hasMoved = false;
-    LinkedHashSet<Square> legalSquares = new LinkedHashSet<>();
+    public LinkedHashSet<Square> legalSquares = new LinkedHashSet<>();
 
     public ChessPiece(int col, int row, ChessPlayer player, PieceType type, int resID) {
         this.col = col;
@@ -30,7 +30,7 @@ public class ChessPiece implements Cloneable{
     public void generateLegalSquares(Square currentSquare) throws CloneNotSupportedException {
         ArrayList<Square> currentSquares = new ArrayList<>();
         if (type == PieceType.KING) {
-            for (int i = this.row - 3 ; i <= this.row + 3; i++) {
+            for (int i = this.row - 1 ; i <= this.row + 1; i++) {
                 for (int j = 0; j <= 7 ; j++) {
                     Square testSquare = new Square(j, i);
                     if (player.canMove(currentSquare, testSquare)) {
@@ -104,5 +104,29 @@ public class ChessPiece implements Cloneable{
         }
         legalSquares.clear();
         legalSquares.addAll(currentSquares);
+    }
+
+    public ChessPlayer getPlayer () {
+        return this.player;
+    }
+
+    public PieceType getType () {
+        return this.type;
+    }
+
+    public int getCurrentMove() {
+        return this.currentMove;
+    }
+
+    public int getSinceMoved() {
+        return this.sinceMoved;
+    }
+
+    public void addSinceMoved(int i) {
+        this.sinceMoved += i;
+    }
+
+    public boolean getHasMoved() {
+        return this.hasMoved;
     }
 }
