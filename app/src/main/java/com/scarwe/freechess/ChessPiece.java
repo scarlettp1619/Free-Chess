@@ -129,4 +129,12 @@ public class ChessPiece implements Cloneable{
     public boolean getHasMoved() {
         return this.hasMoved;
     }
+
+    public void setPieceType(PieceType p) {
+        this.type = p;
+    }
+
+    public void setResId(int id) {
+        this.resID = id;
+    }
 }

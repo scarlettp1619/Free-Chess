@@ -28,6 +28,8 @@ public class ChessPlayer {
 
     public void setCastled(boolean castled) { this.castled = castled; }
 
+    public boolean pawnJustCaptured = false;
+
     private boolean canEnPassant(Square from, Square to) {
         int movementCol, movementRow, enPassantRow;
         if (from.getCol() - to.getCol() == 1) movementCol = -1;
@@ -63,6 +65,7 @@ public class ChessPlayer {
     }
 
     private boolean canPawnRegularMove(Square from, Square to) {
+        pawnJustCaptured = false;
         if (from.getCol() == to.getCol() && BoardGame.pieceLoc(new Square(to.getCol(), to.getRow())) == null) {
             if (BoardGame.pieceLoc(new Square(from.getCol(), from.getRow())).player == this) {
                 if (from.getRow() == 1) return (to.getRow() == 2 || to.getRow() == 3)
@@ -76,20 +79,24 @@ public class ChessPlayer {
         else if (from.getCol() == to.getCol() - 1 && to.getRow() - from.getRow() == 1 &&
                 BoardGame.pieceLoc(new Square(to.getCol(), to.getRow())) != null
                 && BoardGame.pieceLoc(new Square(from.getCol(), from.getRow())).player.colour == 0) {
+            pawnJustCaptured = true;
             return true;
         }
         else if (from.getCol() == to.getCol() + 1 && to.getRow() - from.getRow() == 1 &&
                 BoardGame.pieceLoc(new Square(to.getCol(), to.getRow())) != null &&
                 BoardGame.pieceLoc(new Square(from.getCol(), from.getRow())).player.colour == 0) {
+            pawnJustCaptured = true;
             return true;
         }
         else if (from.getCol() == to.getCol() - 1 && to.getRow() - from.getRow() == -1 &&
                 BoardGame.pieceLoc(new Square(to.getCol(), to.getRow())) != null &&
                 BoardGame.pieceLoc(new Square(from.getCol(), from.getRow())).player.colour == 1) {
+            pawnJustCaptured = true;
             return true;
         } else return from.getCol() == to.getCol() + 1 && to.getRow() - from.getRow() == -1 &&
                 BoardGame.pieceLoc(new Square(to.getCol(), to.getRow())) != null
                 && BoardGame.pieceLoc(new Square(from.getCol(), from.getRow())).player.colour == 1;
+        pawnJustCaptured = true;
         return false;
     }
 
@@ -488,7 +495,8 @@ public class ChessPlayer {
             }
             try {
                 if (tempPiece.type == PieceType.PAWN && Math.abs(toCol - fromCol) == 1 && toRow - fromRow == 1 && !testMove
-                        && BoardGame.pieceLoc(toCol, fromRow).getType() == PieceType.PAWN && BoardGame.pieceLoc(toCol,fromRow).getPlayer().colour != colour) {
+                        && BoardGame.pieceLoc(toCol, fromRow).getType() == PieceType.PAWN
+                        && BoardGame.pieceLoc(toCol,fromRow).getPlayer().colour != colour && !pawnJustCaptured) {
                     ChessPiece removeEnPassant = BoardGame.pieceLoc(toCol, fromRow);
                     BoardGame.whitePlayer.pieces.remove(removeEnPassant);
                     BoardGame.blackPlayer.pieces.remove(removeEnPassant);
@@ -499,13 +507,24 @@ public class ChessPlayer {
 
             try {
                 if (tempPiece.type == PieceType.PAWN && Math.abs(toCol - fromCol) == 1 && toRow - fromRow == -1 && !testMove
-                        && BoardGame.pieceLoc(toCol, fromRow).getType() == PieceType.PAWN && BoardGame.pieceLoc(toCol,fromRow).getPlayer().colour != colour) {
+                        && BoardGame.pieceLoc(toCol, fromRow).getType() == PieceType.PAWN &&
+                        BoardGame.pieceLoc(toCol,fromRow).getPlayer().colour != colour && !pawnJustCaptured) {
                     ChessPiece removeEnPassant = BoardGame.pieceLoc(toCol, fromRow);
                     BoardGame.whitePlayer.pieces.remove(removeEnPassant);
                     BoardGame.blackPlayer.pieces.remove(removeEnPassant);
                 }
             } catch (Exception ex) {
                 //
+            }
+
+            if (tempPiece.getType() == PieceType.PAWN && tempPiece.getPlayer().colour == 0 && toRow == 7) {
+                tempPiece.setPieceType(PieceType.QUEEN);
+                tempPiece.setResId(R.drawable.wq);
+            }
+
+            if (tempPiece.getType() == PieceType.PAWN && tempPiece.getPlayer().colour == 1 && toRow == 0) {
+                tempPiece.setPieceType(PieceType.QUEEN);
+                tempPiece.setResId(R.drawable.bq);
             }
 
             return true;
