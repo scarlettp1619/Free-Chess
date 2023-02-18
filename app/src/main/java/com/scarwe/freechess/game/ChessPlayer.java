@@ -178,7 +178,8 @@ public class ChessPlayer {
                         for (ChessPiece p : tempPieces) {
                             try {
                                 for (Square s : p.legalSquares) {
-                                    if (s.col == from.getCol() + 1 && s.row == from.getRow()
+                                    if (s.col == from.getCol() && s.row == from.getRow()
+                                            || s.col == from.getCol() + 1 && s.row == from.getRow()
                                             || s.col == from.getCol() + 2 && s.row == from.getRow()) {
                                         return false;
                                     }
@@ -220,7 +221,8 @@ public class ChessPlayer {
                     for (ChessPiece p : tempPieces) {
                         try {
                             for (Square s : p.legalSquares) {
-                                if (s.col == from.getCol() - 1 && s.row == from.getRow()
+                                if (s.col == from.getCol() && s.row == from.getRow()
+                                        || s.col == from.getCol() - 1 && s.row == from.getRow()
                                         || s.col == from.getCol() - 2 && s.row == from.getRow()
                                         || s.col == from.getCol() - 3 && s.row == from.getRow()) {
                                     return false;
