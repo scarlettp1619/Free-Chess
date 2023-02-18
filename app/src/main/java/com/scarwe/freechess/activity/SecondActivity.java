@@ -1,8 +1,10 @@
-package com.scarwe.freechess;
+package com.scarwe.freechess.activity;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+
+import com.scarwe.freechess.R;
 
 public class SecondActivity extends AppCompatActivity {
 

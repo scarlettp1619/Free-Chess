@@ -1,4 +1,4 @@
-package com.scarwe.freechess;
+package com.scarwe.freechess.game;
 
 public class Square {
     int row, col;

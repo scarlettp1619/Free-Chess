@@ -1,4 +1,6 @@
-package com.scarwe.freechess;
+package com.scarwe.freechess.game;
+
+import com.scarwe.freechess.R;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -9,8 +11,6 @@ public class ChessPlayer {
 
     public boolean turn = false;
     public boolean checked = false;
-    public boolean checkmated = false;
-    private boolean castled = false;
 
     public int colour;
     public ArrayList<ChessPiece> pieces = new ArrayList<>();
@@ -26,9 +26,11 @@ public class ChessPlayer {
         this.turn = turn;
     }
 
-    public void setCastled(boolean castled) { this.castled = castled; }
-
     public boolean pawnJustCaptured = false;
+
+    {
+        if (colour == 0) turn = true;
+    }
 
     private boolean canEnPassant(Square from, Square to) {
         int movementCol, movementRow, enPassantRow;
@@ -125,7 +127,7 @@ public class ChessPlayer {
     }
 
     public boolean canQueenMove(Square from, Square to) {
-        return canRookMove(from, to) || canBishopMove(from, to);
+        return canRookMove(from, to) || canBishopMove(from, to) || canKnightMove(from, to);
     }
 
     public boolean canKingMove(Square from, Square to){
@@ -185,29 +187,6 @@ public class ChessPlayer {
         return false;
     }
 
-    public int canCastleKingSideTest(Square from) {
-        Square kingSquare;
-        if (colour == 0) kingSquare = new Square(4, 0);
-        else kingSquare = new Square(4, 7);
-
-        try {
-            if (BoardGame.pieceLoc(new Square(from.getCol(), from.getRow())).getPlayer() == this ) {
-                if (BoardGame.pieceLoc(new Square(from.getCol() + 1, from.getRow())) == null
-                        && BoardGame.pieceLoc(new Square(from.getCol() + 2, from.getRow())) == null
-                        && BoardGame.pieceLoc(new Square(from.getCol() + 3, from.getRow())).getType() == PieceType.ROOK
-                        && !BoardGame.pieceLoc(new Square(from.getCol() + 3, from.getRow())).getHasMoved()
-                        && BoardGame.pieceLoc(new Square(from.getCol() + 3, from.getRow())).getType() != null
-                        && !BoardGame.pieceLoc(kingSquare).getHasMoved()
-                        && BoardGame.pieceLoc(kingSquare).getType() == PieceType.KING) {
-                    return 2;
-                }
-            }
-        } catch (Exception ex) {
-            // do a little bit
-        }
-        return 1;
-    }
-
     public boolean canCastleQueenSide(Square from, Square to) {
         Square kingSquare;
         ArrayList<ChessPiece> tempPieces;
@@ -249,29 +228,6 @@ public class ChessPlayer {
             // do a little bit
         }
         return false;
-    }
-
-    public int canCastleQueenSideTest(Square from) {
-        Square kingSquare;
-        if (colour == 0) kingSquare = new Square(4, 0);
-        else kingSquare = new Square(4, 7);
-        try {
-            if (BoardGame.pieceLoc(new Square(from.getCol(), from.getRow())).player == this && !castled) {
-                if (BoardGame.pieceLoc(new Square(from.getCol() - 1, from.getRow())) == null
-                        && BoardGame.pieceLoc(new Square(from.getCol() - 2, from.getRow())) == null
-                        && BoardGame.pieceLoc(new Square(from.getCol() - 3, from.getRow())) == null
-                        && BoardGame.pieceLoc(new Square(from.getCol() - 4, from.getRow())).type == PieceType.ROOK
-                        && BoardGame.pieceLoc(new Square(from.getCol() - 4, from.getRow())).type != null
-                        && !BoardGame.pieceLoc(new Square(from.getCol() - 4, from.getRow())).hasMoved
-                        && !BoardGame.pieceLoc(kingSquare).hasMoved
-                        && BoardGame.pieceLoc(kingSquare).type == PieceType.KING) {
-                    return -2;
-                }
-            }
-        } catch (Exception ex) {
-            // do a little bit
-        }
-        return -1;
     }
 
     // isClear methods ensure pieces can't jump over one another
@@ -528,7 +484,7 @@ public class ChessPlayer {
                 tempPiece.setPieceType(PieceType.QUEEN);
                 tempPiece.setResId(R.drawable.bq);
             }
-
+            if (!testMove) BoardGame.gameMove++;
             return true;
         }
 

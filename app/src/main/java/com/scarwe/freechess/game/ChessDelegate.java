@@ -1,4 +1,4 @@
-package com.scarwe.freechess;
+package com.scarwe.freechess.game;
 
 import java.io.IOException;
 

@@ -1,4 +1,6 @@
-package com.scarwe.freechess;
+package com.scarwe.freechess.game;
+
+import com.scarwe.freechess.R;
 
 import java.util.ArrayList;
 
@@ -6,13 +8,13 @@ public class BoardGame {
     public boolean whiteCastled = false;
     public boolean blackCastled = false;
 
-    static ChessPlayer whitePlayer = new ChessPlayer(0);
-    static ChessPlayer blackPlayer = new ChessPlayer(1);
-    static ChessPlayer currentPlayer = whitePlayer;
+    public static ChessPlayer whitePlayer = new ChessPlayer(0);
+    public static ChessPlayer blackPlayer = new ChessPlayer(1);
+    public static ChessPlayer currentPlayer = whitePlayer;
 
-    static int gameMove = 0;
+    public static int gameMove = 0;
 
-    static ArrayList<ChessPiece> pieces = new ArrayList<>();
+    public static ArrayList<ChessPiece> pieces = new ArrayList<>();
 
     {
         whitePlayer.setTurn(true);
@@ -29,14 +31,8 @@ public class BoardGame {
         gameMove = 0;
         currentPlayer = whitePlayer;
 
-        whitePlayer.setCastled(false);
-        blackPlayer.setCastled(false);
-
         whitePlayer.checked = false;
-        whitePlayer.checkmated = false;
-
         blackPlayer.checked = false;
-        blackPlayer.checkmated = false;
 
         pieces.addAll(whitePlayer.pieces);
         pieces.addAll(blackPlayer.pieces);

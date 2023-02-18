@@ -1,4 +1,4 @@
-package com.scarwe.freechess;
+package com.scarwe.freechess.game;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;

@@ -1,4 +1,4 @@
-package com.scarwe.freechess;
+package com.scarwe.freechess.game;
 
 import android.annotation.SuppressLint;
 import android.graphics.Canvas;
