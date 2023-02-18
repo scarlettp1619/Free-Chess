@@ -380,7 +380,9 @@ public class ChessPlayer {
         return false;
     }
 
-    public boolean movePiece(Square from, Square to, boolean testMove) throws CloneNotSupportedException {
+    public boolean movePiece(Square from, Square to, boolean testMove) {
+        castled = 0;
+
         String currentPgn = BoardGame.pgnMoves.toString();
         int currentGameMove = BoardGame.gameMove;
 

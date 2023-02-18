@@ -37,7 +37,7 @@ public class ChessPiece implements Cloneable{
         ArrayList<Square> currentSquares = new ArrayList<>();
         if (type == PieceType.KING) {
             for (int i = this.row - 1 ; i <= this.row + 1; i++) {
-                for (int j = this.col - 3; j <= this.col + 3; j++) {
+                for (int j = this.col - 4; j <= this.col + 4; j++) {
                     Square testSquare = new Square(j, i);
                     if (player.canMove(currentSquare, testSquare)) {
                         currentSquares.add(testSquare);
