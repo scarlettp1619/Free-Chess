@@ -16,6 +16,7 @@ public class BoardGame {
 
     public static ArrayList<ChessPiece> pieces = new ArrayList<>();
     public static StringBuilder pgnMoves = new StringBuilder("");
+    public static ArrayList<String> pgnCheck = new ArrayList<>();
 
     {
         whitePlayer.setTurn(true);
@@ -36,6 +37,7 @@ public class BoardGame {
         blackPlayer.checked = false;
 
         pgnMoves.setLength(0);
+        pgnCheck.clear();
 
         pieces.addAll(whitePlayer.pieces);
         pieces.addAll(blackPlayer.pieces);
@@ -62,6 +64,8 @@ public class BoardGame {
         // kings
         whitePlayer.pieces.add(new ChessPiece(4, 0, whitePlayer, PieceType.KING, R.drawable.wk));
         blackPlayer.pieces.add(new ChessPiece(4, 7, blackPlayer, PieceType.KING, R.drawable.bk));
+
+        pgnCheck.add(pgnBoard());
     }
 
     public static ChessPiece pieceLoc(Square square) {
@@ -148,5 +152,9 @@ public class BoardGame {
     }
     public static void setCurrentPlayer(ChessPlayer cPlayer) {
         currentPlayer = cPlayer;
+    }
+
+    public static ArrayList<String> getPgn() {
+        return pgnCheck;
     }
 }

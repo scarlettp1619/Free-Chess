@@ -518,10 +518,8 @@ public class ChessPlayer {
                 BoardGame.gameMove++;
                 addToPgn(new Square(fromCol, fromRow), new Square(toCol, toRow), tempPiece.getType(), tempPiece, captureMove, castled);
             }
-
             return true;
         }
-
         return false;
     }
 
@@ -620,15 +618,14 @@ public class ChessPlayer {
 
         if (type == PieceType.KING) {
             BoardGame.pgnMoves.append(" ");
-            System.out.println(castled);
             if (castled == 1) BoardGame.pgnMoves.append("O-O");
             else if (castled == 2) BoardGame.pgnMoves.append("O-O-O");
             else {
-                System.out.println(castled);
                 BoardGame.pgnMoves.append("K");
                 if (capture) BoardGame.pgnMoves.append("x");
                 BoardGame.pgnMoves.append(from.getValToString(to.getCol()).toLowerCase()).append(to.getRow() + 1);
             }
         }
+        BoardGame.pgnCheck.add(BoardGame.pgnBoard());
     }
 }

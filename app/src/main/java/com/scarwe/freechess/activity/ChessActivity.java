@@ -13,12 +13,23 @@ import com.scarwe.freechess.game.ChessDelegate;
 import com.scarwe.freechess.game.ChessPiece;
 import com.scarwe.freechess.game.ChessPlayer;
 import com.scarwe.freechess.R;
+import com.scarwe.freechess.game.PieceType;
 import com.scarwe.freechess.game.Square;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class ChessActivity extends Activity implements ChessDelegate {
 
     private final BoardGame board = new BoardGame();
     private final int bgColor = Color.parseColor("#252525");
+
+    ChessPlayer white = BoardGame.whitePlayer;
+    ChessPlayer black = BoardGame.blackPlayer;
 
     // tag for console logging
     MediaPlayer player;
@@ -56,9 +67,12 @@ public class ChessActivity extends Activity implements ChessDelegate {
     public void movePiece(Square from, Square to) throws CloneNotSupportedException {
         boolean checkmated = true;
         boolean stalemated = true;
+        boolean drawByRepetition = false;
+        boolean insufficientMaterial = false;
+        boolean blackHasBishop = false;
+        boolean whiteHasBishop = false;
 
-        ChessPlayer white = BoardGame.whitePlayer;
-        ChessPlayer black = BoardGame.blackPlayer;
+        int count = 0;
 
         if (white.turn) {
             if (BoardGame.whitePlayer.movePiece(from, to, false)) {
@@ -71,6 +85,21 @@ public class ChessActivity extends Activity implements ChessDelegate {
                     player = MediaPlayer.create(this, R.raw.move);
                 }
                 player.start();
+
+                for (String s : BoardGame.getPgn()) count = Collections.frequency(BoardGame.getPgn(), s);
+                if (count > 2) drawByRepetition = true;
+
+                if (drawByRepetition) {
+                    System.out.println("draw by repetition");
+                }
+
+                insufficientMaterial = checkInsufficient();
+                if (white.pieces.size() == 1 && black.pieces.size() == 1) insufficientMaterial = true;
+
+                if (insufficientMaterial) {
+                    System.out.println("draw by insufficient material");
+                }
+
                 if (black.checked) {
                     System.out.println("black checked");
                     for (ChessPiece p : black.pieces) {
@@ -107,6 +136,20 @@ public class ChessActivity extends Activity implements ChessDelegate {
                     player = MediaPlayer.create(this, R.raw.move);
                 }
                 player.start();
+                for (String s : BoardGame.getPgn()) count = Collections.frequency(BoardGame.getPgn(), s);
+                if (count > 2) drawByRepetition = true;
+
+                insufficientMaterial = checkInsufficient();
+                if (white.pieces.size() == 1 && black.pieces.size() == 1) insufficientMaterial = true;
+
+                if (insufficientMaterial) {
+                    System.out.println("draw by insufficient material");
+                }
+
+                if (drawByRepetition) {
+                    System.out.println("draw by repetition");
+                }
+
                 if (white.checked) {
                     System.out.println("white checked");
                     for (ChessPiece p : white.pieces) {
@@ -140,5 +183,35 @@ public class ChessActivity extends Activity implements ChessDelegate {
     private void setActivityBgColor() {
         View view = this.getWindow().getDecorView();
         view.setBackgroundColor(bgColor);
+    }
+
+    private boolean checkInsufficient() {
+        if (white.pieces.size() < 3 && black.pieces.size() < 3) {
+            for (ChessPiece p : white.pieces) {
+                if (p.getType() == PieceType.KNIGHT) {
+                    return true;
+                }
+                if (p.getType() == PieceType.BISHOP) {
+                    for (ChessPiece b : black.pieces) {
+                        if (b.getType() == PieceType.BISHOP && b.getBishopColour() != p.getBishopColour()) {
+                            return true;
+                        }
+                    }
+                }
+            }
+            for (ChessPiece p : white.pieces) {
+                if (p.getType() == PieceType.KNIGHT) {
+                    return true;
+                }
+                if (p.getType() == PieceType.BISHOP) {
+                    for (ChessPiece b : black.pieces) {
+                        if (b.getType() == PieceType.BISHOP && b.getBishopColour() != p.getBishopColour()) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
     }
 }

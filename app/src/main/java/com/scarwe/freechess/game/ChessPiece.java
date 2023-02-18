@@ -11,6 +11,7 @@ public class ChessPiece implements Cloneable{
     public int row, col, resID;
     public int sinceMoved = -1;
     public int currentMove = 0;
+    public int bishopColour = -1;
     public boolean hasMoved = false;
     public LinkedHashSet<Square> legalSquares = new LinkedHashSet<>();
 
@@ -20,6 +21,11 @@ public class ChessPiece implements Cloneable{
         this.type = type;
         this.player = player;
         this.resID = resID;
+
+        if (col == 2 && row == 0) bishopColour = 1; // dark square
+        if (col == 5 && row == 0) bishopColour = 0; // light square
+        if (col == 2 && row == 7) bishopColour = 1;
+        if (col == 5 && row == 7) bishopColour = 0;
     }
 
     @Override
@@ -138,6 +144,9 @@ public class ChessPiece implements Cloneable{
         this.resID = id;
     }
 
+    public int getBishopColour() {
+        return this.bishopColour;
+    }
     public ChessPiece getPiecesOfType(PieceType pType, ChessPiece p) {
         if (this.type == pType && p != this) {
             return this;
