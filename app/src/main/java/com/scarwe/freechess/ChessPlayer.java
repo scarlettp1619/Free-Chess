@@ -68,9 +68,9 @@ public class ChessPlayer {
         pawnJustCaptured = false;
         if (from.getCol() == to.getCol() && BoardGame.pieceLoc(new Square(to.getCol(), to.getRow())) == null) {
             if (BoardGame.pieceLoc(new Square(from.getCol(), from.getRow())).player == this) {
-                if (from.getRow() == 1) return (to.getRow() == 2 || to.getRow() == 3)
+                if (from.getRow() == 1 && this.colour == 0) return (to.getRow() == 2 || to.getRow() == 3)
                         && isClearVertically(from, to) && this.colour == 0;
-                else if (from.getRow() == 6) return (to.getRow() == 5 || to.getRow() == 4)
+                else if (from.getRow() == 6 && this.colour == 1) return (to.getRow() == 5 || to.getRow() == 4)
                         && isClearVertically(from, to) && this.colour == 1;
                 else if (this.colour == 0 && to.getRow() - from.getRow() == 1) return true;
                 else return this.colour == 1 && to.getRow() - from.getRow() == -1;
@@ -93,10 +93,12 @@ public class ChessPlayer {
                 BoardGame.pieceLoc(new Square(from.getCol(), from.getRow())).player.colour == 1) {
             pawnJustCaptured = true;
             return true;
-        } else return from.getCol() == to.getCol() + 1 && to.getRow() - from.getRow() == -1 &&
+        } else if (from.getCol() == to.getCol() + 1 && to.getRow() - from.getRow() == -1 &&
                 BoardGame.pieceLoc(new Square(to.getCol(), to.getRow())) != null
-                && BoardGame.pieceLoc(new Square(from.getCol(), from.getRow())).player.colour == 1;
-        pawnJustCaptured = true;
+                && BoardGame.pieceLoc(new Square(from.getCol(), from.getRow())).player.colour == 1) {
+            pawnJustCaptured = true;
+            return true;
+        }
         return false;
     }
 
