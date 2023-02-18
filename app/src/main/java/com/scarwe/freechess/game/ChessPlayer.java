@@ -381,6 +381,9 @@ public class ChessPlayer {
     }
 
     public boolean movePiece(Square from, Square to, boolean testMove) throws CloneNotSupportedException {
+        String currentPgn = BoardGame.pgnMoves.toString();
+        int currentGameMove = BoardGame.gameMove;
+
         try {
             if (canMove(from, to) && turn) {
                 clearTempPieces();
@@ -388,6 +391,9 @@ public class ChessPlayer {
                     isKingChecked();
                     if (checked) {
                         resetPieces();
+                        BoardGame.pgnMoves.setLength(0);
+                        BoardGame.gameMove = currentGameMove;
+                        BoardGame.pgnMoves.append(currentPgn);
                         return false;
                     } else {
                         return true;
@@ -411,6 +417,8 @@ public class ChessPlayer {
 
         captureMove = false;
         ArrayList<ChessPiece> tempPieces;
+
+        StringBuilder currentPgn = BoardGame.pgnMoves;
 
         if (colour == 0) tempPieces = BoardGame.blackPlayer.pieces;
         else tempPieces = BoardGame.whitePlayer.pieces;
