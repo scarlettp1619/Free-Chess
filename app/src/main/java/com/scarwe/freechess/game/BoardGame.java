@@ -36,6 +36,12 @@ public class BoardGame {
         whitePlayer.checked = false;
         blackPlayer.checked = false;
 
+        whitePlayer.sincePawnMoved = -1;
+        whitePlayer.sinceCaptured = 0;
+
+        blackPlayer.sincePawnMoved = -1;
+        blackPlayer.sinceCaptured = 0;
+
         pgnMoves.setLength(0);
         pgnCheck.clear();
 
@@ -44,19 +50,19 @@ public class BoardGame {
         // draws all pieces to arraylist
         for (int i = 0; i <= 1; i++) {
             // rooks
-            whitePlayer.pieces.add(new ChessPiece(i * 7, 0, whitePlayer, PieceType.ROOK, R.drawable. wr));
-            blackPlayer.pieces.add(new ChessPiece(i * 7, 7, blackPlayer, PieceType.ROOK, R.drawable.br));
+            //whitePlayer.pieces.add(new ChessPiece(i * 7, 0, whitePlayer, PieceType.ROOK, R.drawable. wr));
+            //blackPlayer.pieces.add(new ChessPiece(i * 7, 7, blackPlayer, PieceType.ROOK, R.drawable.br));
             // knights
-            whitePlayer.pieces.add(new ChessPiece(1 + i * 5, 0, whitePlayer, PieceType.KNIGHT, R.drawable.wn));
-            blackPlayer.pieces.add(new ChessPiece(1 + i * 5, 7, blackPlayer, PieceType.KNIGHT, R.drawable.bn));
+            //whitePlayer.pieces.add(new ChessPiece(1 + i * 5, 0, whitePlayer, PieceType.KNIGHT, R.drawable.wn));
+            //blackPlayer.pieces.add(new ChessPiece(1 + i * 5, 7, blackPlayer, PieceType.KNIGHT, R.drawable.bn));
             // bishops
-            whitePlayer.pieces.add(new ChessPiece(2 + i * 3, 0, whitePlayer, PieceType.BISHOP, R.drawable.wb));
-            blackPlayer.pieces.add(new ChessPiece(2 + i * 3, 7, blackPlayer, PieceType.BISHOP, R.drawable.bb));
+            //whitePlayer.pieces.add(new ChessPiece(2 + i * 3, 0, whitePlayer, PieceType.BISHOP, R.drawable.wb));
+            //blackPlayer.pieces.add(new ChessPiece(2 + i * 3, 7, blackPlayer, PieceType.BISHOP, R.drawable.bb));
         }
         for (int i = 0; i <= 7; i++) {
             // pawns
-            whitePlayer.pieces.add(new ChessPiece(i, 1, whitePlayer, PieceType.PAWN, R.drawable.wp));
-            blackPlayer.pieces.add(new ChessPiece(i, 6, blackPlayer, PieceType.PAWN, R.drawable.bp));
+            //whitePlayer.pieces.add(new ChessPiece(i, 1, whitePlayer, PieceType.PAWN, R.drawable.wp));
+            //blackPlayer.pieces.add(new ChessPiece(i, 6, blackPlayer, PieceType.PAWN, R.drawable.bp));
         }
         // queens
         whitePlayer.pieces.add(new ChessPiece(3, 0, whitePlayer, PieceType.QUEEN, R.drawable.wq));

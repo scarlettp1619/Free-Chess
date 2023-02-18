@@ -16,6 +16,7 @@ import com.scarwe.freechess.R;
 import com.scarwe.freechess.game.PieceType;
 import com.scarwe.freechess.game.Square;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -68,19 +69,28 @@ public class ChessActivity extends Activity implements ChessDelegate {
         boolean checkmated = true;
         boolean stalemated = true;
         boolean drawByRepetition = false;
-        boolean insufficientMaterial = false;
-        boolean blackHasBishop = false;
-        boolean whiteHasBishop = false;
+        boolean insufficientMaterial;
+        boolean fiftyMoveRule = false;
 
         int count = 0;
 
         if (white.turn) {
+            int piecesSize = BoardGame.blackPlayer.pieces.size();
             if (BoardGame.whitePlayer.movePiece(from, to, false)) {
+                int newPiecesSize = BoardGame.blackPlayer.pieces.size();
                 BoardGame.setCurrentPlayer(BoardGame.blackPlayer);
                 BoardGame.whitePlayer.setTurn(false);
                 BoardGame.blackPlayer.setTurn(true);
                 black.findLegalMoves();
                 black.isKingChecked();
+
+                if (piecesSize == newPiecesSize) {
+                    white.sinceCaptured++;
+                } else {
+                    white.sinceCaptured = 0;
+                    black.sinceCaptured = 0;
+                }
+
                 if (player == null) {
                     player = MediaPlayer.create(this, R.raw.move);
                 }
@@ -98,6 +108,15 @@ public class ChessActivity extends Activity implements ChessDelegate {
 
                 if (insufficientMaterial) {
                     System.out.println("draw by insufficient material");
+                }
+
+                if (white.getSincePawnMoved() > 49 && white.getSinceCaptured() > 49
+                        && black.getSincePawnMoved() > 49 && black.getSinceCaptured() > 49) {
+                    fiftyMoveRule = true;
+                }
+
+                if (fiftyMoveRule) {
+                    System.out.println("fifty move rule reached");
                 }
 
                 if (black.checked) {
@@ -126,12 +145,20 @@ public class ChessActivity extends Activity implements ChessDelegate {
                 }
             }
         } else if (BoardGame.blackPlayer.turn) {
+            int piecesSize = BoardGame.whitePlayer.pieces.size();
             if (BoardGame.blackPlayer.movePiece(from, to, false)) {
+                int newPiecesSize = BoardGame.whitePlayer.pieces.size();
                 BoardGame.setCurrentPlayer(BoardGame.whitePlayer);
                 BoardGame.whitePlayer.setTurn(true);
                 BoardGame.blackPlayer.setTurn(false);
                 white.findLegalMoves();
                 white.isKingChecked();
+                if (piecesSize == newPiecesSize) {
+                    black.sinceCaptured++;
+                } else {
+                    white.sinceCaptured = 0;
+                    black.sinceCaptured = 0;
+                }
                 if (player == null) {
                     player = MediaPlayer.create(this, R.raw.move);
                 }
@@ -148,6 +175,15 @@ public class ChessActivity extends Activity implements ChessDelegate {
 
                 if (drawByRepetition) {
                     System.out.println("draw by repetition");
+                }
+
+                if (white.getSincePawnMoved() > 49 && white.getSinceCaptured() > 49
+                        && black.getSincePawnMoved() > 49 && black.getSinceCaptured() > 49) {
+                    fiftyMoveRule = true;
+                }
+
+                if (fiftyMoveRule) {
+                    System.out.println("fifty move rule reached");
                 }
 
                 if (white.checked) {

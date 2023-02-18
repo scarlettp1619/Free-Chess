@@ -34,6 +34,9 @@ public class ChessPlayer {
     public boolean pawnJustCaptured = false;
     public boolean captureMove = false;
 
+    public int sincePawnMoved = -1;
+    public int sinceCaptured = 0;
+
     {
         if (colour == 0) turn = true;
     }
@@ -510,7 +513,7 @@ public class ChessPlayer {
 
             int newPiecesSize = tempPieces.size();
 
-            if (piecesSize > newPiecesSize) {
+            if (piecesSize > newPiecesSize && !testMove) {
                 captureMove = true;
             }
 
@@ -567,6 +570,10 @@ public class ChessPlayer {
             if (capture)
                 BoardGame.pgnMoves.append("x").append(to.getValToString(to.getCol()).toLowerCase());
             BoardGame.pgnMoves.append(to.getRow() + 1);
+            BoardGame.whitePlayer.sincePawnMoved = 0;
+            BoardGame.blackPlayer.sincePawnMoved = 0;
+        } else {
+            sincePawnMoved++;
         }
 
         if (type == PieceType.KNIGHT) {
@@ -627,5 +634,13 @@ public class ChessPlayer {
             }
         }
         BoardGame.pgnCheck.add(BoardGame.pgnBoard());
+    }
+
+    public int getSincePawnMoved() {
+        return this.sincePawnMoved;
+    }
+
+    public int getSinceCaptured() {
+        return this.sinceCaptured;
     }
 }
