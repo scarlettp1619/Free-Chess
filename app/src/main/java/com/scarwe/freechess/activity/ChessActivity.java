@@ -79,7 +79,10 @@ public class ChessActivity extends Activity implements ChessDelegate {
                         }
                     }
                     if (checkmated) {
+                        BoardGame.pgnMoves.append("# 1-0");
                         System.out.println("black checkmated");
+                    } else {
+                        BoardGame.pgnMoves.append("+");
                     }
                 } else {
                     for (ChessPiece p : black.pieces) {
@@ -89,6 +92,7 @@ public class ChessActivity extends Activity implements ChessDelegate {
                     }
                     if (stalemated) {
                         System.out.println("black stalemated");
+                        BoardGame.pgnMoves.append("1-2/1-2");
                     }
                 }
             }
@@ -112,6 +116,9 @@ public class ChessActivity extends Activity implements ChessDelegate {
                     }
                     if (checkmated) {
                         System.out.println("white checkmated");
+                        BoardGame.pgnMoves.append("# 0-1");
+                    } else {
+                        BoardGame.pgnMoves.append("+");
                     }
                 } else {
                     for (ChessPiece p : white.pieces) {
@@ -121,11 +128,12 @@ public class ChessActivity extends Activity implements ChessDelegate {
                     }
                     if (stalemated) {
                         System.out.println("white stalemated");
+                        BoardGame.pgnMoves.append("1-2/1-2");
                     }
                 }
             }
         }
-        System.out.println(BoardGame.gameMove);
+        System.out.println(BoardGame.pgnMoves);
         findViewById(R.id.board_view).invalidate();
     }
 

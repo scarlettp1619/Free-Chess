@@ -124,7 +124,7 @@ public class BoardView extends View{
         piece = chessDelegate.pieceLoc(new Square(fromCol, fromRow));
 
         if (piece != null) {
-            if (BoardGame.gameMove == 0) {
+            if (BoardGame.gameMove == 1) {
                 try {
                     piece.generateLegalSquares(new Square(piece.col, piece.row));
                 } catch (CloneNotSupportedException e) {

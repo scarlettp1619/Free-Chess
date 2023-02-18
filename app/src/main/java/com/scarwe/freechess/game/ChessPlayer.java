@@ -3,9 +3,12 @@ package com.scarwe.freechess.game;
 import com.scarwe.freechess.R;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Set;
 
 public class ChessPlayer {
 
@@ -13,6 +16,8 @@ public class ChessPlayer {
     public boolean checked = false;
 
     public int colour;
+    public int castled;
+
     public ArrayList<ChessPiece> pieces = new ArrayList<>();
 
     public ArrayList<ChessPiece> tempWhitePieces = new ArrayList<>();
@@ -27,6 +32,7 @@ public class ChessPlayer {
     }
 
     public boolean pawnJustCaptured = false;
+    public boolean captureMove = false;
 
     {
         if (colour == 0) turn = true;
@@ -127,7 +133,7 @@ public class ChessPlayer {
     }
 
     public boolean canQueenMove(Square from, Square to) {
-        return canRookMove(from, to) || canBishopMove(from, to) || canKnightMove(from, to);
+        return canRookMove(from, to) || canBishopMove(from, to);
     }
 
     public boolean canKingMove(Square from, Square to){
@@ -391,11 +397,20 @@ public class ChessPlayer {
 
     private boolean movePiece(int fromCol, int fromRow, int toCol, int toRow, boolean testMove) throws CloneNotSupportedException {
 
-        if (fromCol == toCol && fromRow == toRow) return false;
+        int piecesSize;
 
+        if (fromCol == toCol && fromRow == toRow) return false;
         // get pieces
         ChessPiece movingPiece = BoardGame.pieceLoc(fromCol, fromRow);
         ChessPiece removePiece = BoardGame.pieceLoc(toCol, toRow);
+
+        captureMove = false;
+        ArrayList<ChessPiece> tempPieces;
+
+        if (colour == 0) tempPieces = BoardGame.blackPlayer.pieces;
+        else tempPieces = BoardGame.whitePlayer.pieces;
+
+        piecesSize = tempPieces.size();
 
         assert movingPiece != null;
         if (movingPiece.player == this) {
@@ -427,7 +442,6 @@ public class ChessPlayer {
             tempPiece.currentMove += 1;
             pieces.add(tempPiece);
 
-
             for (ChessPiece p : BoardGame.whitePlayer.pieces) {
                 if (p.getType() == PieceType.PAWN && p.getCurrentMove() == 1) {
                     if (!testMove) p.addSinceMoved(1);
@@ -438,19 +452,28 @@ public class ChessPlayer {
                     if (!testMove) p.addSinceMoved(1);
                 }
             }
-            if (tempPiece.type == PieceType.KING && toCol - fromCol == 2 && !testMove) {
-                if (this.colour == 0) movePiece(7, 0, 5, 0, false); // rook
-                if (this.colour == 1) movePiece(7, 7, 5, 7, false);
-            }
 
-            if (tempPiece.type == PieceType.KING && toCol - fromCol == -2 && !testMove) {
+            if (tempPiece.type == PieceType.KING && toCol - fromCol == 2 && !testMove) {
                 if (this.colour == 0) {
-                    movePiece(0, 0, 3, 0, false); // rook
+                    movePiece(7, 0, 5, 0, true); // rook
+                    castled = 1; // kingside
                 }
                 if (this.colour == 1) {
-                    movePiece(0, 7, 3, 7, false);
+                    movePiece(7, 7, 5, 7, true);
+                    castled = 1; // kingside
                 }
             }
+            if (tempPiece.type == PieceType.KING && toCol - fromCol == -2 && !testMove) {
+                if (this.colour == 0) {
+                    movePiece(0, 0, 3, 0, true); // rook
+                    castled = 2; // kingside
+                }
+                if (this.colour == 1) {
+                    movePiece(0, 7, 3, 7, true);
+                    castled = 2; // kingside
+                }
+            }
+
             try {
                 if (tempPiece.type == PieceType.PAWN && Math.abs(toCol - fromCol) == 1 && toRow - fromRow == 1 && !testMove
                         && BoardGame.pieceLoc(toCol, fromRow).getType() == PieceType.PAWN
@@ -484,7 +507,18 @@ public class ChessPlayer {
                 tempPiece.setPieceType(PieceType.QUEEN);
                 tempPiece.setResId(R.drawable.bq);
             }
-            if (!testMove) BoardGame.gameMove++;
+
+            int newPiecesSize = tempPieces.size();
+
+            if (piecesSize > newPiecesSize) {
+                captureMove = true;
+            }
+
+            if (!testMove) {
+                BoardGame.gameMove++;
+                addToPgn(new Square(fromCol, fromRow), new Square(toCol, toRow), tempPiece.getType(), tempPiece, captureMove, castled);
+            }
+
             return true;
         }
 
@@ -503,5 +537,98 @@ public class ChessPlayer {
         tempBlackPieces.clear();
         tempWhitePieces.addAll(BoardGame.whitePlayer.pieces);
         tempBlackPieces.addAll(BoardGame.blackPlayer.pieces);
+    }
+
+    public void addToPgn(Square from, Square to, PieceType type, ChessPiece piece, boolean capture, int castled) {
+        boolean overlap = false;
+        ArrayList<ChessPiece> typePieces = new ArrayList<>();
+        ArrayList<Square> overlapMoves = new ArrayList<>();
+
+        if (type == PieceType.KNIGHT || type == PieceType.ROOK) {
+            for (ChessPiece p : pieces) {
+                typePieces.add(p.getPiecesOfType(type, piece));
+            }
+        }
+
+        for (ChessPiece p : typePieces) {
+            if (p != null) {
+                overlapMoves.addAll(p.legalSquares);
+            }
+        }
+
+        typePieces.removeAll(Collections.singleton(null));
+
+        if (BoardGame.gameMove % 2 == 0) {
+            if (BoardGame.pgnMoves.length() > 0) BoardGame.pgnMoves.append(" ");
+            BoardGame.pgnMoves.append(Math.round((float) BoardGame.gameMove / 2)).append(".");
+        }
+
+        if (type == PieceType.PAWN) {
+            BoardGame.pgnMoves.append(" ");
+            BoardGame.pgnMoves.append(from.getValToString(from.getCol()).toLowerCase());
+            if (capture)
+                BoardGame.pgnMoves.append("x").append(to.getValToString(to.getCol()).toLowerCase());
+            BoardGame.pgnMoves.append(to.getRow() + 1);
+        }
+
+        if (type == PieceType.KNIGHT) {
+            BoardGame.pgnMoves.append(" ");
+            BoardGame.pgnMoves.append("N");
+            for (Square s : overlapMoves) {
+                if (to.getCol() == s.getCol() && to.getRow() == s.getRow()) {
+                    overlap = true;
+                    break;
+                }
+            }
+            if (overlap) {
+                if (capture) BoardGame.pgnMoves.append("x");
+                else BoardGame.pgnMoves.append(from.getValToString(to.getCol()).toLowerCase()); // g
+            }
+            if (capture) BoardGame.pgnMoves.append("x");
+            BoardGame.pgnMoves.append(from.getValToString(to.getCol()).toLowerCase()).append(to.getRow() + 1);
+        }
+
+        if (type == PieceType.BISHOP) {
+            BoardGame.pgnMoves.append(" ").append("B");
+            if (capture) BoardGame.pgnMoves.append("x");
+            BoardGame.pgnMoves.append(from.getValToString(to.getCol()).toLowerCase()).append(to.getRow() + 1);
+        }
+
+        if (type == PieceType.ROOK) {
+            BoardGame.pgnMoves.append(" ");
+            BoardGame.pgnMoves.append("R");
+            for (Square s : overlapMoves) {
+                if (to.getCol() == s.getCol() && to.getRow() == s.getRow()) {
+                    overlap = true;
+                    break;
+                }
+            }
+            if (overlap) {
+                if (capture) BoardGame.pgnMoves.append("x");
+                else BoardGame.pgnMoves.append(from.getValToString(to.getCol()).toLowerCase()); // g
+            }
+            if (capture) BoardGame.pgnMoves.append("x");
+            BoardGame.pgnMoves.append(from.getValToString(to.getCol()).toLowerCase());
+            BoardGame.pgnMoves.append(to.getRow() + 1);
+        }
+
+        if (type == PieceType.QUEEN) {
+            BoardGame.pgnMoves.append(" ").append("Q");
+            if (capture) BoardGame.pgnMoves.append("x");
+            BoardGame.pgnMoves.append(from.getValToString(to.getCol()).toLowerCase()).append(to.getRow() + 1);
+        }
+
+        if (type == PieceType.KING) {
+            BoardGame.pgnMoves.append(" ");
+            System.out.println(castled);
+            if (castled == 1) BoardGame.pgnMoves.append("O-O");
+            else if (castled == 2) BoardGame.pgnMoves.append("O-O-O");
+            else {
+                System.out.println(castled);
+                BoardGame.pgnMoves.append("K");
+                if (capture) BoardGame.pgnMoves.append("x");
+                BoardGame.pgnMoves.append(from.getValToString(to.getCol()).toLowerCase()).append(to.getRow() + 1);
+            }
+        }
     }
 }

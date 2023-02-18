@@ -137,4 +137,11 @@ public class ChessPiece implements Cloneable{
     public void setResId(int id) {
         this.resID = id;
     }
+
+    public ChessPiece getPiecesOfType(PieceType pType, ChessPiece p) {
+        if (this.type == pType && p != this) {
+            return this;
+        }
+        return null;
+    }
 }

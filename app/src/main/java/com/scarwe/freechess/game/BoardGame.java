@@ -12,9 +12,10 @@ public class BoardGame {
     public static ChessPlayer blackPlayer = new ChessPlayer(1);
     public static ChessPlayer currentPlayer = whitePlayer;
 
-    public static int gameMove = 0;
+    public static int gameMove = 1;
 
     public static ArrayList<ChessPiece> pieces = new ArrayList<>();
+    public static StringBuilder pgnMoves = new StringBuilder("");
 
     {
         whitePlayer.setTurn(true);
@@ -28,11 +29,13 @@ public class BoardGame {
         whitePlayer.setTurn(true);
         blackPlayer.setTurn(false);
 
-        gameMove = 0;
+        gameMove = 1;
         currentPlayer = whitePlayer;
 
         whitePlayer.checked = false;
         blackPlayer.checked = false;
+
+        pgnMoves.setLength(0);
 
         pieces.addAll(whitePlayer.pieces);
         pieces.addAll(blackPlayer.pieces);
