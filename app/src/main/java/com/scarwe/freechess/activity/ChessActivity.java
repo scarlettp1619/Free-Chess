@@ -16,13 +16,10 @@ import com.scarwe.freechess.R;
 import com.scarwe.freechess.game.PieceType;
 import com.scarwe.freechess.game.Square;
 
-import java.util.ArrayList;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 public class ChessActivity extends Activity implements ChessDelegate {
 
@@ -50,7 +47,12 @@ public class ChessActivity extends Activity implements ChessDelegate {
         Button resetButton = findViewById(R.id.reset_button);
 
         resetButton.setOnClickListener(v -> {
-            board.resetBoard();
+            try {
+                board.reader = new BufferedReader(new InputStreamReader(getAssets().open("config.json")));
+                board.resetBoard();
+            } catch (IOException | CloneNotSupportedException e) {
+                //
+            }
             board.whiteCastled = false;
             board.blackCastled = false;
             boardView.invalidate();
@@ -65,7 +67,7 @@ public class ChessActivity extends Activity implements ChessDelegate {
     }
 
     @Override
-    public void movePiece(Square from, Square to) throws CloneNotSupportedException {
+    public void movePiece(Square from, Square to) throws CloneNotSupportedException, IOException {
         boolean checkmated = true;
         boolean stalemated = true;
         boolean drawByRepetition = false;
@@ -81,6 +83,7 @@ public class ChessActivity extends Activity implements ChessDelegate {
                 BoardGame.setCurrentPlayer(BoardGame.blackPlayer);
                 BoardGame.whitePlayer.setTurn(false);
                 BoardGame.blackPlayer.setTurn(true);
+
                 black.findLegalMoves();
                 black.isKingChecked();
 
@@ -151,8 +154,10 @@ public class ChessActivity extends Activity implements ChessDelegate {
                 BoardGame.setCurrentPlayer(BoardGame.whitePlayer);
                 BoardGame.whitePlayer.setTurn(true);
                 BoardGame.blackPlayer.setTurn(false);
+
                 white.findLegalMoves();
                 white.isKingChecked();
+
                 if (piecesSize == newPiecesSize) {
                     black.sinceCaptured++;
                 } else {

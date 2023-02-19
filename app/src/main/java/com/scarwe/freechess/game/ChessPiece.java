@@ -13,14 +13,17 @@ public class ChessPiece implements Cloneable{
     public int currentMove = 0;
     public int bishopColour = -1;
     public boolean hasMoved = false;
-    public LinkedHashSet<Square> legalSquares = new LinkedHashSet<>();
 
-    public ChessPiece(int col, int row, ChessPlayer player, PieceType type, int resID) {
+    public LinkedHashSet<Square> legalSquares = new LinkedHashSet<>();
+    public ArrayList<PieceType> moveSet;
+
+    public ChessPiece(int col, int row, ChessPlayer player, PieceType type, int resID, ArrayList<PieceType> moveSet) {
         this.col = col;
         this.row = row;
         this.type = type;
         this.player = player;
         this.resID = resID;
+        this.moveSet = moveSet;
 
         if (col == 2 && row == 0) bishopColour = 1; // dark square
         if (col == 5 && row == 0) bishopColour = 0; // light square
@@ -35,7 +38,7 @@ public class ChessPiece implements Cloneable{
 
     public void generateLegalSquares(Square currentSquare) throws CloneNotSupportedException {
         ArrayList<Square> currentSquares = new ArrayList<>();
-        if (type == PieceType.KING) {
+        if (moveSet.contains(PieceType.KING)) {
             for (int i = this.row - 1 ; i <= this.row + 1; i++) {
                 for (int j = this.col - 4; j <= this.col + 4; j++) {
                     Square testSquare = new Square(j, i);
@@ -49,7 +52,7 @@ public class ChessPiece implements Cloneable{
                     }
                 }
             }
-        } else if (type == PieceType.PAWN) {
+        } if (moveSet.contains(PieceType.PAWN)) {
             int rowModifier;
             if (currentMove == 0) rowModifier = 2;
             else rowModifier = 1;
@@ -68,7 +71,7 @@ public class ChessPiece implements Cloneable{
                 }
             }
         }
-        else if (type == PieceType.ROOK) {
+        if (moveSet.contains(PieceType.ROOK)) {
             for (int i = 0; i <= 7; i++) {
                 Square testSquare = new Square(this.col, i);
                 if (player.canMove(currentSquare, testSquare)) {
@@ -93,7 +96,7 @@ public class ChessPiece implements Cloneable{
             }
         }
         //Math.abs(from.getCol() - to.getCol()) == Math.abs(from.getRow() - to.getRow())
-        else if (type == PieceType.BISHOP) {
+        if (moveSet.contains(PieceType.BISHOP)) {
             for (int i = 1; i <= 7; i++) {
                 Square testSquare1 = new Square(this.col + i, this.row + i);
                 Square testSquare2 = new Square(this.col - i, this.row - i);
@@ -127,7 +130,7 @@ public class ChessPiece implements Cloneable{
                 }
             }
         }
-        else if (type == PieceType.QUEEN) {
+        if (moveSet.contains(PieceType.QUEEN)) {
             // Bishop-like moves
             for (int i = -7; i <= 7; i++) {
                 if (i == 0) {
@@ -194,7 +197,7 @@ public class ChessPiece implements Cloneable{
                 }
             }
         }
-        else if (type == PieceType.KNIGHT) {
+        if (moveSet.contains(PieceType.KNIGHT)) {
             int[][] possibleOffsets = {{-2, 1}, {-1, 2}, {1, 2}, {2, 1}, {2, -1}, {1, -2}, {-1, -2}, {-2, -1}};
             for (int[] offset : possibleOffsets) {
                 int testCol = this.col + offset[0];
@@ -251,10 +254,15 @@ public class ChessPiece implements Cloneable{
     public int getBishopColour() {
         return this.bishopColour;
     }
+
     public ChessPiece getPiecesOfType(PieceType pType, ChessPiece p) {
         if (this.type == pType && p != this) {
             return this;
         }
         return null;
+    }
+
+    public ArrayList<PieceType> getMoveSet() {
+        return this.moveSet;
     }
 }

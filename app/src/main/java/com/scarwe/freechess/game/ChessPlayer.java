@@ -1,8 +1,14 @@
 package com.scarwe.freechess.game;
 
+import android.content.Context;
+
 import com.scarwe.freechess.R;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -36,7 +42,6 @@ public class ChessPlayer {
 
     public int sincePawnMoved = -1;
     public int sinceCaptured = 0;
-
     {
         if (colour == 0) turn = true;
     }
@@ -292,14 +297,14 @@ public class ChessPlayer {
         checked = false;
         if (colour == 0) {
             for (ChessPiece p : BoardGame.blackPlayer.pieces) {
-                Square tempSquare = new Square(p.col, p.row);
-                p.generateLegalSquares(tempSquare);
+                Square s = new Square(p.col, p.row);
+                p.generateLegalSquares(s);
                 opponentLegalMoves.addAll(p.legalSquares);
             }
         } else {
             for (ChessPiece p : BoardGame.whitePlayer.pieces) {
-                Square tempSquare = new Square(p.col, p.row);
-                p.generateLegalSquares(tempSquare);
+                Square s = new Square(p.col, p.row);
+                p.generateLegalSquares(s);
                 opponentLegalMoves.addAll(p.legalSquares);
             }
         }
@@ -350,6 +355,8 @@ public class ChessPlayer {
 
     // check if pieces are able to move, if not don't move them
     public boolean canMove(Square from, Square to){
+        boolean pawnMove = false, knightMove = false, bishopMove = false,
+                rookMove = false, queenMove = false, kingMove = false;
         try {
             ChessPiece movingPiece = BoardGame.pieceLoc(from);
 
@@ -360,20 +367,19 @@ public class ChessPlayer {
             if (to.getCol() < 0 || to.getCol() > 7 || to.getRow() < 0 || to.getRow() > 7) {
                 return false;
             }
-            switch (movingPiece.type) {
-                case PAWN:
-                    return canPawnMove(from, to);
-                case KNIGHT:
-                    return canKnightMove(from, to);
-                case BISHOP:
-                    return canBishopMove(from, to);
-                case ROOK:
-                    return canRookMove(from, to);
-                case QUEEN:
-                    return canQueenMove(from, to);
-                case KING:
-                    return canKingMove(from, to);
-            }
+            if(movingPiece.moveSet.contains(PieceType.PAWN)
+                    && canPawnMove(from, to)) pawnMove = true;
+            if(movingPiece.moveSet.contains(PieceType.KNIGHT)
+                    && canKnightMove(from, to)) knightMove = true;
+            if(movingPiece.moveSet.contains(PieceType.BISHOP)
+                    && canBishopMove(from, to)) bishopMove = true;
+            if(movingPiece.moveSet.contains(PieceType.ROOK)
+                    && canRookMove(from, to)) rookMove = true;
+            if(movingPiece.moveSet.contains(PieceType.QUEEN)
+                    && canQueenMove(from, to)) queenMove = true;
+            if(movingPiece.moveSet.contains(PieceType.KING)
+                    && canKingMove(from, to)) kingMove = true;
+            return pawnMove || knightMove || bishopMove || rookMove || queenMove || kingMove;
         } catch  (Exception ex) {
             //
         }
@@ -419,8 +425,6 @@ public class ChessPlayer {
 
         captureMove = false;
         ArrayList<ChessPiece> tempPieces;
-
-        StringBuilder currentPgn = BoardGame.pgnMoves;
 
         if (colour == 0) tempPieces = BoardGame.blackPlayer.pieces;
         else tempPieces = BoardGame.whitePlayer.pieces;
@@ -579,8 +583,19 @@ public class ChessPlayer {
         if (type == PieceType.PAWN) {
             BoardGame.pgnMoves.append(" ");
             BoardGame.pgnMoves.append(from.getValToString(from.getCol()).toLowerCase());
-            if (capture)
-                BoardGame.pgnMoves.append("x").append(to.getValToString(to.getCol()).toLowerCase());
+
+            if ((piece.moveSet.contains(PieceType.KNIGHT) || piece.moveSet.contains(PieceType.BISHOP)
+            || piece.moveSet.contains(PieceType.ROOK) || piece.moveSet.contains(PieceType.QUEEN)
+            || piece.moveSet.contains(PieceType.KING)) && to.getCol() != from.getCol()) {
+                if (capture)
+                    BoardGame.pgnMoves.append("x").append(to.getValToString(to.getCol()).toLowerCase());
+                else {
+                    BoardGame.pgnMoves.append(to.getValToString(to.getCol()).toLowerCase());
+                }
+            } else{
+                if (capture)
+                    BoardGame.pgnMoves.append("x").append(to.getValToString(to.getCol()).toLowerCase());
+            }
             BoardGame.pgnMoves.append(to.getRow() + 1);
             BoardGame.whitePlayer.sincePawnMoved = 0;
             BoardGame.blackPlayer.sincePawnMoved = 0;
