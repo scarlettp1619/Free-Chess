@@ -47,6 +47,7 @@ public class ChessPiece implements Cloneable{
 
     public void generateLegalSquares(Square currentSquare) throws CloneNotSupportedException {
         ArrayList<Square> currentSquares = new ArrayList<>();
+        ArrayList<Square> currentProtectedSquares = new ArrayList<>();
         if (moveSet.contains(PieceType.KING)) {
             for (int i = this.row - 1 ; i <= this.row + 1; i++) {
                 for (int j = this.col - 4; j <= this.col + 4; j++) {
@@ -54,7 +55,7 @@ public class ChessPiece implements Cloneable{
                     if (player.canMove(currentSquare, testSquare)) {
                         currentSquares.add(testSquare);
                         discoveredSquares.add(testSquare);
-                        protectedSquares.add(testSquare);
+                        currentProtectedSquares.add(testSquare);
                     }
                     for (ChessPiece piece : player.pieces) {
                         if (testSquare.col == piece.col && testSquare.row == piece.row) {
@@ -84,7 +85,6 @@ public class ChessPiece implements Cloneable{
                     Square testSquare = new Square(j, i);
                     if (player.canMove(currentSquare, testSquare)) {
                         currentSquares.add(testSquare);
-                        protectedSquares.add(testSquare);
                     }
                     for (ChessPiece piece : player.pieces) {
                         if (testSquare.col == piece.col && testSquare.row == piece.row) {
@@ -99,7 +99,7 @@ public class ChessPiece implements Cloneable{
                 Square testSquare = new Square(this.col, i);
                 if (player.canMove(currentSquare, testSquare)) {
                     currentSquares.add(testSquare);
-                    protectedSquares.add(testSquare);
+                    currentProtectedSquares.add(testSquare);
                 }
                 for (ChessPiece piece : player.pieces) {
                     if (testSquare.col == piece.col && testSquare.row == piece.row) {
@@ -111,7 +111,7 @@ public class ChessPiece implements Cloneable{
                 Square testSquare = new Square(j, this.row);
                 if (player.canMove(currentSquare, testSquare)) {
                     currentSquares.add(testSquare);
-                    protectedSquares.add(testSquare);
+                    currentProtectedSquares.add(testSquare);
                 }
                 for (ChessPiece piece : player.pieces) {
                     if (testSquare.col == piece.col && testSquare.row == piece.row) {
@@ -129,19 +129,19 @@ public class ChessPiece implements Cloneable{
                 Square testSquare4 = new Square(this.col + i, this.row - i);
                 if (player.canMove(currentSquare, testSquare1)) {
                     currentSquares.add(testSquare1);
-                    protectedSquares.add(testSquare1);
+                    currentProtectedSquares.add(testSquare1);
                 }
                 if (player.canMove(currentSquare, testSquare2)) {
                     currentSquares.add(testSquare2);
-                    protectedSquares.add(testSquare2);
+                    currentProtectedSquares.add(testSquare2);
                 }
                 if (player.canMove(currentSquare, testSquare3)) {
                     currentSquares.add(testSquare3);
-                    protectedSquares.add(testSquare3);
+                    currentProtectedSquares.add(testSquare3);
                 }
                 if (player.canMove(currentSquare, testSquare4)) {
                     currentSquares.add(testSquare4);
-                    protectedSquares.add(testSquare4);
+                    currentProtectedSquares.add(testSquare4);
                 }
                 for (ChessPiece piece : player.pieces) {
                     if (testSquare1.col == piece.col && testSquare1.row == piece.row) {
@@ -168,7 +168,7 @@ public class ChessPiece implements Cloneable{
                 Square testSquare = new Square(this.col + i, this.row + i);
                 if (player.canMove(currentSquare, testSquare)) {
                     currentSquares.add(testSquare);
-                    protectedSquares.add(testSquare);
+                    currentProtectedSquares.add(testSquare);
                 }
                 for (ChessPiece piece : player.pieces) {
                     if (testSquare.col == piece.col && testSquare.row == piece.row) {
@@ -178,7 +178,7 @@ public class ChessPiece implements Cloneable{
                 testSquare = new Square(this.col - i, this.row - i);
                 if (player.canMove(currentSquare, testSquare)) {
                     currentSquares.add(testSquare);
-                    protectedSquares.add(testSquare);
+                    currentProtectedSquares.add(testSquare);
                 }
                 for (ChessPiece piece : player.pieces) {
                     if (testSquare.col == piece.col && testSquare.row == piece.row) {
@@ -188,7 +188,7 @@ public class ChessPiece implements Cloneable{
                 testSquare = new Square(this.col + i, this.row - i);
                 if (player.canMove(currentSquare, testSquare)) {
                     currentSquares.add(testSquare);
-                    protectedSquares.add(testSquare);
+                    currentProtectedSquares.add(testSquare);
                 }
                 for (ChessPiece piece : player.pieces) {
                     if (testSquare.col == piece.col && testSquare.row == piece.row) {
@@ -198,7 +198,7 @@ public class ChessPiece implements Cloneable{
                 testSquare = new Square(this.col - i, this.row + i);
                 if (player.canMove(currentSquare, testSquare)) {
                     currentSquares.add(testSquare);
-                    protectedSquares.add(testSquare);
+                    currentProtectedSquares.add(testSquare);
                 }
                 for (ChessPiece piece : player.pieces) {
                     if (testSquare.col == piece.col && testSquare.row == piece.row) {
@@ -211,7 +211,7 @@ public class ChessPiece implements Cloneable{
                 Square testSquare = new Square(this.col, i);
                 if (player.canMove(currentSquare, testSquare)) {
                     currentSquares.add(testSquare);
-                    protectedSquares.add(testSquare);
+                    currentProtectedSquares.add(testSquare);
                 }
                 for (ChessPiece piece : player.pieces) {
                     if (testSquare.col == piece.col && testSquare.row == piece.row) {
@@ -223,7 +223,7 @@ public class ChessPiece implements Cloneable{
                 Square testSquare = new Square(j, this.row);
                 if (player.canMove(currentSquare, testSquare)) {
                     currentSquares.add(testSquare);
-                    protectedSquares.add(testSquare);
+                    currentProtectedSquares.add(testSquare);
                 }
                 for (ChessPiece piece : player.pieces) {
                     if (testSquare.col == piece.col && testSquare.row == piece.row) {
@@ -241,7 +241,7 @@ public class ChessPiece implements Cloneable{
                     Square testSquare = new Square(testCol, testRow);
                     if (player.canMove(currentSquare, testSquare)) {
                         currentSquares.add(testSquare);
-                        protectedSquares.add(testSquare);
+                        currentProtectedSquares.add(testSquare);
                     }
                     for (ChessPiece piece : player.pieces) {
                         if (testSquare.col == piece.col && testSquare.row == piece.row) {
@@ -253,6 +253,8 @@ public class ChessPiece implements Cloneable{
         }
         legalSquares.clear();
         legalSquares.addAll(currentSquares);
+        protectedSquares.clear();
+        protectedSquares.addAll(currentProtectedSquares);
     }
 
     public void generateDiscoveredSquares(Square currentSquare) {
