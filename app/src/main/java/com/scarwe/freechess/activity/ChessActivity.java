@@ -111,7 +111,6 @@ public class ChessActivity extends Activity implements ChessDelegate {
                     p.generateDiscoveredSquares(new Square(p.col, p.row));
                 }
 
-                white.findLegalMoves();
                 black.findLegalMoves();
                 if (BoardGame.gameMove > 3) black.isKingChecked(null, null);
 

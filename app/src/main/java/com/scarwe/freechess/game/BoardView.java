@@ -47,6 +47,10 @@ public class BoardView extends View{
     private Bitmap movingPieceBitmap;
     private int fromCol = -1;
     private int fromRow = -1;
+    private int col = -1;
+    private int row = -1;
+    private int tempCol = -1;
+    private int tempRow = -1;
     private float movingPieceX = -1f;
     private float movingPieceY = -1f;
 
@@ -95,18 +99,18 @@ public class BoardView extends View{
         }
         if (e.getAction() == MotionEvent.ACTION_UP) {
             // locate position
-            int col = (int) Math.floor((e.getX() - originX) / cellSize);
-            int row = 7 - ((int) Math.floor((e.getY() - originY) / cellSize));
+            col = (int) Math.floor((e.getX() - originX) / cellSize);
+            row = 7 - ((int) Math.floor((e.getY() - originY) / cellSize));
             // move the piece to the new position
             try {
                 chessDelegate.movePiece(new Square(fromCol, fromRow), new Square(col, row));
-            } catch (CloneNotSupportedException ex) {
-                throw new RuntimeException(ex);
-            } catch (IOException ex) {
+            } catch (CloneNotSupportedException | IOException ex) {
                 throw new RuntimeException(ex);
             }
             // deletes moving piece image (drag and move)
             movingPieceBitmap = null;
+            tempCol = fromCol;
+            tempRow = fromRow;
             fromCol = -1;
             fromRow = -1;
         }
@@ -122,24 +126,32 @@ public class BoardView extends View{
     }
 
     private void drawPieces(Canvas canvas){
-        ChessPiece piece;
+        ChessPiece piece, movePiece = null;
 
         piece = chessDelegate.pieceLoc(new Square(fromCol, fromRow));
+        if (col != -1 && row != -1) {
+            movePiece = chessDelegate.pieceLoc(new Square(col, row));
+        }
 
         if (piece != null) {
             String legalLightColor = "#C7AFF3";
             String legalDarkColor = "#A874E5";
             drawLegalMoves(canvas, fromRow, fromCol, legalLightColor, legalDarkColor);
-
         }
+
+        if (movePiece != null) {
+            String moveLightColor = "#BFC6F5";
+            String moveDarkColor = "#8095EC";
+            String placeLightColor = "#A3A3F0";
+            String placeDarkColor = "#717ADA";
+            drawLegalMoves(canvas, row, col, placeLightColor, placeDarkColor);
+            drawLegalMoves(canvas, tempRow, tempCol, moveLightColor, moveDarkColor);
+        }
+
 
         if (piece != null) {
             for (Square s : piece.legalSquares) {
-                if (piece.player != BoardGame.currentPlayer) {
-                    String nonPlayerLightColor = "#C4B4A2";
-                    String nonPlayerDarkColor = "#A17D69";
-                    drawLegalMoves(canvas, s.getRow(), s.getCol(), nonPlayerLightColor, nonPlayerDarkColor);
-                } else {
+                if (piece.player == BoardGame.currentPlayer) {
                     String legalLightColor = "#F0B095";
                     String legalDarkColor = "#C47358";
                     drawLegalMoves(canvas, s.getRow(), s.getCol(), legalLightColor, legalDarkColor);
