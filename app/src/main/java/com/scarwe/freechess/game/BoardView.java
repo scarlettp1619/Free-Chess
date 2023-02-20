@@ -127,6 +127,13 @@ public class BoardView extends View{
         piece = chessDelegate.pieceLoc(new Square(fromCol, fromRow));
 
         if (piece != null) {
+            String legalLightColor = "#C7AFF3";
+            String legalDarkColor = "#A874E5";
+            drawLegalMoves(canvas, fromRow, fromCol, legalLightColor, legalDarkColor);
+
+        }
+
+        if (piece != null) {
             for (Square s : piece.legalSquares) {
                 if (piece.player != BoardGame.currentPlayer) {
                     String nonPlayerLightColor = "#C4B4A2";

@@ -26,6 +26,8 @@ public class ChessActivity extends Activity implements ChessDelegate {
 
     private final BoardGame board = new BoardGame();
     private final int bgColor = Color.parseColor("#252525");
+    private int gameState = 0;
+    private String winner = "";
 
     ChessPlayer white = BoardGame.whitePlayer;
     ChessPlayer black = BoardGame.blackPlayer;
@@ -68,7 +70,7 @@ public class ChessActivity extends Activity implements ChessDelegate {
     }
 
     @Override
-    public void movePiece(Square from, Square to) throws CloneNotSupportedException, IOException {
+    public void movePiece(Square from, Square to) throws CloneNotSupportedException {
         boolean checkmated = true;
         boolean stalemated = true;
         boolean drawByRepetition = false;
@@ -77,7 +79,7 @@ public class ChessActivity extends Activity implements ChessDelegate {
 
         int count = 0;
 
-        if (white.turn) {
+        if (white.turn && gameState == 0) {
             int piecesSize = BoardGame.blackPlayer.pieces.size();
             if (BoardGame.whitePlayer.movePiece(from, to, false)) {
                 int newPiecesSize = BoardGame.blackPlayer.pieces.size();
@@ -115,6 +117,7 @@ public class ChessActivity extends Activity implements ChessDelegate {
                 if (count > 2) drawByRepetition = true;
 
                 if (drawByRepetition) {
+                    gameState = 3;
                     System.out.println("draw by repetition");
                 }
 
@@ -122,6 +125,7 @@ public class ChessActivity extends Activity implements ChessDelegate {
                 if (white.pieces.size() == 1 && black.pieces.size() == 1) insufficientMaterial = true;
 
                 if (insufficientMaterial) {
+                    gameState = 4;
                     System.out.println("draw by insufficient material");
                 }
 
@@ -131,6 +135,7 @@ public class ChessActivity extends Activity implements ChessDelegate {
                 }
 
                 if (fiftyMoveRule) {
+                    gameState = 5;
                     System.out.println("fifty move rule reached");
                 }
 
@@ -142,6 +147,8 @@ public class ChessActivity extends Activity implements ChessDelegate {
                         }
                     }
                     if (checkmated) {
+                        gameState = 1;
+                        winner = "White";
                         BoardGame.pgnMoves.append("# 1-0");
                         System.out.println("black checkmated");
                     } else {
@@ -154,12 +161,13 @@ public class ChessActivity extends Activity implements ChessDelegate {
                         }
                     }
                     if (stalemated) {
+                        gameState = 2;
                         System.out.println("black stalemated");
                         BoardGame.pgnMoves.append(" 1-2/1-2");
                     }
                 }
             }
-        } else if (BoardGame.blackPlayer.turn) {
+        } else if (BoardGame.blackPlayer.turn && gameState == 0) {
             int piecesSize = BoardGame.whitePlayer.pieces.size();
             if (BoardGame.blackPlayer.movePiece(from, to, false)) {
                 int newPiecesSize = BoardGame.whitePlayer.pieces.size();
@@ -199,10 +207,12 @@ public class ChessActivity extends Activity implements ChessDelegate {
                 if (white.pieces.size() == 1 && black.pieces.size() == 1) insufficientMaterial = true;
 
                 if (insufficientMaterial) {
+                    gameState = 4;
                     System.out.println("draw by insufficient material");
                 }
 
                 if (drawByRepetition) {
+                    gameState = 3;
                     System.out.println("draw by repetition");
                 }
 
@@ -212,6 +222,7 @@ public class ChessActivity extends Activity implements ChessDelegate {
                 }
 
                 if (fiftyMoveRule) {
+                    gameState = 5;
                     System.out.println("fifty move rule reached");
                 }
 
@@ -223,6 +234,8 @@ public class ChessActivity extends Activity implements ChessDelegate {
                         }
                     }
                     if (checkmated) {
+                        gameState = 1;
+                        winner = "Black";
                         System.out.println("white checkmated");
                         BoardGame.pgnMoves.append("# 0-1");
                     } else {
@@ -235,6 +248,7 @@ public class ChessActivity extends Activity implements ChessDelegate {
                         }
                     }
                     if (stalemated) {
+                        gameState = 2;
                         System.out.println("white stalemated");
                         BoardGame.pgnMoves.append("1-2/1-2");
                     }
@@ -243,6 +257,9 @@ public class ChessActivity extends Activity implements ChessDelegate {
         }
         System.out.println(BoardGame.pgnMoves);
         findViewById(R.id.board_view).invalidate();
+        if (gameState != 0) {
+            System.out.println("game end");
+        }
     }
 
     private void setActivityBgColor() {
