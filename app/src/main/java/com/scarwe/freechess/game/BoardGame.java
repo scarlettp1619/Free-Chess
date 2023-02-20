@@ -22,12 +22,12 @@ public class BoardGame {
     public static ArrayList<String> pgnCheck = new ArrayList<>();
 
 
-    public static ArrayList<PieceType> pawnMoveSet = new ArrayList<>();
-    public static ArrayList<PieceType> knightMoveSet = new ArrayList<>();
-    public static ArrayList<PieceType> bishopMoveSet = new ArrayList<>();
-    public static ArrayList<PieceType> rookMoveSet = new ArrayList<>();
-    public static ArrayList<PieceType> queenMoveSet = new ArrayList<>();
-    public static ArrayList<PieceType> kingMoveSet = new ArrayList<>();
+    private ArrayList<PieceType> pawnMoveSet = new ArrayList<>();
+    private ArrayList<PieceType> knightMoveSet = new ArrayList<>();
+    private ArrayList<PieceType> bishopMoveSet = new ArrayList<>();
+    private ArrayList<PieceType> rookMoveSet = new ArrayList<>();
+    private ArrayList<PieceType> queenMoveSet = new ArrayList<>();
+    private ArrayList<PieceType> kingMoveSet = new ArrayList<>();
 
 
     public static StringBuilder pgnMoves = new StringBuilder("");

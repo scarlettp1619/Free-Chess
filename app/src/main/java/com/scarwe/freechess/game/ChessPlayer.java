@@ -328,6 +328,8 @@ public class ChessPlayer {
         int kingRow = 0, kingCol = 0;
         checked = false;
         ChessPiece opponentAttackingPiece;
+        ChessPiece attackingKingPiece = null;
+        ArrayList<Square> attackedSquares = new ArrayList<>();
         ArrayList<ChessPiece> opponentPieces;
         if (colour == 0) {
             opponentAttackingPiece = BoardGame.blackPlayer.currentAttackingPiece;
@@ -358,9 +360,51 @@ public class ChessPlayer {
             }
         }
 
+        for (ChessPiece p : opponentPieces) {
+            for (Square s : p.legalSquares) {
+                if (s.col == kingCol && s.row == kingRow) {
+                    attackingKingPiece = p;
+                    checked = true;
+                    break;
+                }
+            }
+        }
+
+        if (to != null && attackingKingPiece != null) {
+            for (Square s : attackingKingPiece.legalSquares) {
+                for (int i = kingRow - 1; i < kingRow + 1; i++) {
+                    for (int j = kingCol - 1; j < kingCol + 1; j++) {
+                        if (j < 0 || j > 7 || i < 0 || i > 7) break;
+                        if (s.col == j && s.row == i) {
+                            checked = true;
+                            break;
+                        } else {
+                            if (to.col == s.col && to.row == s.row) {
+                                checked = false;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         if (to != null) {
             if (to.col == opponentAttackingPiece.col && to.row == opponentAttackingPiece.row) {
                 checked = false;
+            }
+        }
+
+        if (to != null && piece != null) {
+            if (piece.getType() == PieceType.KING) {
+                for (ChessPiece p : opponentPieces) {
+                    for (Square s : p.legalSquares) {
+                        if (to.col == s.col && to.row == s.row) {
+                            checked = true;
+                            break;
+                        }
+                    }
+                }
             }
         }
 
@@ -371,6 +415,7 @@ public class ChessPlayer {
     public boolean isKingDiscovered(ChessPiece tempPiece, Square to) {
         LinkedHashSet<Square> opponentDiscoveredSquares = new LinkedHashSet<>();
         LinkedHashSet<Square> opponentLegalSquares = new LinkedHashSet<>();
+        LinkedHashSet<Square> opponentPawnSquares = new LinkedHashSet<>();
         int kingRow = 0, kingCol = 0;
         discovered = false;
         boolean possibleCheck = false;
@@ -380,7 +425,7 @@ public class ChessPlayer {
             for (ChessPiece p : BoardGame.blackPlayer.pieces) {
                 opponentDiscoveredSquares.addAll(p.discoveredSquares);
                 opponentLegalSquares.addAll(p.legalSquares);
-                opponentLegalSquares.addAll(p.pawnCaptureSquares);
+                opponentPawnSquares.addAll(p.pawnCaptureSquares);
             }
             for (ChessPiece p : BoardGame.whitePlayer.pieces) {
                 if (p.kingID == 1) {
@@ -392,7 +437,7 @@ public class ChessPlayer {
             for (ChessPiece p : BoardGame.whitePlayer.pieces) {
                 opponentDiscoveredSquares.addAll(p.discoveredSquares);
                 opponentLegalSquares.addAll(p.legalSquares);
-                opponentLegalSquares.addAll(p.pawnCaptureSquares);
+                opponentPawnSquares.addAll(p.pawnCaptureSquares);
             }
             for (ChessPiece p : BoardGame.blackPlayer.pieces) {
                 if (p.kingID == 1) {
@@ -401,33 +446,26 @@ public class ChessPlayer {
                 }
             }
         }
-
-        if (tempPiece.getType() == PieceType.KING) {
-            for (Square s : opponentLegalSquares) {
-                if (s.getCol() == to.col && s.getRow() == to.row) {
-                    discovered = true;
-                    break;
-                }
+        for (Square s : opponentPawnSquares) {
+            if (s.getCol() == kingCol && s.getRow() == kingRow) {
+                discovered = true;
+                break;
             }
         }
-
-        if (!discovered) {
-            for (Square s : opponentDiscoveredSquares) {
-                if (s.getCol() == kingCol && s.getRow() == kingRow) {
-                    possibleCheck = true;
-                }
-                for (int i = kingRow - 1; i <= kingRow + 1; i++) {
-                    for (int j = kingCol - 1; j <= kingCol + 1; j++) {
-                        if (j < 0 || j > 7 || i < 0 || i > 7) break;
-                        if (tempPiece.col == j && tempPiece.row == i && tempPiece.col == s.col && tempPiece.row == s.row) {
-                            movedIntoDiscovered = true;
-                            break;
-                        }
+        for (Square s : opponentDiscoveredSquares) {
+            if (s.getCol() == kingCol && s.getRow() == kingRow) {
+                possibleCheck = true;
+            }
+            for (int i = kingRow - 1; i <= kingRow + 1; i++) {
+                for (int j = kingCol - 1; j <= kingCol + 1; j++) {
+                    if (j < 0 || j > 7 || i < 0 || i > 7) break;
+                    if (tempPiece.col == j && tempPiece.row == i && tempPiece.col == s.col && tempPiece.row == s.row) {
+                        movedIntoDiscovered = true;
+                        break;
                     }
                 }
             }
         }
-
         if (tempPiece.getType() == PieceType.KING) {
             for (Square s : opponentLegalSquares) {
                 if (to.getCol() != s.getCol() && to.getRow() != s.getRow()) {
@@ -436,7 +474,6 @@ public class ChessPlayer {
                 }
             }
         }
-
         if (possibleCheck && movedIntoDiscovered) {
             discovered = true;
         }
@@ -602,11 +639,11 @@ public class ChessPlayer {
             if (tempPiece.type == PieceType.KING && toCol - fromCol == -2 && !testMove) {
                 if (this.colour == 0) {
                     movePiece(0, 0, 3, 0, true); // rook
-                    castled = 2; // kingside
+                    castled = 2; // queenside
                 }
                 if (this.colour == 1) {
                     movePiece(0, 7, 3, 7, true);
-                    castled = 2; // kingside
+                    castled = 2; // queenside
                 }
             }
 
@@ -636,13 +673,11 @@ public class ChessPlayer {
 
             if (tempPiece.getType() == PieceType.PAWN && tempPiece.getPlayer().colour == 0 && toRow == 7) {
                 tempPiece.setPieceType(PieceType.QUEEN);
-                tempPiece.moveSet = BoardGame.queenMoveSet;
                 tempPiece.setResId(R.drawable.wq);
             }
 
             if (tempPiece.getType() == PieceType.PAWN && tempPiece.getPlayer().colour == 1 && toRow == 0) {
                 tempPiece.setPieceType(PieceType.QUEEN);
-                tempPiece.moveSet = BoardGame.queenMoveSet;
                 tempPiece.setResId(R.drawable.bq);
             }
 
