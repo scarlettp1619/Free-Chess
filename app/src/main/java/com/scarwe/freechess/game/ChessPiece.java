@@ -12,9 +12,12 @@ public class ChessPiece implements Cloneable{
     public int sinceMoved = -1;
     public int currentMove = 0;
     public int bishopColour = -1;
+    public int kingID = 0;
     public boolean hasMoved = false;
 
     public LinkedHashSet<Square> legalSquares = new LinkedHashSet<>();
+    public LinkedHashSet<Square> discoveredSquares = new LinkedHashSet<>();
+    public LinkedHashSet<Square> pawnCaptureSquares = new LinkedHashSet<>();
     public ArrayList<PieceType> moveSet;
 
     public ChessPiece(int col, int row, ChessPlayer player, PieceType type, int resID, ArrayList<PieceType> moveSet) {
@@ -29,6 +32,10 @@ public class ChessPiece implements Cloneable{
         if (col == 5 && row == 0) bishopColour = 0; // light square
         if (col == 2 && row == 7) bishopColour = 1;
         if (col == 5 && row == 7) bishopColour = 0;
+
+        if (this.type == PieceType.KING) {
+            kingID = 1;
+        }
     }
 
     @Override
@@ -44,6 +51,7 @@ public class ChessPiece implements Cloneable{
                     Square testSquare = new Square(j, i);
                     if (player.canMove(currentSquare, testSquare)) {
                         currentSquares.add(testSquare);
+                        discoveredSquares.add(testSquare);
                     }
                     for (ChessPiece piece : player.pieces) {
                         if (testSquare.col == piece.col && testSquare.row == piece.row) {
@@ -54,8 +62,19 @@ public class ChessPiece implements Cloneable{
             }
         } if (moveSet.contains(PieceType.PAWN)) {
             int rowModifier;
+            int captureModifier;
+
+            if (this.getPlayer().colour == 0) captureModifier = 1;
+            else captureModifier = -1;
+
             if (currentMove == 0) rowModifier = 2;
             else rowModifier = 1;
+
+            Square leftCapture = new Square(col - 1, row + captureModifier);
+            Square rightCapture = new Square(col + 1, row + captureModifier);
+
+            pawnCaptureSquares.add(leftCapture);
+            pawnCaptureSquares.add(rightCapture);
             for (int i = this.row - rowModifier; i <= this.row + rowModifier; i++) {
                 for (int j = this.col - 1; j <= this.col + 1; j++) {
                     if (j > 7 || j < -1 || i > 7 || i < -1) break;
@@ -97,7 +116,7 @@ public class ChessPiece implements Cloneable{
         }
         //Math.abs(from.getCol() - to.getCol()) == Math.abs(from.getRow() - to.getRow())
         if (moveSet.contains(PieceType.BISHOP)) {
-            for (int i = 1; i <= 7; i++) {
+            for (int i = 0; i <= 7; i++) {
                 Square testSquare1 = new Square(this.col + i, this.row + i);
                 Square testSquare2 = new Square(this.col - i, this.row - i);
                 Square testSquare3 = new Square(this.col - i, this.row + i);
@@ -217,6 +236,128 @@ public class ChessPiece implements Cloneable{
         }
         legalSquares.clear();
         legalSquares.addAll(currentSquares);
+    }
+
+    public void generateDiscoveredSquares(Square currentSquare) {
+        discoveredSquares.clear();
+        if (moveSet.contains(PieceType.KING)) {
+            for (int i = this.row - 1 ; i <= this.row + 1; i++) {
+                for (int j = this.col - 1; j <= this.col + 1; j++) {
+                    if (i < 0 || i > 7 || j < 0 || j > 7) break;
+                    Square testSquare = new Square(j, i);
+                    if (player.canKingAttackMove(currentSquare, testSquare)) {
+                        discoveredSquares.add(testSquare);
+                    }
+                }
+            }
+        } if (moveSet.contains(PieceType.PAWN)) {
+            int rowModifier = 1;
+            for (int i = this.row - rowModifier; i <= this.row + rowModifier; i++) {
+                for (int j = this.col - 1; j <= this.col + 1; j++) {
+                    if (j > 7 || j < -1 || i > 7 || i < -1) break;
+                    Square testSquare = new Square(j, i);
+                    if (player.canPawnTestMove(currentSquare, testSquare)) {
+                        discoveredSquares.add(testSquare);
+                    }
+                }
+            }
+        }
+        if (moveSet.contains(PieceType.ROOK)) {
+            for (int i = 0; i <= 7; i++) {
+                Square testSquare = new Square(this.col, i);
+                if (player.canRookAttackMove(currentSquare, testSquare)) {
+                    discoveredSquares.add(testSquare);
+                }
+            }
+            for (int j = 0; j <= 7; j++) {
+                Square testSquare = new Square(j, this.row);
+                if (player.canRookAttackMove(currentSquare, testSquare)) {
+                    discoveredSquares.add(testSquare);
+                }
+            }
+        }
+        if (moveSet.contains(PieceType.BISHOP)) {
+            for (int i = 0; i <= 7; i++) {
+                Square testSquare1 = new Square(this.col + i, this.row + i);
+                if (player.canBishopAttackMove(currentSquare, testSquare1)) {
+                    discoveredSquares.add(testSquare1);
+                }
+            }
+            for (int i = 0; i < 7; i++) {
+                Square testSquare2 = new Square(this.col - i, this.row - i);
+                if (player.canBishopAttackMove(currentSquare, testSquare2)) {
+                    discoveredSquares.add(testSquare2);
+                }
+            }
+            for (int i = 0; i < 7; i++) {
+                Square testSquare3 = new Square(this.col - i, this.row + i);
+                if (player.canBishopAttackMove(currentSquare, testSquare3)) {
+                    discoveredSquares.add(testSquare3);
+                }
+            }
+            for (int i = 0; i < 7; i++) {
+                Square testSquare4 = new Square(this.col + i, this.row - i);
+                if (player.canBishopAttackMove(currentSquare, testSquare4)) {
+                    discoveredSquares.add(testSquare4);
+                }
+            }
+        }
+        if (moveSet.contains(PieceType.QUEEN)) {
+            // Bishop-like moves
+            for (int i = -7; i <= 7; i++) {
+                if (i == 0) {
+                    continue;
+                }
+                Square testSquare = new Square(this.col + i, this.row + i);
+                if (player.canBishopAttackMove(currentSquare, testSquare)) {
+                    discoveredSquares.add(testSquare);
+                }
+            }
+            for (int i = -7; i <= 7; i++) {
+                Square testSquare = new Square(this.col - i, this.row - i);
+                if (player.canBishopAttackMove(currentSquare, testSquare)) {
+                    discoveredSquares.add(testSquare);
+                }
+            }
+            for (int i = -7; i <= 7; i++) {
+                Square testSquare = new Square(this.col + i, this.row - i);
+                if (player.canBishopAttackMove(currentSquare, testSquare)) {
+                    discoveredSquares.add(testSquare);
+                }
+            }
+            for (int i = -7; i <= 7; i++) {
+                Square testSquare = new Square(this.col - i, this.row + i);
+                if (player.canBishopAttackMove(currentSquare, testSquare)) {
+                    discoveredSquares.add(testSquare);
+                }
+            }
+            // Rook-like moves
+            for (int i = 0; i <= 7; i++) {
+                Square testSquare = new Square(this.col, i);
+                if (player.canRookAttackMove(currentSquare, testSquare)) {
+                    discoveredSquares.add(testSquare);
+                }
+            }
+            for (int j = 0; j <= 7; j++) {
+                Square testSquare = new Square(j, this.row);
+                if (player.canRookAttackMove(currentSquare, testSquare)) {
+                    discoveredSquares.add(testSquare);
+                }
+            }
+        }
+        if (moveSet.contains(PieceType.KNIGHT)) {
+            int[][] possibleOffsets = {{-2, 1}, {-1, 2}, {1, 2}, {2, 1}, {2, -1}, {1, -2}, {-1, -2}, {-2, -1}};
+            for (int[] offset : possibleOffsets) {
+                int testCol = this.col + offset[0];
+                int testRow = this.row + offset[1];
+                if (testCol >= 0 && testCol <= 7 && testRow >= 0 && testRow <= 7) {
+                    Square testSquare = new Square(testCol, testRow);
+                    if (player.canKnightMove(currentSquare, testSquare)) {
+                        discoveredSquares.add(testSquare);
+                    }
+                }
+            }
+        }
     }
 
     public ChessPlayer getPlayer () {

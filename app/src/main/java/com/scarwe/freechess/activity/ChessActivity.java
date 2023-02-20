@@ -1,6 +1,7 @@
 package com.scarwe.freechess.activity;
 
 import android.app.Activity;
+import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.os.Bundle;
@@ -35,8 +36,8 @@ public class ChessActivity extends Activity implements ChessDelegate {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_chess);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         // finds the board view by its ID
         BoardView boardView = findViewById(R.id.board_view);
@@ -81,11 +82,9 @@ public class ChessActivity extends Activity implements ChessDelegate {
             if (BoardGame.whitePlayer.movePiece(from, to, false)) {
                 int newPiecesSize = BoardGame.blackPlayer.pieces.size();
                 BoardGame.setCurrentPlayer(BoardGame.blackPlayer);
+
                 BoardGame.whitePlayer.setTurn(false);
                 BoardGame.blackPlayer.setTurn(true);
-
-                black.findLegalMoves();
-                black.isKingChecked();
 
                 if (piecesSize == newPiecesSize) {
                     white.sinceCaptured++;
@@ -98,6 +97,19 @@ public class ChessActivity extends Activity implements ChessDelegate {
                     player = MediaPlayer.create(this, R.raw.move);
                 }
                 player.start();
+
+                for (ChessPiece p : white.pieces) {
+                    p.generateLegalSquares(new Square(p.col, p.row));
+                    p.generateDiscoveredSquares(new Square(p.col, p.row));
+                }
+
+                for (ChessPiece p : black.pieces) {
+                    p.generateLegalSquares(new Square(p.col, p.row));
+                    p.generateDiscoveredSquares(new Square(p.col, p.row));
+                }
+
+                black.findLegalMoves();
+                if (BoardGame.gameMove > 3) black.isKingChecked(null, null);
 
                 for (String s : BoardGame.getPgn()) count = Collections.frequency(BoardGame.getPgn(), s);
                 if (count > 2) drawByRepetition = true;
@@ -143,7 +155,7 @@ public class ChessActivity extends Activity implements ChessDelegate {
                     }
                     if (stalemated) {
                         System.out.println("black stalemated");
-                        BoardGame.pgnMoves.append("1-2/1-2");
+                        BoardGame.pgnMoves.append(" 1-2/1-2");
                     }
                 }
             }
@@ -155,9 +167,6 @@ public class ChessActivity extends Activity implements ChessDelegate {
                 BoardGame.whitePlayer.setTurn(true);
                 BoardGame.blackPlayer.setTurn(false);
 
-                white.findLegalMoves();
-                white.isKingChecked();
-
                 if (piecesSize == newPiecesSize) {
                     black.sinceCaptured++;
                 } else {
@@ -167,7 +176,22 @@ public class ChessActivity extends Activity implements ChessDelegate {
                 if (player == null) {
                     player = MediaPlayer.create(this, R.raw.move);
                 }
+
+                for (ChessPiece p : white.pieces) {
+                    p.generateLegalSquares(new Square(p.col, p.row));
+                    p.generateDiscoveredSquares(new Square(p.col, p.row));
+                }
+
+                for (ChessPiece p : black.pieces) {
+                    p.generateLegalSquares(new Square(p.col, p.row));
+                    p.generateDiscoveredSquares(new Square(p.col, p.row));
+                }
+
+                white.findLegalMoves();
+                if (BoardGame.gameMove > 2) white.isKingChecked(null, null);
+
                 player.start();
+
                 for (String s : BoardGame.getPgn()) count = Collections.frequency(BoardGame.getPgn(), s);
                 if (count > 2) drawByRepetition = true;
 

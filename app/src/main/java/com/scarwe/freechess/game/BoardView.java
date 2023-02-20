@@ -17,6 +17,7 @@ import androidx.annotation.Nullable;
 
 import com.scarwe.freechess.R;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Locale;
 
@@ -96,16 +97,18 @@ public class BoardView extends View{
             // locate position
             int col = (int) Math.floor((e.getX() - originX) / cellSize);
             int row = 7 - ((int) Math.floor((e.getY() - originY) / cellSize));
+            // move the piece to the new position
             try {
-                // move the piece to the new position
                 chessDelegate.movePiece(new Square(fromCol, fromRow), new Square(col, row));
-                // deletes moving piece image (drag and move)
-                movingPieceBitmap = null;
-                fromCol = -1;
-                fromRow = -1;
-            } catch (Exception ex) {
-                // do nothing
+            } catch (CloneNotSupportedException ex) {
+                throw new RuntimeException(ex);
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
             }
+            // deletes moving piece image (drag and move)
+            movingPieceBitmap = null;
+            fromCol = -1;
+            fromRow = -1;
         }
         return true;
     }
@@ -124,13 +127,6 @@ public class BoardView extends View{
         piece = chessDelegate.pieceLoc(new Square(fromCol, fromRow));
 
         if (piece != null) {
-            if (BoardGame.gameMove == 1) {
-                try {
-                    piece.generateLegalSquares(new Square(piece.col, piece.row));
-                } catch (CloneNotSupportedException e) {
-                    throw new RuntimeException(e);
-                }
-            }
             for (Square s : piece.legalSquares) {
                 if (piece.player != BoardGame.currentPlayer) {
                     String nonPlayerLightColor = "#C4B4A2";

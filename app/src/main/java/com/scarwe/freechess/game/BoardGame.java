@@ -139,9 +139,12 @@ public class BoardGame {
 
         for (ChessPiece p : whitePlayer.pieces) {
             p.generateLegalSquares(new Square(p.col, p.row));
+            p.generateDiscoveredSquares(new Square(p.col, p.row));
         }
+
         for (ChessPiece p : blackPlayer.pieces) {
             p.generateLegalSquares(new Square(p.col, p.row));
+            p.generateDiscoveredSquares(new Square(p.col, p.row));
         }
 
         pgnCheck.add(pgnBoard());
