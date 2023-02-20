@@ -371,7 +371,6 @@ public class ChessPlayer {
     public boolean isKingDiscovered(ChessPiece tempPiece, Square to) {
         LinkedHashSet<Square> opponentDiscoveredSquares = new LinkedHashSet<>();
         LinkedHashSet<Square> opponentLegalSquares = new LinkedHashSet<>();
-        LinkedHashSet<Square> opponentPawnSquares = new LinkedHashSet<>();
         int kingRow = 0, kingCol = 0;
         discovered = false;
         boolean possibleCheck = false;
@@ -381,7 +380,7 @@ public class ChessPlayer {
             for (ChessPiece p : BoardGame.blackPlayer.pieces) {
                 opponentDiscoveredSquares.addAll(p.discoveredSquares);
                 opponentLegalSquares.addAll(p.legalSquares);
-                opponentPawnSquares.addAll(p.pawnCaptureSquares);
+                opponentLegalSquares.addAll(p.pawnCaptureSquares);
             }
             for (ChessPiece p : BoardGame.whitePlayer.pieces) {
                 if (p.kingID == 1) {
@@ -393,7 +392,7 @@ public class ChessPlayer {
             for (ChessPiece p : BoardGame.whitePlayer.pieces) {
                 opponentDiscoveredSquares.addAll(p.discoveredSquares);
                 opponentLegalSquares.addAll(p.legalSquares);
-                opponentPawnSquares.addAll(p.pawnCaptureSquares);
+                opponentLegalSquares.addAll(p.pawnCaptureSquares);
             }
             for (ChessPiece p : BoardGame.blackPlayer.pieces) {
                 if (p.kingID == 1) {
@@ -402,26 +401,33 @@ public class ChessPlayer {
                 }
             }
         }
-        for (Square s : opponentPawnSquares) {
-            if (s.getCol() == kingCol && s.getRow() == kingRow) {
-                discovered = true;
-                break;
+
+        if (tempPiece.getType() == PieceType.KING) {
+            for (Square s : opponentLegalSquares) {
+                if (s.getCol() == to.col && s.getRow() == to.row) {
+                    discovered = true;
+                    break;
+                }
             }
         }
-        for (Square s : opponentDiscoveredSquares) {
-            if (s.getCol() == kingCol && s.getRow() == kingRow) {
-                possibleCheck = true;
-            }
-            for (int i = kingRow - 1; i <= kingRow + 1; i++) {
-                for (int j = kingCol - 1; j <= kingCol + 1; j++) {
-                    if (j < 0 || j > 7 || i < 0 || i > 7) break;
-                    if (tempPiece.col == j && tempPiece.row == i && tempPiece.col == s.col && tempPiece.row == s.row) {
-                        movedIntoDiscovered = true;
-                        break;
+
+        if (!discovered) {
+            for (Square s : opponentDiscoveredSquares) {
+                if (s.getCol() == kingCol && s.getRow() == kingRow) {
+                    possibleCheck = true;
+                }
+                for (int i = kingRow - 1; i <= kingRow + 1; i++) {
+                    for (int j = kingCol - 1; j <= kingCol + 1; j++) {
+                        if (j < 0 || j > 7 || i < 0 || i > 7) break;
+                        if (tempPiece.col == j && tempPiece.row == i && tempPiece.col == s.col && tempPiece.row == s.row) {
+                            movedIntoDiscovered = true;
+                            break;
+                        }
                     }
                 }
             }
         }
+
         if (tempPiece.getType() == PieceType.KING) {
             for (Square s : opponentLegalSquares) {
                 if (to.getCol() != s.getCol() && to.getRow() != s.getRow()) {
@@ -430,6 +436,7 @@ public class ChessPlayer {
                 }
             }
         }
+
         if (possibleCheck && movedIntoDiscovered) {
             discovered = true;
         }
@@ -629,11 +636,13 @@ public class ChessPlayer {
 
             if (tempPiece.getType() == PieceType.PAWN && tempPiece.getPlayer().colour == 0 && toRow == 7) {
                 tempPiece.setPieceType(PieceType.QUEEN);
+                tempPiece.moveSet = BoardGame.queenMoveSet;
                 tempPiece.setResId(R.drawable.wq);
             }
 
             if (tempPiece.getType() == PieceType.PAWN && tempPiece.getPlayer().colour == 1 && toRow == 0) {
                 tempPiece.setPieceType(PieceType.QUEEN);
+                tempPiece.moveSet = BoardGame.queenMoveSet;
                 tempPiece.setResId(R.drawable.bq);
             }
 
