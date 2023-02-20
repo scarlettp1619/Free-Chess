@@ -415,7 +415,7 @@ public class ChessPlayer {
                     }
                 }
                 if (attackingKingPiece != null) {
-                    for (Square s : attackingKingPiece.legalSquares) {
+                    for (Square s : attackingKingPiece.discoveredSquares) {
                         if (to.col == s.col && to.row == s.row) {
                             checked = true;
                             break;
