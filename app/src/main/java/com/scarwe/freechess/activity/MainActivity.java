@@ -1,5 +1,6 @@
 package com.scarwe.freechess.activity;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -20,13 +21,14 @@ public class MainActivity extends Activity {
     /*public MainActivity() throws IOException {
     }*/
 
+    @SuppressLint("SourceLockedOrientationActivity")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
-        final Button startButton = (Button) findViewById(R.id.start_button);
+        final Button startButton = findViewById(R.id.start_button);
 
         startButton.setOnClickListener((v) -> {
             Context context = MainActivity.this;
@@ -34,6 +36,7 @@ public class MainActivity extends Activity {
             Class<ChessActivity> destinationActivity = ChessActivity.class;
 
             try {
+                // reads config file and starts game
                 BufferedReader reader = new BufferedReader(new InputStreamReader(getAssets().open("config.json")));
                 BoardGame board = new BoardGame();
                 board.reader = reader;
@@ -44,6 +47,7 @@ public class MainActivity extends Activity {
 
             Intent intent = new Intent(context, destinationActivity);
 
+            // moves to chess activity
             startActivity(intent);
         });
     }

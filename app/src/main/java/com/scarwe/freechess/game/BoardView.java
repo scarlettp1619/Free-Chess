@@ -38,12 +38,13 @@ public class BoardView extends View{
     // loads all piece images (will soon be replaced with config)
     private static final int[] images = {R.drawable.bb, R.drawable.bk, R.drawable.bn, R.drawable.bp,
             R.drawable.bq, R.drawable.br, R.drawable.wb, R.drawable.wk, R.drawable.wn, R.drawable.wp,
-            R.drawable.wq, R.drawable.wr};
+            R.drawable.wq, R.drawable.wr, R.drawable.cwk, R.drawable.cbk};
 
     private final HashMap<Integer, Bitmap> bitmaps = new HashMap<>();
     private final Paint paint = new Paint();
     private final TextPaint textPaint = new TextPaint();
 
+    // setting up stuff for drawing
     private Bitmap movingPieceBitmap;
     private int fromCol = -1;
     private int fromRow = -1;
@@ -120,6 +121,7 @@ public class BoardView extends View{
         return true;
     }
 
+    // scales the board properly
     private void scaleSize() {
         float scaleF = 1f;
         float boardSize = Math.min(getWidth(), getHeight()) * scaleF;
@@ -136,13 +138,16 @@ public class BoardView extends View{
             movePiece = chessDelegate.pieceLoc(new Square(col, row));
         }
 
+        // if the piece selected isn't an empty square
         if (piece != null) {
             String legalLightColor = "#C7AFF3";
             String legalDarkColor = "#A874E5";
             drawLegalMoves(canvas, fromRow, fromCol, legalLightColor, legalDarkColor);
         }
 
+        // if piece moving isn't null
         if (movePiece != null && moved) {
+            // initialise colours
             String moveLightColor = "#BFC6F5";
             String moveDarkColor = "#8095EC";
             String placeLightColor = "#A3A3F0";
@@ -218,11 +223,13 @@ public class BoardView extends View{
 
     private void drawNotation(Canvas canvas) {
         for (int i = 0; i < 8; i++) {
+            // makes sure colours are correct
             if (i % 2 == 0) {
                 textPaint.setColor(Color.parseColor("#F9E2BD")); // dark square
             } else {
                 textPaint.setColor(Color.parseColor("#9A7455"));
             }
+            // setting up text painter
             textPaint.setFakeBoldText(true);
             textPaint.setTextSize(cellSize / 5);
             canvas.drawText(intToString(i + 1).toLowerCase(Locale.ROOT), i * cellSize +
