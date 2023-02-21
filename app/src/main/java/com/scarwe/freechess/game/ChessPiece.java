@@ -18,7 +18,6 @@ public class ChessPiece implements Cloneable{
     public LinkedHashSet<Square> legalSquares = new LinkedHashSet<>();
     public LinkedHashSet<Square> protectedSquares = new LinkedHashSet<>();
     public LinkedHashSet<Square> discoveredSquares = new LinkedHashSet<>();
-    public LinkedHashSet<Square> pawnCaptureSquares = new LinkedHashSet<>();
 
     public ArrayList<PieceType> moveSet;
 
@@ -77,8 +76,8 @@ public class ChessPiece implements Cloneable{
             Square leftCapture = new Square(col - 1, row + captureModifier);
             Square rightCapture = new Square(col + 1, row + captureModifier);
 
-            pawnCaptureSquares.add(leftCapture);
-            pawnCaptureSquares.add(rightCapture);
+            currentProtectedSquares.add(leftCapture);
+            currentProtectedSquares.add(rightCapture);
             for (int i = this.row - rowModifier; i <= this.row + rowModifier; i++) {
                 for (int j = this.col - 1; j <= this.col + 1; j++) {
                     if (j > 7 || j < -1 || i > 7 || i < -1) break;
