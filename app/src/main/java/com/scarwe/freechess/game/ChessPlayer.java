@@ -389,17 +389,6 @@ public class ChessPlayer {
             if (to.col == opponentAttackingPiece.col && to.row == opponentAttackingPiece.row) {
                 checked = false;
             }
-            /*for (Square s : opponentAttackingPiece.legalSquares) {
-                for (int i = kingRow - 1; i < kingRow + 1; i++) {
-                    for (int j = kingCol - 1; j < kingCol + 1; j++) {
-                        if (j < 0 || j > 7 || i < 0 || i > 7) break;
-                        if (s.col == j && s.row == i) {
-                            checked = true;
-                            break;
-                        }
-                    }
-                }
-            }*/
         }
 
         if (to != null && piece != null) {
@@ -623,11 +612,13 @@ public class ChessPlayer {
 
             if (tempPiece.getType() == PieceType.PAWN && tempPiece.getPlayer().colour == 0 && toRow == 7) {
                 tempPiece.setPieceType(PieceType.QUEEN);
+                tempPiece.moveSet = BoardGame.queenMoveSet;
                 tempPiece.setResId(R.drawable.wq);
             }
 
             if (tempPiece.getType() == PieceType.PAWN && tempPiece.getPlayer().colour == 1 && toRow == 0) {
                 tempPiece.setPieceType(PieceType.QUEEN);
+                tempPiece.moveSet = BoardGame.queenMoveSet;
                 tempPiece.setResId(R.drawable.bq);
             }
 
