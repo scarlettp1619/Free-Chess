@@ -364,8 +364,8 @@ public class ChessPlayer {
                 if (s.col == kingCol && s.row == kingRow) {
                     if (p != opponentAttackingPiece) {
                         attackingKingPiece = p;
+                        checked = true;
                     }
-                    checked = true;
                     break;
                 }
             }
