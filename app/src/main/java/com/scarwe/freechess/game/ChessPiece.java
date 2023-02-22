@@ -416,8 +416,4 @@ public class ChessPiece implements Cloneable{
         }
         return null;
     }
-
-    public ArrayList<PieceType> getMoveSet() {
-        return this.moveSet;
-    }
 }
