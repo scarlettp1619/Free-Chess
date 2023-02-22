@@ -352,7 +352,7 @@ public class ChessPlayer {
             }
         }
 
-        for (Square s : opponentAttackingPiece.protectedSquares) {
+        for (Square s : opponentAttackingPiece.legalSquares) {
             if (s.getCol() == kingCol && s.getRow() == kingRow) {
                 checked = true;
                 break;
@@ -360,7 +360,7 @@ public class ChessPlayer {
         }
 
         for (ChessPiece p : opponentPieces) {
-            for (Square s : p.protectedSquares) {
+            for (Square s : p.legalSquares) {
                 if (s.col == kingCol && s.row == kingRow) {
                     if (p != opponentAttackingPiece) {
                         attackingKingPiece = p;
@@ -372,7 +372,7 @@ public class ChessPlayer {
         }
 
         if (to != null && attackingKingPiece != null) {
-            for (Square s : attackingKingPiece.protectedSquares) {
+            for (Square s : attackingKingPiece.legalSquares) {
                 for (int i = kingRow - 1; i < kingRow + 1; i++) {
                     for (int j = kingCol - 1; j < kingCol + 1; j++) {
                         if (j < 0 || j > 7 || i < 0 || i > 7) break;
@@ -404,7 +404,7 @@ public class ChessPlayer {
                     }
                 }
                 if (attackingKingPiece != null) {
-                    for (Square s : attackingKingPiece.protectedSquares) {
+                    for (Square s : attackingKingPiece.discoveredSquares) {
                         if (to.col == s.col && to.row == s.row) {
                             checked = true;
                             break;
@@ -412,6 +412,15 @@ public class ChessPlayer {
                             checked = false;
                         }
                     }
+                }
+            }
+        }
+
+        for (ChessPiece p : opponentPieces) {
+            for (Square s : p.pawnCaptureSquares) {
+                if (s.col == kingCol && s.row == kingRow) {
+                    checked = true;
+                    break;
                 }
             }
         }
