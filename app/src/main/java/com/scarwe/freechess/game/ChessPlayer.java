@@ -346,9 +346,6 @@ public class ChessPlayer {
 =======
                 opponentDiscoveredSquares.addAll(p.discoveredSquares);
                 opponentLegalSquares.addAll(p.protectedSquares);
-<<<<<<< HEAD
->>>>>>> parent of c826006 (checkmate screen time)
-=======
 >>>>>>> parent of c826006 (checkmate screen time)
             }
             for (ChessPiece p : BoardGame.whitePlayer.pieces) {
@@ -364,9 +361,6 @@ public class ChessPlayer {
 =======
                 opponentDiscoveredSquares.addAll(p.discoveredSquares);
                 opponentLegalSquares.addAll(p.protectedSquares);
-<<<<<<< HEAD
->>>>>>> parent of c826006 (checkmate screen time)
-=======
 >>>>>>> parent of c826006 (checkmate screen time)
             }
             for (ChessPiece p : BoardGame.blackPlayer.pieces) {
@@ -410,17 +404,6 @@ public class ChessPlayer {
                 }
             }
         }
-<<<<<<< HEAD
-=======
-        if (tempPiece.getType() == PieceType.KING) {
-            for (Square s : opponentLegalSquares) {
-                if (to.getCol() != s.getCol() && to.getRow() != s.getRow()) {
-                    movedIntoDiscovered = false;
-                    break;
-                }
-            }
-        }
->>>>>>> parent of c826006 (checkmate screen time)
         if (possibleCheck && movedIntoDiscovered) {
             discovered = true;
         }
@@ -620,7 +603,6 @@ public class ChessPlayer {
                 // ensures the attacking piece isn't null
                 if (colour == 0 && BoardGame.gameMove > 2) {
 <<<<<<< HEAD
-<<<<<<< HEAD
                     // prevents moving into check by discovery
                     isKingDiscovered(tempPiece);
                     checked = isKingChecked(tempPiece, to);
@@ -629,12 +611,6 @@ public class ChessPlayer {
                     isKingDiscovered(tempPiece);
                     checked = isKingChecked(tempPiece, to);
 =======
-=======
-                    isKingDiscovered(tempPiece, to);
-                    isKingChecked(tempPiece, to);
-                }
-                else if (colour == 1 && BoardGame.gameMove > 1) {
->>>>>>> parent of c826006 (checkmate screen time)
                     isKingDiscovered(tempPiece, to);
                     isKingChecked(tempPiece, to);
                 }
