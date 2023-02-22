@@ -86,14 +86,14 @@ public class ChessActivity extends Activity implements ChessDelegate {
         if (white.turn && gameState == 0) {
             // for capture moves
             int piecesSize = BoardGame.blackPlayer.pieces.size();
-            for (ChessPiece p : BoardGame.whitePlayer.pieces) {
-                if (p.getType() == PieceType.KING && !BoardGame.whitePlayer.checked) {
-                    p.resID = R.drawable.wk;
-                    break;
-                }
-            }
             // if can move piece
             if (BoardGame.whitePlayer.movePiece(from, to, false)) {
+                for (ChessPiece p : BoardGame.whitePlayer.pieces) {
+                    if (p.getType() == PieceType.KING && !BoardGame.whitePlayer.checked) {
+                        p.resID = R.drawable.wk;
+                        break;
+                    }
+                }
                 int newPiecesSize = BoardGame.blackPlayer.pieces.size();
                 BoardGame.setCurrentPlayer(BoardGame.blackPlayer);
 
@@ -190,14 +190,14 @@ public class ChessActivity extends Activity implements ChessDelegate {
             }
         // everything the same for black, should probably simplify this at some point
         } else if (BoardGame.blackPlayer.turn && gameState == 0) {
-            for (ChessPiece p : BoardGame.blackPlayer.pieces) {
-                if (p.getType() == PieceType.KING && !BoardGame.blackPlayer.checked) {
-                    p.resID = R.drawable.bk;
-                    break;
-                }
-            }
             int piecesSize = BoardGame.whitePlayer.pieces.size();
             if (BoardGame.blackPlayer.movePiece(from, to, false)) {
+                for (ChessPiece p : BoardGame.blackPlayer.pieces) {
+                    if (p.getType() == PieceType.KING && !BoardGame.blackPlayer.checked) {
+                        p.resID = R.drawable.bk;
+                        break;
+                    }
+                }
                 int newPiecesSize = BoardGame.whitePlayer.pieces.size();
                 BoardGame.setCurrentPlayer(BoardGame.whitePlayer);
                 BoardGame.whitePlayer.setTurn(true);
