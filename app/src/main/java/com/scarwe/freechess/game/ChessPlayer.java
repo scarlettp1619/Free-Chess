@@ -12,6 +12,7 @@ public class ChessPlayer {
 
     public boolean turn = false;
     public boolean checked = false;
+    public boolean discovered = false;
 
     public int colour;
     public int castled;
@@ -118,6 +119,26 @@ public class ChessPlayer {
         return false;
     }
 
+    public boolean canPawnTestMove(Square from, Square to) {
+        if (from.getCol() == to.getCol() - 1 && to.getRow() - from.getRow() == 1
+                && BoardGame.pieceLoc(new Square(from.getCol(), from.getRow())).getPlayer().colour == 0) {
+            return true;
+        }
+        else if (from.getCol() == to.getCol() + 1 && to.getRow() - from.getRow() == 1
+                && BoardGame.pieceLoc(new Square(from.getCol(), from.getRow())).getPlayer().colour == 0) {
+            return true;
+        }
+        else if (from.getCol() == to.getCol() - 1 && to.getRow() - from.getRow() == -1
+                && BoardGame.pieceLoc(new Square(from.getCol(), from.getRow())).getPlayer().colour == 1) {
+            return true;
+        }
+        else if (from.getCol() == to.getCol() + 1 && to.getRow() - from.getRow() == -1
+                && BoardGame.pieceLoc(new Square(from.getCol(), from.getRow())).getPlayer().colour == 1) {
+            return true;
+        }
+        return canEnPassant(from, to);
+    }
+
     public boolean canPawnMove(Square from, Square to) {
         return (canPawnRegularMove(from, to) || canEnPassant(from, to));
     }
@@ -135,13 +156,30 @@ public class ChessPlayer {
         return false;
     }
 
+    public boolean canBishopAttackMove(Square from, Square to) {
+        return (Math.abs(from.getCol() - to.getCol()) == Math.abs(from.getRow() - to.getRow()));
+    }
+
+
     public boolean canRookMove(Square from, Square to) {
         return from.getCol() == to.getCol() && isClearVertically(from, to) ||
                 from.getRow() == to.getRow() && isClearHorizontally(from, to);
     }
 
+    public boolean canRookAttackMove(Square from, Square to) {
+        return from.getCol() == to.getCol() ||
+                from.getRow() == to.getRow();
+    }
+
     public boolean canQueenMove(Square from, Square to) {
         return canRookMove(from, to) || canBishopMove(from, to);
+    }
+
+    public boolean canKingAttackMove(Square from, Square to) {
+        return Math.abs(from.row - to.row) == 1 &&
+                (Math.abs(from.row - to.row) == 0 || Math.abs(from.row - to.row) == 1) ||
+                Math.abs(from.col - to.col) == 1 &&
+                        (Math.abs(from.row - to.row) == 0 || Math.abs(from.row - to.row) == 1);
     }
 
     public boolean canKingMove(Square from, Square to){
@@ -293,6 +331,65 @@ public class ChessPlayer {
         return true;
     }
 
+    public boolean isKingDiscovered(ChessPiece tempPiece, Square to) {
+        LinkedHashSet<Square> opponentDiscoveredSquares = new LinkedHashSet<>();
+        LinkedHashSet<Square> opponentLegalSquares = new LinkedHashSet<>();
+        int kingRow = 0, kingCol = 0;
+        discovered = false;
+        boolean possibleCheck = false;
+        boolean movedIntoDiscovered = false;
+
+        if (colour == 0) {
+            for (ChessPiece p : BoardGame.blackPlayer.pieces) {
+                opponentDiscoveredSquares.addAll(p.discoveredSquares);
+                opponentLegalSquares.addAll(p.protectedSquares);
+            }
+            for (ChessPiece p : BoardGame.whitePlayer.pieces) {
+                if (p.kingID == 1) {
+                    kingRow = p.row;
+                    kingCol = p.col;
+                }
+            }
+        } else {
+            for (ChessPiece p : BoardGame.whitePlayer.pieces) {
+                opponentDiscoveredSquares.addAll(p.discoveredSquares);
+                opponentLegalSquares.addAll(p.protectedSquares);
+            }
+            for (ChessPiece p : BoardGame.blackPlayer.pieces) {
+                if (p.kingID == 1) {
+                    kingRow = p.row;
+                    kingCol = p.col;
+                }
+            }
+        }
+        for (Square s : opponentDiscoveredSquares) {
+            if (s.getCol() == kingCol && s.getRow() == kingRow) {
+                possibleCheck = true;
+            }
+            for (int i = kingRow - 1; i <= kingRow + 1; i++) {
+                for (int j = kingCol - 1; j <= kingCol + 1; j++) {
+                    if (j < 0 || j > 7 || i < 0 || i > 7) break;
+                    if (tempPiece.col == j && tempPiece.row == i && tempPiece.col == s.col && tempPiece.row == s.row) {
+                        movedIntoDiscovered = true;
+                        break;
+                    }
+                }
+            }
+        }
+        if (tempPiece.getType() == PieceType.KING) {
+            for (Square s : opponentLegalSquares) {
+                if (to.getCol() != s.getCol() && to.getRow() != s.getRow()) {
+                    movedIntoDiscovered = false;
+                    break;
+                }
+            }
+        }
+        if (possibleCheck && movedIntoDiscovered) {
+            discovered = true;
+        }
+        return discovered;
+    }
+
     // honestly idk why this isn't a boolean but i'm lazy to change it
     public void isKingChecked(ChessPiece piece, Square to) {
         // initialise where king could be
@@ -337,7 +434,7 @@ public class ChessPlayer {
         }
 
         for (ChessPiece p : opponentPieces) {
-            for (Square s : p.protectedSquares) {
+            for (Square s : p.legalSquares) {
                 if (s.col == kingCol && s.row == kingRow) {
                     // for discovered checks
                     if (p != opponentAttackingPiece) {
@@ -353,15 +450,9 @@ public class ChessPlayer {
         if (to != null && attackingKingPiece != null) {
             for (Square s : attackingKingPiece.protectedSquares) {
                 // find squares around king
-                for (int i = kingRow - 1; i < kingRow + 1; i++) {
-                    for (int j = kingCol - 1; j < kingCol + 1; j++) {
-                        // if illegal squares are found
-                        if (j < 0 || j > 7 || i < 0 || i > 7) break;
-                        if (to.col == s.col && to.row == s.row) {
-                            checked = false;
-                            break;
-                        }
-                    }
+                if (to.col == s.col && to.row == s.row) {
+                    checked = false;
+                    break;
                 }
             }
         }
@@ -398,6 +489,9 @@ public class ChessPlayer {
                     }
                 }
             }
+        }
+        if (attackingKingPiece != null) {
+            attackingKingPiece.generateLegalSquares(new Square(attackingKingPiece.col, attackingKingPiece.row));
         }
     }
 
@@ -479,9 +573,15 @@ public class ChessPlayer {
             clearTempPieces();
             if (movePiece(from.getCol(), from.getRow(), to.getCol(), to.getRow(), testMove)) {
                 // ensures the attacking piece isn't null
-                if (colour == 0 && BoardGame.gameMove > 2) isKingChecked(tempPiece, to);
-                else if (colour == 1 && BoardGame.gameMove > 1) isKingChecked(tempPiece, to);
-                if (checked) {
+                if (colour == 0 && BoardGame.gameMove > 2) {
+                    isKingDiscovered(tempPiece, to);
+                    isKingChecked(tempPiece, to);
+                }
+                else if (colour == 1 && BoardGame.gameMove > 1) {
+                    isKingDiscovered(tempPiece, to);
+                    isKingChecked(tempPiece, to);
+                }
+                if (checked || discovered) {
                     // reset temp pieces (for testing)
                     resetPieces();
                     BoardGame.pgnMoves.setLength(0);
@@ -626,6 +726,7 @@ public class ChessPlayer {
             if (!testMove) {
                 BoardGame.gameMove++;
                 currentAttackingPiece = tempPiece;
+                tempPiece.generateDiscoveredSquares(new Square(toCol, toRow));
                 // writes to pgn
                 addToPgn(new Square(fromCol, fromRow), new Square(toCol, toRow), tempPiece.getType(), tempPiece, captureMove, castled);
             }
