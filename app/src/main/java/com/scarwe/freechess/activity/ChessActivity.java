@@ -53,7 +53,6 @@ public class ChessActivity extends Activity implements ChessDelegate {
             try {
                 board.reader = new BufferedReader(new InputStreamReader(getAssets().open("config.json")));
                 board.resetBoard();
-                gameState = 0;
             } catch (IOException | CloneNotSupportedException e) {
                 //
             }
@@ -111,7 +110,6 @@ public class ChessActivity extends Activity implements ChessDelegate {
                     p.generateDiscoveredSquares(new Square(p.col, p.row));
                 }
 
-                white.findLegalMoves();
                 black.findLegalMoves();
                 if (BoardGame.gameMove > 3) black.isKingChecked(null, null);
 
@@ -198,7 +196,7 @@ public class ChessActivity extends Activity implements ChessDelegate {
                 }
 
                 white.findLegalMoves();
-                if (BoardGame.gameMove > 3) white.isKingChecked(null, null);
+                if (BoardGame.gameMove > 2) white.isKingChecked(null, null);
 
                 player.start();
 

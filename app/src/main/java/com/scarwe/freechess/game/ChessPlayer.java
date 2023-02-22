@@ -362,10 +362,8 @@ public class ChessPlayer {
         for (ChessPiece p : opponentPieces) {
             for (Square s : p.legalSquares) {
                 if (s.col == kingCol && s.row == kingRow) {
-                    if (p != opponentAttackingPiece) {
-                        attackingKingPiece = p;
-                        checked = true;
-                    }
+                    attackingKingPiece = p;
+                    checked = true;
                     break;
                 }
             }
@@ -373,22 +371,31 @@ public class ChessPlayer {
 
         if (to != null && attackingKingPiece != null) {
             for (Square s : attackingKingPiece.legalSquares) {
+                if (to.col == s.col && to.row == s.row) {
+                    checked = false;
+                    break;
+                }
+            }
+        }
+
+        if (to != null) {
+            if (to.col == opponentAttackingPiece.col && to.row == opponentAttackingPiece.row) {
+                checked = false;
+            }
+<<<<<<< HEAD
+=======
+            for (Square s : opponentAttackingPiece.legalSquares) {
                 for (int i = kingRow - 1; i < kingRow + 1; i++) {
                     for (int j = kingCol - 1; j < kingCol + 1; j++) {
                         if (j < 0 || j > 7 || i < 0 || i > 7) break;
-                        if (to.col == s.col && to.row == s.row) {
-                            checked = false;
+                        if (s.col == j && s.row == i) {
+                            checked = true;
                             break;
                         }
                     }
                 }
             }
-        }
-
-        if (to != null && piece != null) {
-            if (to.col == opponentAttackingPiece.col && to.row == opponentAttackingPiece.row) {
-                checked = false;
-            }
+>>>>>>> parent of ca5992a (still a tiny bug)
         }
 
         if (to != null && piece != null) {
@@ -398,29 +405,8 @@ public class ChessPlayer {
                         if (to.col == s.col && to.row == s.row) {
                             checked = true;
                             break;
-                        } else {
-                            checked = false;
                         }
                     }
-                }
-                if (attackingKingPiece != null) {
-                    for (Square s : attackingKingPiece.legalSquares) {
-                        if (to.col == s.col && to.row == s.row) {
-                            checked = true;
-                            break;
-                        } else {
-                            checked = false;
-                        }
-                    }
-                }
-            }
-        }
-
-        for (ChessPiece p : opponentPieces) {
-            for (Square s : p.pawnCaptureSquares) {
-                if (s.col == kingCol && s.row == kingRow) {
-                    checked = true;
-                    break;
                 }
             }
         }
