@@ -51,7 +51,6 @@ public class BoardView extends View{
     private int row = -1;
     private int tempCol = -1;
     private int tempRow = -1;
-    private boolean moved = false;
     private float movingPieceX = -1f;
     private float movingPieceY = -1f;
 
@@ -83,7 +82,6 @@ public class BoardView extends View{
     public boolean onTouchEvent(MotionEvent e) {
         // holding finger down
         if (e.getAction() == MotionEvent.ACTION_DOWN) {
-            moved = false;
             // locate position, math.floor required as rectangles are floats
             fromCol = (int) Math.floor((e.getX() - originX) / cellSize);
             fromRow = 7 - ((int) Math.floor((e.getY() - originY) / cellSize));
@@ -106,7 +104,6 @@ public class BoardView extends View{
             // move the piece to the new position
             try {
                 chessDelegate.movePiece(new Square(fromCol, fromRow), new Square(col, row));
-                moved = BoardGame.pieceLoc(fromCol, fromRow) != BoardGame.pieceLoc(col, row);
             } catch (CloneNotSupportedException | IOException ex) {
                 throw new RuntimeException(ex);
             }
@@ -142,7 +139,7 @@ public class BoardView extends View{
             drawLegalMoves(canvas, fromRow, fromCol, legalLightColor, legalDarkColor);
         }
 
-        if (movePiece != null && moved) {
+        if (movePiece != null) {
             String moveLightColor = "#BFC6F5";
             String moveDarkColor = "#8095EC";
             String placeLightColor = "#A3A3F0";
