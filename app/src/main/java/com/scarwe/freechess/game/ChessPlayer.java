@@ -331,17 +331,22 @@ public class ChessPlayer {
         return true;
     }
 
-    public void isKingDiscovered(ChessPiece tempPiece) {
+    public boolean isKingDiscovered(ChessPiece tempPiece, Square to) {
         LinkedHashSet<Square> opponentDiscoveredSquares = new LinkedHashSet<>();
+        LinkedHashSet<Square> opponentLegalSquares = new LinkedHashSet<>();
         int kingRow = 0, kingCol = 0;
         discovered = false;
         boolean possibleCheck = false;
         boolean movedIntoDiscovered = false;
 
         if (colour == 0) {
-            // finds all discovered squares
             for (ChessPiece p : BoardGame.blackPlayer.pieces) {
+<<<<<<< HEAD
+                opponentDiscoveredSquares.addAll(p.protectedSquares);
+=======
                 opponentDiscoveredSquares.addAll(p.discoveredSquares);
+                opponentLegalSquares.addAll(p.protectedSquares);
+>>>>>>> parent of c826006 (checkmate screen time)
             }
             for (ChessPiece p : BoardGame.whitePlayer.pieces) {
                 if (p.kingID == 1) {
@@ -351,7 +356,12 @@ public class ChessPlayer {
             }
         } else {
             for (ChessPiece p : BoardGame.whitePlayer.pieces) {
+<<<<<<< HEAD
+                opponentDiscoveredSquares.addAll(p.protectedSquares);
+=======
                 opponentDiscoveredSquares.addAll(p.discoveredSquares);
+                opponentLegalSquares.addAll(p.protectedSquares);
+>>>>>>> parent of c826006 (checkmate screen time)
             }
             for (ChessPiece p : BoardGame.blackPlayer.pieces) {
                 if (p.kingID == 1) {
@@ -360,31 +370,48 @@ public class ChessPlayer {
                 }
             }
         }
+<<<<<<< HEAD
+        for (int i = kingRow - 1; i <= kingRow + 1; i++) {
+            for (int j = kingCol - 1; j <= kingCol + 1; j++) {
+                if (j < 0 || j > 7 || i < 0 || i > 7) break;
+                for (Square s : opponentDiscoveredSquares) {
+                    // opponents discovered squares stop at a piece that blocks it, so this works
+                    if (s.getCol() == j && s.getRow() == i) {
+                        possibleCheck = true;
+                    }
+=======
         for (Square s : opponentDiscoveredSquares) {
-            // opponents discovered squares stop at a piece that blocks it, so this works
             if (s.getCol() == kingCol && s.getRow() == kingRow) {
                 possibleCheck = true;
             }
-            // checks squares around king to ensure you can't walk into check
             for (int i = kingRow - 1; i <= kingRow + 1; i++) {
                 for (int j = kingCol - 1; j <= kingCol + 1; j++) {
                     if (j < 0 || j > 7 || i < 0 || i > 7) break;
+>>>>>>> parent of c826006 (checkmate screen time)
                     if (tempPiece.col == j && tempPiece.row == i && tempPiece.col == s.col && tempPiece.row == s.row) {
                         movedIntoDiscovered = true;
                         break;
                     }
+                    // checks squares around king to ensure you can't walk into check
                 }
             }
         }
-
-        // idk why this needs two checks but for some reason it won't work otherwise
+        if (tempPiece.getType() == PieceType.KING) {
+            for (Square s : opponentLegalSquares) {
+                if (to.getCol() != s.getCol() && to.getRow() != s.getRow()) {
+                    movedIntoDiscovered = false;
+                    break;
+                }
+            }
+        }
         if (possibleCheck && movedIntoDiscovered) {
             discovered = true;
         }
+        return discovered;
     }
 
     // honestly idk why this isn't a boolean but i'm lazy to change it
-    public void isKingChecked(ChessPiece piece, Square to) {
+    public boolean isKingChecked(ChessPiece piece, Square to) {
         // initialise where king could be
         int kingRow = 0, kingCol = 0;
         // assume king isn't checked
@@ -432,20 +459,39 @@ public class ChessPlayer {
                     // for discovered checks
                     if (p != opponentAttackingPiece) {
                         attackingKingPiece = p;
+                        break;
                     }
+                }
+            }
+        }
+
+        if (attackingKingPiece != null) {
+            // ensures king can't move into check after a discovered check
+            for (Square s : attackingKingPiece.protectedSquares) {
+                if (kingCol == s.col && kingRow == s.row) {
                     checked = true;
                     break;
                 }
             }
         }
 
-        // for non-test discovered check moves
         if (to != null && attackingKingPiece != null) {
             for (Square s : attackingKingPiece.protectedSquares) {
                 // find squares around king
-                if (to.col == s.col && to.row == s.row) {
-                    checked = false;
-                    break;
+                for (int i = kingRow - 1; i < kingRow + 1; i++) {
+                    for (int j = kingCol - 1; j < kingCol + 1; j++) {
+                        // if illegal squares are found
+                        if (j < 0 || j > 7 || i < 0 || i > 7) break;
+                        if (s.col == j && s.row == i){
+                            checked = true;
+                            break;
+                        } else {
+                            if (to.col == s.col && to.row == s.row) {
+                                checked = false;
+                                break;
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -465,27 +511,16 @@ public class ChessPlayer {
                         if (to.col == s.col && to.row == s.row) {
                             checked = true;
                             break;
-                        } else {
-                            checked = false;
-                        }
-                    }
-                }
-                if (attackingKingPiece != null) {
-                    // ensures king can't move into check after a discovered check
-                    for (Square s : attackingKingPiece.protectedSquares) {
-                        if (to.col == s.col && to.row == s.row) {
-                            checked = true;
-                            break;
-                        } else {
-                            checked = false;
                         }
                     }
                 }
             }
         }
+
         if (attackingKingPiece != null) {
             attackingKingPiece.generateLegalSquares(new Square(attackingKingPiece.col, attackingKingPiece.row));
         }
+        return checked;
     }
 
     // finds legal moves
@@ -567,13 +602,22 @@ public class ChessPlayer {
             if (movePiece(from.getCol(), from.getRow(), to.getCol(), to.getRow(), testMove)) {
                 // ensures the attacking piece isn't null
                 if (colour == 0 && BoardGame.gameMove > 2) {
+<<<<<<< HEAD
                     // prevents moving into check by discovery
                     isKingDiscovered(tempPiece);
-                    isKingChecked(tempPiece, to);
+                    checked = isKingChecked(tempPiece, to);
                 }
                 else if (colour == 1 && BoardGame.gameMove > 1) {
                     isKingDiscovered(tempPiece);
+                    checked = isKingChecked(tempPiece, to);
+=======
+                    isKingDiscovered(tempPiece, to);
                     isKingChecked(tempPiece, to);
+                }
+                else if (colour == 1 && BoardGame.gameMove > 1) {
+                    isKingDiscovered(tempPiece, to);
+                    isKingChecked(tempPiece, to);
+>>>>>>> parent of c826006 (checkmate screen time)
                 }
                 if (checked || discovered) {
                     // reset temp pieces (for testing)
@@ -720,7 +764,6 @@ public class ChessPlayer {
             if (!testMove) {
                 BoardGame.gameMove++;
                 currentAttackingPiece = tempPiece;
-                tempPiece.generateDiscoveredSquares(new Square(toCol, toRow));
                 // writes to pgn
                 addToPgn(new Square(fromCol, fromRow), new Square(toCol, toRow), tempPiece.getType(), tempPiece, captureMove, castled);
             }
