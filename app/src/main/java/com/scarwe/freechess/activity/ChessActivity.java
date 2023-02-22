@@ -1,6 +1,5 @@
 package com.scarwe.freechess.activity;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.pm.ActivityInfo;
 import android.graphics.Color;
@@ -28,15 +27,14 @@ public class ChessActivity extends Activity implements ChessDelegate {
     private final BoardGame board = new BoardGame();
     private final int bgColor = Color.parseColor("#252525");
     private int gameState = 0;
-    // for pop up when winning
     private String winner = "";
 
     ChessPlayer white = BoardGame.whitePlayer;
     ChessPlayer black = BoardGame.blackPlayer;
 
+    // tag for console logging
     MediaPlayer player;
 
-    @SuppressLint("SourceLockedOrientationActivity")
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,13 +51,14 @@ public class ChessActivity extends Activity implements ChessDelegate {
 
         resetButton.setOnClickListener(v -> {
             try {
-                // load config file
                 board.reader = new BufferedReader(new InputStreamReader(getAssets().open("config.json")));
                 board.resetBoard();
                 gameState = 0;
             } catch (IOException | CloneNotSupportedException e) {
                 //
             }
+            board.whiteCastled = false;
+            board.blackCastled = false;
             boardView.invalidate();
         });
 
@@ -73,7 +72,6 @@ public class ChessActivity extends Activity implements ChessDelegate {
 
     @Override
     public void movePiece(Square from, Square to) throws CloneNotSupportedException {
-        // automatically true and checked if false, easier to check this way
         boolean checkmated = true;
         boolean stalemated = true;
         boolean drawByRepetition = false;
@@ -82,56 +80,44 @@ public class ChessActivity extends Activity implements ChessDelegate {
 
         int count = 0;
 
-        // if whites turn and gam eplayable
         if (white.turn && gameState == 0) {
-            // for capture moves
             int piecesSize = BoardGame.blackPlayer.pieces.size();
-            for (ChessPiece p : BoardGame.whitePlayer.pieces) {
-                if (p.getType() == PieceType.KING) {
-                    p.resID = R.drawable.wk;
-                    break;
-                }
-            }
-            // if can move piece
             if (BoardGame.whitePlayer.movePiece(from, to, false)) {
                 int newPiecesSize = BoardGame.blackPlayer.pieces.size();
                 BoardGame.setCurrentPlayer(BoardGame.blackPlayer);
 
-                // ensures correct turn turn
                 BoardGame.whitePlayer.setTurn(false);
                 BoardGame.blackPlayer.setTurn(true);
-
-                // for first move
-                if (player == null) {
-                    player = MediaPlayer.create(this, R.raw.move);
-                }
-                player.start();
 
                 if (piecesSize == newPiecesSize) {
                     white.sinceCaptured++;
                 } else {
                     white.sinceCaptured = 0;
                     black.sinceCaptured = 0;
-
                 }
-                // find legal moves for players
+
+                if (player == null) {
+                    player = MediaPlayer.create(this, R.raw.move);
+                }
+                player.start();
+
                 for (ChessPiece p : white.pieces) {
                     p.generateLegalSquares(new Square(p.col, p.row));
+                    p.generateDiscoveredSquares(new Square(p.col, p.row));
                 }
 
                 for (ChessPiece p : black.pieces) {
                     p.generateLegalSquares(new Square(p.col, p.row));
+                    p.generateDiscoveredSquares(new Square(p.col, p.row));
                 }
 
                 black.findLegalMoves();
                 if (BoardGame.gameMove > 3) black.isKingChecked(null, null);
 
-                // see if current state has been repeated
                 for (String s : BoardGame.getPgn()) count = Collections.frequency(BoardGame.getPgn(), s);
                 if (count > 2) drawByRepetition = true;
 
                 if (drawByRepetition) {
-                    // will probably make a button to claim a draw at some point, instead of automatic
                     gameState = 3;
                     System.out.println("draw by repetition");
                 }
@@ -157,14 +143,8 @@ public class ChessActivity extends Activity implements ChessDelegate {
                 if (black.checked) {
                     System.out.println("black checked");
                     for (ChessPiece p : black.pieces) {
-                        if (p.getType() == PieceType.KING) {
-                            p.resID = R.drawable.cbk;
-                            break;
-                        }
-                        // if there are any legal moves, checkmated is false
                         if (p.legalSquares.size() != 0) {
                             checkmated = false;
-                            break;
                         }
                     }
                     if (checkmated) {
@@ -177,10 +157,8 @@ public class ChessActivity extends Activity implements ChessDelegate {
                     }
                 } else {
                     for (ChessPiece p : black.pieces) {
-                        // if not in check and there are legal moves
                         if (p.legalSquares.size() != 0) {
                             stalemated = false;
-                            break;
                         }
                     }
                     if (stalemated) {
@@ -190,14 +168,7 @@ public class ChessActivity extends Activity implements ChessDelegate {
                     }
                 }
             }
-        // everything the same for black, should probably simplify this at some point
         } else if (BoardGame.blackPlayer.turn && gameState == 0) {
-            for (ChessPiece p : BoardGame.blackPlayer.pieces) {
-                if (p.getType() == PieceType.KING) {
-                    p.resID = R.drawable.bk;
-                    break;
-                }
-            }
             int piecesSize = BoardGame.whitePlayer.pieces.size();
             if (BoardGame.blackPlayer.movePiece(from, to, false)) {
                 int newPiecesSize = BoardGame.whitePlayer.pieces.size();
@@ -205,27 +176,30 @@ public class ChessActivity extends Activity implements ChessDelegate {
                 BoardGame.whitePlayer.setTurn(true);
                 BoardGame.blackPlayer.setTurn(false);
 
-                if (player == null) {
-                    player = MediaPlayer.create(this, R.raw.move);
-                }
-                player.start();
                 if (piecesSize == newPiecesSize) {
                     black.sinceCaptured++;
                 } else {
                     white.sinceCaptured = 0;
                     black.sinceCaptured = 0;
                 }
+                if (player == null) {
+                    player = MediaPlayer.create(this, R.raw.move);
+                }
 
                 for (ChessPiece p : white.pieces) {
                     p.generateLegalSquares(new Square(p.col, p.row));
+                    p.generateDiscoveredSquares(new Square(p.col, p.row));
                 }
 
                 for (ChessPiece p : black.pieces) {
                     p.generateLegalSquares(new Square(p.col, p.row));
+                    p.generateDiscoveredSquares(new Square(p.col, p.row));
                 }
 
                 white.findLegalMoves();
                 if (BoardGame.gameMove > 3) white.isKingChecked(null, null);
+
+                player.start();
 
                 for (String s : BoardGame.getPgn()) count = Collections.frequency(BoardGame.getPgn(), s);
                 if (count > 2) drawByRepetition = true;
@@ -256,10 +230,6 @@ public class ChessActivity extends Activity implements ChessDelegate {
                 if (white.checked) {
                     System.out.println("white checked");
                     for (ChessPiece p : white.pieces) {
-                        if (p.getType() == PieceType.KING) {
-                            p.resID = R.drawable.cwk;
-                            break;
-                        }
                         if (p.legalSquares.size() != 0) {
                             checkmated = false;
                         }
@@ -293,13 +263,11 @@ public class ChessActivity extends Activity implements ChessDelegate {
         }
     }
 
-    // set background colour
     private void setActivityBgColor() {
         View view = this.getWindow().getDecorView();
         view.setBackgroundColor(bgColor);
     }
 
-    // find insufficient material
     private boolean checkInsufficient() {
         if (white.pieces.size() < 3 && black.pieces.size() < 3) {
             for (ChessPiece p : white.pieces) {

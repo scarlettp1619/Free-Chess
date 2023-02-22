@@ -10,8 +10,9 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 public class BoardGame {
+    public boolean whiteCastled = false;
+    public boolean blackCastled = false;
 
-    // initialise players
     public static ChessPlayer whitePlayer = new ChessPlayer(0);
     public static ChessPlayer blackPlayer = new ChessPlayer(1);
     public static ChessPlayer currentPlayer = whitePlayer;
@@ -21,7 +22,7 @@ public class BoardGame {
     public static ArrayList<ChessPiece> pieces = new ArrayList<>();
     public static ArrayList<String> pgnCheck = new ArrayList<>();
 
-    // initialise move sets to add to pieces
+
     public static ArrayList<PieceType> pawnMoveSet = new ArrayList<>();
     public static ArrayList<PieceType> knightMoveSet = new ArrayList<>();
     public static ArrayList<PieceType> bishopMoveSet = new ArrayList<>();
@@ -46,7 +47,6 @@ public class BoardGame {
         whitePlayer.setTurn(true);
         blackPlayer.setTurn(false);
 
-        // game set up stuff
         gameMove = 1;
         currentPlayer = whitePlayer;
 
@@ -65,13 +65,11 @@ public class BoardGame {
         pieces.addAll(whitePlayer.pieces);
         pieces.addAll(blackPlayer.pieces);
 
-        // reads config file
         String line = reader.readLine();
         String pawnMoves = null, knightMoves = null, bishopMoves = null,
                 rookMoves = null, queenMoves = null, kingMoves = null;
         ArrayList<String> moveSet = new ArrayList<>();
 
-        // no format checking but oh well
         while (line != null) {
             String testLine = line.replaceAll("\\s","").replace("\"", "");
             if (testLine.startsWith("PawnMoves:")) pawnMoves = testLine;
@@ -83,7 +81,6 @@ public class BoardGame {
             line = reader.readLine();
         }
 
-        // adds to piece move set
         moveSet.add(pawnMoves);
         moveSet.add(knightMoves);
         moveSet.add(bishopMoves);
@@ -94,7 +91,6 @@ public class BoardGame {
         for (int i = 0; i < moveSet.size(); i++) {
             String s = moveSet.get(i);
             String[] possibleMoves = s.split(":");
-            // get the move set for the piece's type
             ArrayList<PieceType> currentMoveSet = new ArrayList<>();
 
             if (i == 0) currentMoveSet = pawnMoveSet;
@@ -142,13 +138,14 @@ public class BoardGame {
         whitePlayer.pieces.add(new ChessPiece(4, 0, whitePlayer, PieceType.KING, R.drawable.wk, kingMoveSet));
         blackPlayer.pieces.add(new ChessPiece(4, 7, blackPlayer, PieceType.KING, R.drawable.bk, kingMoveSet));
 
-        // generates legal moves to ensure players can. move i guess
         for (ChessPiece p : whitePlayer.pieces) {
             p.generateLegalSquares(new Square(p.col, p.row));
+            p.generateDiscoveredSquares(new Square(p.col, p.row));
         }
 
         for (ChessPiece p : blackPlayer.pieces) {
             p.generateLegalSquares(new Square(p.col, p.row));
+            p.generateDiscoveredSquares(new Square(p.col, p.row));
         }
 
         pgnCheck.add(pgnBoard());

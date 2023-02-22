@@ -5,6 +5,7 @@ import com.scarwe.freechess.R;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Map;
 
@@ -12,13 +13,13 @@ public class ChessPlayer {
 
     public boolean turn = false;
     public boolean checked = false;
+    public boolean discovered = false;
 
     public int colour;
     public int castled;
 
     public ArrayList<ChessPiece> pieces = new ArrayList<>();
 
-    // used to calculate legal moves, this allows board to be reset
     public ArrayList<ChessPiece> tempWhitePieces = new ArrayList<>();
     public ArrayList<ChessPiece> tempBlackPieces = new ArrayList<>();
 
@@ -43,11 +44,9 @@ public class ChessPlayer {
 
     private boolean canEnPassant(Square from, Square to) {
         int movementCol, movementRow, enPassantRow;
-        // depends which direction the capture is
         if (from.getCol() - to.getCol() == 1) movementCol = -1;
         else movementCol = 1;
 
-        // determines pawn up or down
         if (this.colour == 0) {
             movementRow = 1;
             enPassantRow = 4;
@@ -60,7 +59,6 @@ public class ChessPlayer {
         Square square = new Square(from.getCol() + movementCol, from.getRow());
 
         try {
-            // a whole lot of rules
             if ((BoardGame.pieceLoc(square).getPlayer().colour != this.colour)
                     && (BoardGame.pieceLoc(square).getType() == PieceType.PAWN)
                     && (BoardGame.pieceLoc(new Square(from.getCol() + movementCol, from.getRow() + movementRow))) == null
@@ -80,7 +78,6 @@ public class ChessPlayer {
 
     private boolean canPawnRegularMove(Square from, Square to) {
         pawnJustCaptured = false;
-        // pawn first move
         if (from.getCol() == to.getCol() && BoardGame.pieceLoc(new Square(to.getCol(), to.getRow())) == null) {
             if (BoardGame.pieceLoc(new Square(from.getCol(), from.getRow())).player == this) {
                 if (from.getRow() == 1 && this.colour == 0) return (to.getRow() == 2 || to.getRow() == 3)
@@ -91,7 +88,6 @@ public class ChessPlayer {
                 else return this.colour == 1 && to.getRow() - from.getRow() == -1 && isClearVertically(from, to);
             }
         }
-        // i gotta rewrite this, but you should get the idea
         else if (from.getCol() == to.getCol() - 1 && to.getRow() - from.getRow() == 1 &&
                 BoardGame.pieceLoc(new Square(to.getCol(), to.getRow())) != null
                 && BoardGame.pieceLoc(new Square(from.getCol(), from.getRow())).player.colour == 0) {
@@ -118,6 +114,26 @@ public class ChessPlayer {
         return false;
     }
 
+    public boolean canPawnTestMove(Square from, Square to) {
+        if (from.getCol() == to.getCol() - 1 && to.getRow() - from.getRow() == 1
+                && BoardGame.pieceLoc(new Square(from.getCol(), from.getRow())).getPlayer().colour == 0) {
+            return true;
+        }
+        else if (from.getCol() == to.getCol() + 1 && to.getRow() - from.getRow() == 1
+                && BoardGame.pieceLoc(new Square(from.getCol(), from.getRow())).getPlayer().colour == 0) {
+            return true;
+        }
+        else if (from.getCol() == to.getCol() - 1 && to.getRow() - from.getRow() == -1
+                && BoardGame.pieceLoc(new Square(from.getCol(), from.getRow())).getPlayer().colour == 1) {
+            return true;
+        }
+        else if (from.getCol() == to.getCol() + 1 && to.getRow() - from.getRow() == -1
+                && BoardGame.pieceLoc(new Square(from.getCol(), from.getRow())).getPlayer().colour == 1) {
+            return true;
+        }
+        return canEnPassant(from, to);
+    }
+
     public boolean canPawnMove(Square from, Square to) {
         return (canPawnRegularMove(from, to) || canEnPassant(from, to));
     }
@@ -135,9 +151,18 @@ public class ChessPlayer {
         return false;
     }
 
+    public boolean canBishopAttackMove(Square from, Square to) {
+        return (Math.abs(from.getCol() - to.getCol()) == Math.abs(from.getRow() - to.getRow()));
+    }
+
     public boolean canRookMove(Square from, Square to) {
         return from.getCol() == to.getCol() && isClearVertically(from, to) ||
                 from.getRow() == to.getRow() && isClearHorizontally(from, to);
+    }
+
+    public boolean canRookAttackMove(Square from, Square to) {
+        return from.getCol() == to.getCol() ||
+                from.getRow() == to.getRow();
     }
 
     public boolean canQueenMove(Square from, Square to) {
@@ -158,6 +183,13 @@ public class ChessPlayer {
                             (Math.abs(from.row - to.row) == 0 || Math.abs(from.row - to.row) == 1);
         }
         return false;
+    }
+
+    public boolean canKingAttackMove(Square from, Square to) {
+        return Math.abs(from.row - to.row) == 1 &&
+                (Math.abs(from.row - to.row) == 0 || Math.abs(from.row - to.row) == 1) ||
+                Math.abs(from.col - to.col) == 1 &&
+                        (Math.abs(from.row - to.row) == 0 || Math.abs(from.row - to.row) == 1);
     }
 
     public boolean canCastleKingSide(Square from, Square to) {
@@ -193,8 +225,7 @@ public class ChessPlayer {
                                 //
                             }
                         }
-                    // gotta rework this return, just makes sure that the king moves to the correct space
-                    return to.getCol() - from.getCol() > 1;
+                    return to.getCol() - from.getCol() == 2;
                 }
             }
         } catch (Exception ex) {
@@ -238,7 +269,7 @@ public class ChessPlayer {
                             //
                         }
                     }
-                    return to.getCol() - from.getCol() < -1;
+                    return to.getCol() - from.getCol() == -2;
                 }
             }
         } catch (Exception ex) {
@@ -293,24 +324,18 @@ public class ChessPlayer {
         return true;
     }
 
-    // honestly idk why this isn't a boolean but i'm lazy to change it
-    public void isKingChecked(ChessPiece piece, Square to) {
-        // initialise where king could be
+    public boolean isKingChecked(ChessPiece piece, Square to) throws CloneNotSupportedException {
         int kingRow = 0, kingCol = 0;
-        // assume king isn't checked
         checked = false;
-        ChessPiece opponentAttackingPiece; // piece that just moved
-        ChessPiece attackingKingPiece = null; // for discovered checks
+        ChessPiece opponentAttackingPiece;
+        ChessPiece attackingKingPiece = null;
         ArrayList<ChessPiece> opponentPieces;
         if (colour == 0) {
-            // find last moved opponent piece
             opponentAttackingPiece = BoardGame.blackPlayer.currentAttackingPiece;
-            // finds where piece could move, used for testing scenarios
             opponentAttackingPiece.generateLegalSquares(new Square(opponentAttackingPiece.col, opponentAttackingPiece.row));
             opponentPieces = BoardGame.blackPlayer.pieces;
             for (ChessPiece p : BoardGame.whitePlayer.pieces) {
                 if (p.kingID == 1) {
-                    // locate king, needs to expand for possible more than one king.
                     kingRow = p.row;
                     kingCol = p.col;
                 }
@@ -328,8 +353,6 @@ public class ChessPlayer {
         }
 
         for (Square s : opponentAttackingPiece.protectedSquares) {
-            // if king lands in seen squares (protected includes any overlap on own pieces,
-            // this is to prevent capturing into check
             if (s.getCol() == kingCol && s.getRow() == kingRow) {
                 checked = true;
                 break;
@@ -339,7 +362,6 @@ public class ChessPlayer {
         for (ChessPiece p : opponentPieces) {
             for (Square s : p.protectedSquares) {
                 if (s.col == kingCol && s.row == kingRow) {
-                    // for discovered checks
                     if (p != opponentAttackingPiece) {
                         attackingKingPiece = p;
                     }
@@ -349,13 +371,10 @@ public class ChessPlayer {
             }
         }
 
-        // for non-test discovered check moves
         if (to != null && attackingKingPiece != null) {
             for (Square s : attackingKingPiece.protectedSquares) {
-                // find squares around king
                 for (int i = kingRow - 1; i < kingRow + 1; i++) {
                     for (int j = kingCol - 1; j < kingCol + 1; j++) {
-                        // if illegal squares are found
                         if (j < 0 || j > 7 || i < 0 || i > 7) break;
                         if (to.col == s.col && to.row == s.row) {
                             checked = false;
@@ -367,7 +386,6 @@ public class ChessPlayer {
         }
 
         if (to != null && piece != null) {
-            // if attacking piece is captured
             if (to.col == opponentAttackingPiece.col && to.row == opponentAttackingPiece.row) {
                 checked = false;
             }
@@ -376,7 +394,6 @@ public class ChessPlayer {
         if (to != null && piece != null) {
             if (piece.getType() == PieceType.KING) {
                 for (ChessPiece p : opponentPieces) {
-                    // ensures king can't walk into check
                     for (Square s : p.protectedSquares) {
                         if (to.col == s.col && to.row == s.row) {
                             checked = true;
@@ -387,7 +404,6 @@ public class ChessPlayer {
                     }
                 }
                 if (attackingKingPiece != null) {
-                    // ensures king can't move into check after a discovered check
                     for (Square s : attackingKingPiece.protectedSquares) {
                         if (to.col == s.col && to.row == s.row) {
                             checked = true;
@@ -399,31 +415,28 @@ public class ChessPlayer {
                 }
             }
         }
+
+        opponentAttackingPiece.generateLegalSquares(new Square(opponentAttackingPiece.col, opponentAttackingPiece.row));
+        return checked;
     }
 
-    // finds legal moves
     public void findLegalMoves() throws CloneNotSupportedException {
         HashMap<ChessPiece, LinkedHashSet<Square>> legalMoves = new HashMap<>();
         LinkedHashSet<Square> newLegalMoves = new LinkedHashSet<>();
         for (ChessPiece p : pieces) {
-            // adds legal moves to hashmap
             legalMoves.put(p, p.legalSquares);
             legalMoves.entrySet().removeIf(ent -> ent.getValue().isEmpty());
         }
-        // searches individual pieces
         for (Map.Entry<ChessPiece, LinkedHashSet<Square>> entry : legalMoves.entrySet()) {
             ChessPiece p = entry.getKey();
             LinkedHashSet<Square> legalSquares = entry.getValue();
-            // clears hashset
             newLegalMoves.clear();
             for (Square s : legalSquares) {
-                // if player can move
                 if (movePiece(new Square(p.col, p.row), s, true)) {
                     newLegalMoves.add(s);
                     resetPieces();
                 }
             }
-            // clears current legal squares and adds all new ones
             p.legalSquares.clear();
             p.legalSquares.addAll(newLegalMoves);
         }
@@ -443,7 +456,6 @@ public class ChessPlayer {
             if (to.getCol() < 0 || to.getCol() > 7 || to.getRow() < 0 || to.getRow() > 7) {
                 return false;
             }
-            // checks all move sets
             if(movingPiece.moveSet.contains(PieceType.PAWN)
                     && canPawnMove(from, to)) pawnMove = true;
             if(movingPiece.moveSet.contains(PieceType.KNIGHT)
@@ -465,30 +477,30 @@ public class ChessPlayer {
 
 
     public boolean movePiece(Square from, Square to, boolean testMove) throws CloneNotSupportedException {
-        // for pgn testing
         castled = 0;
+
         String currentPgn = BoardGame.pgnMoves.toString();
         int currentGameMove = BoardGame.gameMove;
-        // gets current piece trying to move
         ChessPiece tempPiece;
         tempPiece = BoardGame.pieceLoc(from);
 
-        // if in moveset
         if (canMove(from, to) && turn) {
-            // for test moves
             clearTempPieces();
             if (movePiece(from.getCol(), from.getRow(), to.getCol(), to.getRow(), testMove)) {
-                // ensures the attacking piece isn't null
-                if (colour == 0 && BoardGame.gameMove > 2) isKingChecked(tempPiece, to);
-                else if (colour == 1 && BoardGame.gameMove > 1) isKingChecked(tempPiece, to);
-                if (checked) {
-                    // reset temp pieces (for testing)
+                if (BoardGame.gameMove > 3) {
+                    isKingChecked(tempPiece, to);
+                }
+                if (checked || discovered) {
                     resetPieces();
                     BoardGame.pgnMoves.setLength(0);
                     BoardGame.gameMove = currentGameMove;
                     BoardGame.pgnMoves.append(currentPgn);
                     return false;
                 } else {
+                    if (!testMove) {
+                        BoardGame.pieceLoc(to).generateLegalSquares(to);
+                        BoardGame.pieceLoc(to).generateDiscoveredSquares(to);
+                    }
                     return true;
                 }
             }
@@ -498,7 +510,6 @@ public class ChessPlayer {
 
     boolean movePiece(int fromCol, int fromRow, int toCol, int toRow, boolean testMove) throws CloneNotSupportedException {
 
-        // gets size of pieces (check if move is a capture for sfx and pgn)
         int piecesSize;
 
         if (fromCol == toCol && fromRow == toRow) return false;
@@ -509,11 +520,9 @@ public class ChessPlayer {
         captureMove = false;
         ArrayList<ChessPiece> tempPieces;
 
-        // gets opponent pieces
         if (colour == 0) tempPieces = BoardGame.blackPlayer.pieces;
         else tempPieces = BoardGame.whitePlayer.pieces;
 
-        // gets opponent pieces size
         piecesSize = tempPieces.size();
 
         if (movingPiece.player == this) {
@@ -525,16 +534,20 @@ public class ChessPlayer {
             } catch (Exception ex) {
                 // do nothing
             }
-            // removes pieces from board
-            BoardGame.whitePlayer.pieces.remove(removePiece);
-            BoardGame.whitePlayer.pieces.remove(movingPiece);
-            BoardGame.blackPlayer.pieces.remove(removePiece);
-            BoardGame.blackPlayer.pieces.remove(movingPiece);
+            // ensures players can't move null squares (no pieces on them)
+            BoardGame.currentPlayer.pieces.remove(removePiece);
+            BoardGame.currentPlayer.pieces.remove(movingPiece);
 
-            // clones piece so it retains attributes (such as moved/not)
+            if (BoardGame.currentPlayer == BoardGame.whitePlayer) {
+                BoardGame.blackPlayer.pieces.remove(removePiece);
+                BoardGame.blackPlayer.pieces.remove(movingPiece);
+            } else {
+                BoardGame.whitePlayer.pieces.remove(removePiece);
+                BoardGame.whitePlayer.pieces.remove(movingPiece);
+            }
+
             ChessPiece tempPiece = (ChessPiece) movingPiece.clone();
 
-            // sets attributes of cloned piece
             tempPiece.col = toCol;
             tempPiece.row = toRow;
             tempPiece.hasMoved = true;
@@ -543,7 +556,6 @@ public class ChessPlayer {
 
             for (ChessPiece p : BoardGame.whitePlayer.pieces) {
                 if (p.getType() == PieceType.PAWN && p.getCurrentMove() == 1) {
-                    // en passant stuff
                     if (!testMove) p.addSinceMoved(1);
                 }
             }
@@ -553,33 +565,28 @@ public class ChessPlayer {
                 }
             }
 
-            if (tempPiece.type == PieceType.KING && toCol - fromCol > 1 && !testMove) {
+            if (tempPiece.type == PieceType.KING && toCol - fromCol == 2 && !testMove) {
                 if (this.colour == 0) {
-                    movePiece(tempPiece.col, tempPiece.row, 7, 0, true);
-                    movePiece(7, 0, 5, 0, true); // moves rook for kingside
-                    castled = 1;
+                    movePiece(7, 0, 5, 0, true); // rook
+                    castled = 1; // kingside
                 }
                 if (this.colour == 1) {
-                    movePiece(tempPiece.col, tempPiece.row, 7, 7, true);
                     movePiece(7, 7, 5, 7, true);
-                    castled = 1;
+                    castled = 1; // kingside
                 }
             }
-            if (tempPiece.type == PieceType.KING && toCol - fromCol < -1 && !testMove) {
+            if (tempPiece.type == PieceType.KING && toCol - fromCol == -2 && !testMove) {
                 if (this.colour == 0) {
-                    movePiece(tempPiece.col, tempPiece.row, 2, 0, true);
-                    movePiece(0, 0, 3, 0, true); // moves rook for queenside
-                    castled = 2;
+                    movePiece(0, 0, 3, 0, true); // rook
+                    castled = 2; // queenside
                 }
                 if (this.colour == 1) {
-                    movePiece(tempPiece.col, tempPiece.row, 2, 7, true);
                     movePiece(0, 7, 3, 7, true);
                     castled = 2; // queenside
                 }
             }
 
             try {
-                // en passant check to remove captured piece. ugh
                 if (tempPiece.type == PieceType.PAWN && Math.abs(toCol - fromCol) == 1 && toRow - fromRow == 1 && !testMove
                         && BoardGame.pieceLoc(toCol, fromRow).getType() == PieceType.PAWN
                         && BoardGame.pieceLoc(toCol,fromRow).getPlayer().colour != colour && !pawnJustCaptured) {
@@ -603,7 +610,6 @@ public class ChessPlayer {
                 //
             }
 
-            // promotion (only to queen currently)
             if (tempPiece.getType() == PieceType.PAWN && tempPiece.getPlayer().colour == 0 && toRow == 7) {
                 tempPiece.setPieceType(PieceType.QUEEN);
                 tempPiece.moveSet = BoardGame.queenMoveSet;
@@ -616,7 +622,6 @@ public class ChessPlayer {
                 tempPiece.setResId(R.drawable.bq);
             }
 
-            // calculates new pieces size
             int newPiecesSize = tempPieces.size();
 
             if (piecesSize > newPiecesSize && !testMove) {
@@ -626,7 +631,6 @@ public class ChessPlayer {
             if (!testMove) {
                 BoardGame.gameMove++;
                 currentAttackingPiece = tempPiece;
-                // writes to pgn
                 addToPgn(new Square(fromCol, fromRow), new Square(toCol, toRow), tempPiece.getType(), tempPiece, captureMove, castled);
             }
             return true;
@@ -661,8 +665,6 @@ public class ChessPlayer {
 
         for (ChessPiece p : typePieces) {
             if (p != null) {
-                // if there are any shared squares between pieces (rooks / knights), make sure to
-                // specify which piece is being moved (e.g. Rhh4)
                 overlapMoves.addAll(p.legalSquares);
             }
         }
