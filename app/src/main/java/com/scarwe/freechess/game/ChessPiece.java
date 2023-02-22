@@ -18,7 +18,10 @@ public class ChessPiece implements Cloneable{
     public LinkedHashSet<Square> legalSquares = new LinkedHashSet<>();
     public LinkedHashSet<Square> protectedSquares = new LinkedHashSet<>();
     public LinkedHashSet<Square> discoveredSquares = new LinkedHashSet<>();
+<<<<<<< Updated upstream
     public LinkedHashSet<Square> pawnCaptureSquares = new LinkedHashSet<>();
+=======
+>>>>>>> Stashed changes
 
     public ArrayList<PieceType> moveSet;
 
@@ -47,20 +50,35 @@ public class ChessPiece implements Cloneable{
 
     public void generateLegalSquares(Square currentSquare) throws CloneNotSupportedException {
         ArrayList<Square> currentSquares = new ArrayList<>();
+<<<<<<< Updated upstream
+=======
+        ArrayList<Square> currentProtectedSquares = new ArrayList<>();
+        ArrayList<Square> currentDiscoveredSquares = new ArrayList<>();
+>>>>>>> Stashed changes
         if (moveSet.contains(PieceType.KING)) {
             for (int i = this.row - 1 ; i <= this.row + 1; i++) {
                 for (int j = this.col - 4; j <= this.col + 4; j++) {
                     Square testSquare = new Square(j, i);
                     if (player.canMove(currentSquare, testSquare)) {
                         currentSquares.add(testSquare);
+<<<<<<< Updated upstream
                         discoveredSquares.add(testSquare);
                         protectedSquares.add(testSquare);
+=======
+>>>>>>> Stashed changes
                     }
                     for (ChessPiece piece : player.pieces) {
                         if (testSquare.col == piece.col && testSquare.row == piece.row) {
                             currentSquares.remove(testSquare);
                         }
                     }
+                }
+            }
+            for (int i = this.row - 1; i <= this.row + 1; i++) {
+                for (int j = this.col - 1; j <= this.col + 1; j++) {
+                    Square testSquare = new Square(j, i);
+                    currentProtectedSquares.add(testSquare);
+                    currentDiscoveredSquares.add(testSquare);
                 }
             }
         } if (moveSet.contains(PieceType.PAWN)) {
@@ -76,11 +94,17 @@ public class ChessPiece implements Cloneable{
             Square leftCapture = new Square(col - 1, row + captureModifier);
             Square rightCapture = new Square(col + 1, row + captureModifier);
 
+<<<<<<< Updated upstream
             pawnCaptureSquares.add(leftCapture);
             pawnCaptureSquares.add(rightCapture);
+=======
+            currentProtectedSquares.add(leftCapture);
+            currentProtectedSquares.add(rightCapture);
+            discoveredSquares.add(leftCapture);
+            discoveredSquares.add(rightCapture);
+>>>>>>> Stashed changes
             for (int i = this.row - rowModifier; i <= this.row + rowModifier; i++) {
                 for (int j = this.col - 1; j <= this.col + 1; j++) {
-                    if (j > 7 || j < -1 || i > 7 || i < -1) break;
                     Square testSquare = new Square(j, i);
                     if (player.canMove(currentSquare, testSquare)) {
                         currentSquares.add(testSquare);
@@ -95,8 +119,20 @@ public class ChessPiece implements Cloneable{
             }
         }
         if (moveSet.contains(PieceType.ROOK)) {
+            boolean kingInArea = false;
+            ChessPlayer opponent;
+            if (this.getPlayer().colour == 0) opponent = BoardGame.blackPlayer;
+            else opponent = BoardGame.whitePlayer;
+            int kingCol = -1, kingRow = -1;
             for (int i = 0; i <= 7; i++) {
                 Square testSquare = new Square(this.col, i);
+                if (BoardGame.pieceLoc(this.col, i) != null) {
+                    if (BoardGame.pieceLoc(this.col, i).getType() == PieceType.KING
+                    && BoardGame.pieceLoc(this.col, i).getPlayer() != this.player){
+                        kingInArea = true;
+                        kingRow = i;
+                    }
+                }
                 if (player.canMove(currentSquare, testSquare)) {
                     currentSquares.add(testSquare);
                     protectedSquares.add(testSquare);
@@ -107,7 +143,46 @@ public class ChessPiece implements Cloneable{
                     }
                 }
             }
+            if (kingInArea) {
+                if (kingRow > this.row) {
+                    int piecesDiscovered = 0;
+                    for (int i = this.row; i <= kingRow; i++) {
+                        Square testSquare = new Square(this.col, i);
+                        if (piecesDiscovered < 2) {
+                            currentDiscoveredSquares.add(testSquare);
+                        }
+                        for (ChessPiece piece : opponent.pieces) {
+                            if (testSquare.col == piece.col && testSquare.row == piece.row) {
+                                piecesDiscovered++;
+                                break;
+                            }
+                        }
+                    }
+                } else {
+                    int piecesDiscovered = 0;
+                    for (int i = this.row; i >= kingRow; i--) {
+                        Square testSquare = new Square(this.col, i);
+                        if (piecesDiscovered < 2) {
+                            currentDiscoveredSquares.add(testSquare);
+                        }
+                        for (ChessPiece piece : opponent.pieces) {
+                            if (testSquare.col == piece.col && testSquare.row == piece.row) {
+                                piecesDiscovered++;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+            kingInArea = false;
             for (int j = 0; j <= 7; j++) {
+                if (BoardGame.pieceLoc(j, this.row) != null) {
+                    if (BoardGame.pieceLoc(j, this.row).getType() == PieceType.KING
+                    && BoardGame.pieceLoc(j, this.row).getPlayer() != this.player) {
+                        kingInArea = true;
+                        kingCol = j;
+                    }
+                }
                 Square testSquare = new Square(j, this.row);
                 if (player.canMove(currentSquare, testSquare)) {
                     currentSquares.add(testSquare);
@@ -119,14 +194,76 @@ public class ChessPiece implements Cloneable{
                     }
                 }
             }
+            if (kingInArea) {
+                if (kingCol > this.col) {
+                    int piecesDiscovered = 0;
+                    for (int i = this.col; i <= kingCol; i++) {
+                        Square testSquare = new Square(i, this.row);
+                        if (piecesDiscovered < 2) {
+                            currentDiscoveredSquares.add(testSquare);
+                        }
+                        for (ChessPiece piece : opponent.pieces) {
+                            if (testSquare.col == piece.col && testSquare.row == piece.row) {
+                                piecesDiscovered++;
+                                break;
+                            }
+                        }
+                    }
+                } else {
+                    int piecesDiscovered = 0;
+                    for (int i = this.col; i >= kingCol; i--) {
+                        Square testSquare = new Square(i, this.row);
+                        if (piecesDiscovered < 2) {
+                            currentDiscoveredSquares.add(testSquare);
+                        }
+                        for (ChessPiece piece : opponent.pieces) {
+                            if (testSquare.col == piece.col && testSquare.row == piece.row) {
+                                piecesDiscovered++;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
         }
         //Math.abs(from.getCol() - to.getCol()) == Math.abs(from.getRow() - to.getRow())
         if (moveSet.contains(PieceType.BISHOP)) {
+            ChessPlayer opponent;
+            if (this.getPlayer().colour == 0) opponent = BoardGame.blackPlayer;
+            else opponent = BoardGame.whitePlayer;
+            boolean kingInArea1 = false;
+            boolean kingInArea2 = false;
+            boolean kingInArea3 = false;
+            boolean kingInArea4 = false;
             for (int i = 0; i <= 7; i++) {
                 Square testSquare1 = new Square(this.col + i, this.row + i);
+                if (BoardGame.pieceLoc(testSquare1) != null) {
+                    if(BoardGame.pieceLoc(testSquare1).getType() == PieceType.KING
+                    && BoardGame.pieceLoc(testSquare1).getPlayer() != this.player) {
+                        kingInArea1 = true;
+                    }
+                }
                 Square testSquare2 = new Square(this.col - i, this.row - i);
+                if (BoardGame.pieceLoc(testSquare2) != null) {
+                    if(BoardGame.pieceLoc(testSquare2).getType() == PieceType.KING
+                            && BoardGame.pieceLoc(testSquare2).getPlayer() != this.player) {
+                        kingInArea2 = true;
+                    }
+                }
                 Square testSquare3 = new Square(this.col - i, this.row + i);
+                if (BoardGame.pieceLoc(testSquare3) != null) {
+                    if(BoardGame.pieceLoc(testSquare3).getType() == PieceType.KING
+                            && BoardGame.pieceLoc(testSquare3).getPlayer() != this.player) {
+                        kingInArea3 = true;
+                    }
+                }
                 Square testSquare4 = new Square(this.col + i, this.row - i);
+                if (BoardGame.pieceLoc(testSquare4) != null) {
+                    if(BoardGame.pieceLoc(testSquare4).getType() == PieceType.KING
+                            && BoardGame.pieceLoc(testSquare4).getPlayer() != this.player) {
+                        kingInArea4 = true;
+                    }
+                }
                 if (player.canMove(currentSquare, testSquare1)) {
                     currentSquares.add(testSquare1);
                     protectedSquares.add(testSquare1);
@@ -158,6 +295,7 @@ public class ChessPiece implements Cloneable{
                     }
                 }
             }
+<<<<<<< Updated upstream
         }
         if (moveSet.contains(PieceType.QUEEN)) {
             // Bishop-like moves
@@ -228,6 +366,66 @@ public class ChessPiece implements Cloneable{
                 for (ChessPiece piece : player.pieces) {
                     if (testSquare.col == piece.col && testSquare.row == piece.row) {
                         currentSquares.remove(testSquare);
+=======
+            if (kingInArea1) {
+                int piecesDiscovered = 0;
+                for (int i = 0; i <= 7; i++) {
+                    Square testSquare = new Square(this.col + i, this.row + i);
+                    if (piecesDiscovered < 2) {
+                        currentDiscoveredSquares.add(testSquare);
+                    }
+                    for (ChessPiece piece : opponent.pieces) {
+                        if (testSquare.col == piece.col && testSquare.row == piece.row) {
+                            piecesDiscovered++;
+                            break;
+                        }
+                    }
+                }
+
+            }
+            else if (kingInArea2) {
+                int piecesDiscovered = 0;
+                for (int i = 0; i <= 7; i++) {
+                    Square testSquare = new Square(this.col - i, this.row - i);
+                    if (piecesDiscovered < 2) {
+                        currentDiscoveredSquares.add(testSquare);
+                    }
+                    for (ChessPiece piece : opponent.pieces) {
+                        if (testSquare.col == piece.col && testSquare.row == piece.row) {
+                            piecesDiscovered++;
+                            break;
+                        }
+                    }
+                }
+            }
+            else if (kingInArea3) {
+                int piecesDiscovered = 0;
+                for (int i = 0; i <= 7; i++) {
+                    Square testSquare = new Square(this.col - i, this.row + i);
+                    if (piecesDiscovered < 2) {
+                        currentDiscoveredSquares.add(testSquare);
+                    }
+                    for (ChessPiece piece : opponent.pieces) {
+                        if (testSquare.col == piece.col && testSquare.row == piece.row) {
+                            piecesDiscovered++;
+                            break;
+                        }
+                    }
+                }
+            }
+            else if (kingInArea4) {
+                int piecesDiscovered = 0;
+                for (int i = 0; i <= 7; i++) {
+                    Square testSquare = new Square(this.col + i, this.row - i);
+                    if (piecesDiscovered < 2) {
+                        currentDiscoveredSquares.add(testSquare);
+                    }
+                    for (ChessPiece piece : opponent.pieces) {
+                        if (testSquare.col == piece.col && testSquare.row == piece.row) {
+                            piecesDiscovered++;
+                            break;
+                        }
+>>>>>>> Stashed changes
                     }
                 }
             }
@@ -241,7 +439,12 @@ public class ChessPiece implements Cloneable{
                     Square testSquare = new Square(testCol, testRow);
                     if (player.canMove(currentSquare, testSquare)) {
                         currentSquares.add(testSquare);
+<<<<<<< Updated upstream
                         protectedSquares.add(testSquare);
+=======
+                        currentDiscoveredSquares.add(testSquare);
+                        currentProtectedSquares.add(testSquare);
+>>>>>>> Stashed changes
                     }
                     for (ChessPiece piece : player.pieces) {
                         if (testSquare.col == piece.col && testSquare.row == piece.row) {
@@ -253,6 +456,7 @@ public class ChessPiece implements Cloneable{
         }
         legalSquares.clear();
         legalSquares.addAll(currentSquares);
+<<<<<<< Updated upstream
     }
 
     public void generateDiscoveredSquares(Square currentSquare) {
@@ -375,6 +579,12 @@ public class ChessPiece implements Cloneable{
                 }
             }
         }
+=======
+        protectedSquares.clear();
+        protectedSquares.addAll(currentProtectedSquares);
+        discoveredSquares.clear();
+        discoveredSquares.addAll(currentDiscoveredSquares);
+>>>>>>> Stashed changes
     }
 
     public ChessPlayer getPlayer () {

@@ -3,6 +3,6 @@
   "KnightMoves": "knight",
   "BishopMoves": "bishop",
   "RookMoves": "rook",
-  "QueenMoves": "queen",
+  "QueenMoves": "rook, bishop",
   "KingMoves": "king"
 }

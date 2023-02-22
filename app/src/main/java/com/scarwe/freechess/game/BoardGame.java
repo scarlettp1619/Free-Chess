@@ -107,7 +107,6 @@ public class BoardGame {
                     if (Objects.equals(st, "knight")) currentMoveSet.add(PieceType.KNIGHT);
                     if (Objects.equals(st, "bishop")) currentMoveSet.add(PieceType.BISHOP);
                     if (Objects.equals(st, "rook")) currentMoveSet.add(PieceType.ROOK);
-                    if (Objects.equals(st, "queen")) currentMoveSet.add(PieceType.QUEEN);
                     if (Objects.equals(st, "king")) currentMoveSet.add(PieceType.KING);
                 }
             }

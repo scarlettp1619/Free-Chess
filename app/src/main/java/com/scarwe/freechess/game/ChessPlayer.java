@@ -155,6 +155,10 @@ public class ChessPlayer {
         return (Math.abs(from.getCol() - to.getCol()) == Math.abs(from.getRow() - to.getRow()));
     }
 
+<<<<<<< Updated upstream
+=======
+
+>>>>>>> Stashed changes
     public boolean canRookMove(Square from, Square to) {
         return from.getCol() == to.getCol() && isClearVertically(from, to) ||
                 from.getRow() == to.getRow() && isClearHorizontally(from, to);
@@ -167,6 +171,13 @@ public class ChessPlayer {
 
     public boolean canQueenMove(Square from, Square to) {
         return canRookMove(from, to) || canBishopMove(from, to);
+    }
+
+    public boolean canKingAttackMove(Square from, Square to) {
+        return Math.abs(from.row - to.row) == 1 &&
+                (Math.abs(from.row - to.row) == 0 || Math.abs(from.row - to.row) == 1) ||
+                Math.abs(from.col - to.col) == 1 &&
+                        (Math.abs(from.row - to.row) == 0 || Math.abs(from.row - to.row) == 1);
     }
 
     public boolean canKingMove(Square from, Square to){
@@ -324,7 +335,59 @@ public class ChessPlayer {
         return true;
     }
 
+<<<<<<< Updated upstream
     public boolean isKingChecked(ChessPiece piece, Square to) throws CloneNotSupportedException {
+=======
+    public void isKingDiscovered(ChessPiece tempPiece) {
+        LinkedHashSet<Square> opponentDiscoveredSquares = new LinkedHashSet<>();
+        ChessPlayer opponent;
+        int kingRow = 0, kingCol = 0;
+        int directionOfAttack;
+        discovered = false;
+        boolean possibleCheck = false;
+        boolean movedIntoDiscovered = false;
+
+        if (colour == 0) {
+            // finds all discovered squares
+            opponent = BoardGame.blackPlayer;
+            for (ChessPiece p : BoardGame.whitePlayer.pieces) {
+                if (p.kingID == 1) {
+                    kingRow = p.row;
+                    kingCol = p.col;
+                }
+            }
+        } else {
+            opponent = BoardGame.whitePlayer;
+            for (ChessPiece p : BoardGame.blackPlayer.pieces) {
+                if (p.kingID == 1) {
+                    kingRow = p.row;
+                    kingCol = p.col;
+                }
+            }
+        }
+        for (ChessPiece p : opponent.pieces) {
+            for (Square s : p.discoveredSquares) {
+                // opponents discovered squares stop at a piece that blocks it, so this works
+                if (s.getCol() == kingCol && s.getRow() == kingRow) {
+                    possibleCheck = true;
+                }
+                if (tempPiece.col == s.col && tempPiece.row == s.row) {
+                    movedIntoDiscovered = true;
+                }
+                // checks squares around king to ensure you can't walk into check
+            }
+        }
+
+        // idk why this needs two checks but for some reason it won't work otherwise
+        if (possibleCheck && movedIntoDiscovered) {
+            discovered = true;
+        }
+    }
+
+    // honestly idk why this isn't a boolean but i'm lazy to change it
+    public void isKingChecked(ChessPiece piece, Square to) {
+        // initialise where king could be
+>>>>>>> Stashed changes
         int kingRow = 0, kingCol = 0;
         checked = false;
         ChessPiece opponentAttackingPiece;
@@ -335,6 +398,7 @@ public class ChessPlayer {
             opponentAttackingPiece.generateLegalSquares(new Square(opponentAttackingPiece.col, opponentAttackingPiece.row));
             opponentPieces = BoardGame.blackPlayer.pieces;
             for (ChessPiece p : BoardGame.whitePlayer.pieces) {
+                // find where king is located
                 if (p.kingID == 1) {
                     kingRow = p.row;
                     kingCol = p.col;
@@ -352,6 +416,10 @@ public class ChessPlayer {
             }
         }
 
+<<<<<<< Updated upstream
+=======
+        // if the king lies in a seen square
+>>>>>>> Stashed changes
         for (Square s : opponentAttackingPiece.legalSquares) {
             if (s.getCol() == kingCol && s.getRow() == kingRow) {
                 checked = true;
@@ -362,7 +430,14 @@ public class ChessPlayer {
         for (ChessPiece p : opponentPieces) {
             for (Square s : p.legalSquares) {
                 if (s.col == kingCol && s.row == kingRow) {
+<<<<<<< Updated upstream
                     attackingKingPiece = p;
+=======
+                    // used for discovered checks
+                    if (p != opponentAttackingPiece) {
+                        attackingKingPiece = p;
+                    }
+>>>>>>> Stashed changes
                     checked = true;
                     break;
                 }
@@ -371,6 +446,7 @@ public class ChessPlayer {
 
         if (to != null && attackingKingPiece != null) {
             for (Square s : attackingKingPiece.legalSquares) {
+<<<<<<< Updated upstream
                 if (to.col == s.col && to.row == s.row) {
                     checked = false;
                     break;
@@ -396,10 +472,27 @@ public class ChessPlayer {
                 }
             }
 >>>>>>> parent of ca5992a (still a tiny bug)
+=======
+                // if you are able to block a discovered check
+                if (to.col == s.col && to.row == s.row) {
+                    checked = false;
+                    break;
+                }
+            }
         }
+
+        if (to != null) {
+            // if you can capture a checking piece
+            if (to.col == opponentAttackingPiece.col && to.row == opponentAttackingPiece.row) {
+                checked = false;
+            }
+>>>>>>> Stashed changes
+        }
+
 
         if (to != null && piece != null) {
             if (piece.getType() == PieceType.KING) {
+                // prevents king from walking into checks
                 for (ChessPiece p : opponentPieces) {
                     for (Square s : p.protectedSquares) {
                         if (to.col == s.col && to.row == s.row) {
@@ -482,10 +575,29 @@ public class ChessPlayer {
         if (canMove(from, to) && turn) {
             clearTempPieces();
             if (movePiece(from.getCol(), from.getRow(), to.getCol(), to.getRow(), testMove)) {
+<<<<<<< Updated upstream
                 if (BoardGame.gameMove > 3) {
                     isKingChecked(tempPiece, to);
                 }
                 if (checked || discovered) {
+=======
+                // ensures the attacking piece isn't null
+                if (colour == 0 && BoardGame.gameMove > 2) {
+                    // prevents moving into check by discovery
+                    isKingDiscovered(tempPiece);
+                    if (!discovered) {
+                        isKingChecked(tempPiece, to);
+                    }
+                }
+                else if (colour == 1 && BoardGame.gameMove > 1) {
+                    isKingDiscovered(tempPiece);
+                    if (!discovered) {
+                        isKingChecked(tempPiece, to);
+                    }
+                }
+                if (checked || discovered) {
+                    // reset temp pieces (for testing)
+>>>>>>> Stashed changes
                     resetPieces();
                     BoardGame.pgnMoves.setLength(0);
                     BoardGame.gameMove = currentGameMove;
