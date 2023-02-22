@@ -1,5 +1,7 @@
 package com.scarwe.freechess.game;
 
+import androidx.annotation.NonNull;
+
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 
@@ -11,17 +13,15 @@ public class ChessPiece implements Cloneable{
     public int row, col, resID;
     public int sinceMoved = -1;
     public int currentMove = 0;
+    // to check for stalemates by insufficient material
     public int bishopColour = -1;
     public int kingID = 0;
     public boolean hasMoved = false;
 
     public LinkedHashSet<Square> legalSquares = new LinkedHashSet<>();
+    // literally only exists cause pawns exist
     public LinkedHashSet<Square> protectedSquares = new LinkedHashSet<>();
     public LinkedHashSet<Square> discoveredSquares = new LinkedHashSet<>();
-<<<<<<< Updated upstream
-    public LinkedHashSet<Square> pawnCaptureSquares = new LinkedHashSet<>();
-=======
->>>>>>> Stashed changes
 
     public ArrayList<PieceType> moveSet;
 
@@ -43,29 +43,24 @@ public class ChessPiece implements Cloneable{
         }
     }
 
+    @NonNull
     @Override
     public Object clone() throws CloneNotSupportedException {
         return super.clone();
     }
 
-    public void generateLegalSquares(Square currentSquare) throws CloneNotSupportedException {
+    // generates possible moves for the piece,
+    // not gonna explain the math it's very hard coded you can figure out
+    public void generateLegalSquares(Square currentSquare) {
         ArrayList<Square> currentSquares = new ArrayList<>();
-<<<<<<< Updated upstream
-=======
         ArrayList<Square> currentProtectedSquares = new ArrayList<>();
         ArrayList<Square> currentDiscoveredSquares = new ArrayList<>();
->>>>>>> Stashed changes
         if (moveSet.contains(PieceType.KING)) {
             for (int i = this.row - 1 ; i <= this.row + 1; i++) {
-                for (int j = this.col - 4; j <= this.col + 4; j++) {
+                for (int j = this.col - 3; j <= this.col + 3; j++) {
                     Square testSquare = new Square(j, i);
                     if (player.canMove(currentSquare, testSquare)) {
                         currentSquares.add(testSquare);
-<<<<<<< Updated upstream
-                        discoveredSquares.add(testSquare);
-                        protectedSquares.add(testSquare);
-=======
->>>>>>> Stashed changes
                     }
                     for (ChessPiece piece : player.pieces) {
                         if (testSquare.col == piece.col && testSquare.row == piece.row) {
@@ -94,21 +89,15 @@ public class ChessPiece implements Cloneable{
             Square leftCapture = new Square(col - 1, row + captureModifier);
             Square rightCapture = new Square(col + 1, row + captureModifier);
 
-<<<<<<< Updated upstream
-            pawnCaptureSquares.add(leftCapture);
-            pawnCaptureSquares.add(rightCapture);
-=======
             currentProtectedSquares.add(leftCapture);
             currentProtectedSquares.add(rightCapture);
             discoveredSquares.add(leftCapture);
             discoveredSquares.add(rightCapture);
->>>>>>> Stashed changes
             for (int i = this.row - rowModifier; i <= this.row + rowModifier; i++) {
                 for (int j = this.col - 1; j <= this.col + 1; j++) {
                     Square testSquare = new Square(j, i);
                     if (player.canMove(currentSquare, testSquare)) {
                         currentSquares.add(testSquare);
-                        protectedSquares.add(testSquare);
                     }
                     for (ChessPiece piece : player.pieces) {
                         if (testSquare.col == piece.col && testSquare.row == piece.row) {
@@ -128,14 +117,14 @@ public class ChessPiece implements Cloneable{
                 Square testSquare = new Square(this.col, i);
                 if (BoardGame.pieceLoc(this.col, i) != null) {
                     if (BoardGame.pieceLoc(this.col, i).getType() == PieceType.KING
-                    && BoardGame.pieceLoc(this.col, i).getPlayer() != this.player){
+                            && BoardGame.pieceLoc(this.col, i).getPlayer() != this.player){
                         kingInArea = true;
                         kingRow = i;
                     }
                 }
                 if (player.canMove(currentSquare, testSquare)) {
                     currentSquares.add(testSquare);
-                    protectedSquares.add(testSquare);
+                    currentProtectedSquares.add(testSquare);
                 }
                 for (ChessPiece piece : player.pieces) {
                     if (testSquare.col == piece.col && testSquare.row == piece.row) {
@@ -178,7 +167,7 @@ public class ChessPiece implements Cloneable{
             for (int j = 0; j <= 7; j++) {
                 if (BoardGame.pieceLoc(j, this.row) != null) {
                     if (BoardGame.pieceLoc(j, this.row).getType() == PieceType.KING
-                    && BoardGame.pieceLoc(j, this.row).getPlayer() != this.player) {
+                            && BoardGame.pieceLoc(j, this.row).getPlayer() != this.player) {
                         kingInArea = true;
                         kingCol = j;
                     }
@@ -186,7 +175,7 @@ public class ChessPiece implements Cloneable{
                 Square testSquare = new Square(j, this.row);
                 if (player.canMove(currentSquare, testSquare)) {
                     currentSquares.add(testSquare);
-                    protectedSquares.add(testSquare);
+                    currentProtectedSquares.add(testSquare);
                 }
                 for (ChessPiece piece : player.pieces) {
                     if (testSquare.col == piece.col && testSquare.row == piece.row) {
@@ -239,7 +228,7 @@ public class ChessPiece implements Cloneable{
                 Square testSquare1 = new Square(this.col + i, this.row + i);
                 if (BoardGame.pieceLoc(testSquare1) != null) {
                     if(BoardGame.pieceLoc(testSquare1).getType() == PieceType.KING
-                    && BoardGame.pieceLoc(testSquare1).getPlayer() != this.player) {
+                            && BoardGame.pieceLoc(testSquare1).getPlayer() != this.player) {
                         kingInArea1 = true;
                     }
                 }
@@ -266,19 +255,19 @@ public class ChessPiece implements Cloneable{
                 }
                 if (player.canMove(currentSquare, testSquare1)) {
                     currentSquares.add(testSquare1);
-                    protectedSquares.add(testSquare1);
+                    currentProtectedSquares.add(testSquare1);
                 }
                 if (player.canMove(currentSquare, testSquare2)) {
                     currentSquares.add(testSquare2);
-                    protectedSquares.add(testSquare2);
+                    currentProtectedSquares.add(testSquare2);
                 }
                 if (player.canMove(currentSquare, testSquare3)) {
                     currentSquares.add(testSquare3);
-                    protectedSquares.add(testSquare3);
+                    currentProtectedSquares.add(testSquare3);
                 }
                 if (player.canMove(currentSquare, testSquare4)) {
                     currentSquares.add(testSquare4);
-                    protectedSquares.add(testSquare4);
+                    currentProtectedSquares.add(testSquare4);
                 }
                 for (ChessPiece piece : player.pieces) {
                     if (testSquare1.col == piece.col && testSquare1.row == piece.row) {
@@ -295,78 +284,6 @@ public class ChessPiece implements Cloneable{
                     }
                 }
             }
-<<<<<<< Updated upstream
-        }
-        if (moveSet.contains(PieceType.QUEEN)) {
-            // Bishop-like moves
-            for (int i = -7; i <= 7; i++) {
-                if (i == 0) {
-                    continue;
-                }
-                Square testSquare = new Square(this.col + i, this.row + i);
-                if (player.canMove(currentSquare, testSquare)) {
-                    currentSquares.add(testSquare);
-                    protectedSquares.add(testSquare);
-                }
-                for (ChessPiece piece : player.pieces) {
-                    if (testSquare.col == piece.col && testSquare.row == piece.row) {
-                        currentSquares.remove(testSquare);
-                    }
-                }
-                testSquare = new Square(this.col - i, this.row - i);
-                if (player.canMove(currentSquare, testSquare)) {
-                    currentSquares.add(testSquare);
-                    protectedSquares.add(testSquare);
-                }
-                for (ChessPiece piece : player.pieces) {
-                    if (testSquare.col == piece.col && testSquare.row == piece.row) {
-                        currentSquares.remove(testSquare);
-                    }
-                }
-                testSquare = new Square(this.col + i, this.row - i);
-                if (player.canMove(currentSquare, testSquare)) {
-                    currentSquares.add(testSquare);
-                    protectedSquares.add(testSquare);
-                }
-                for (ChessPiece piece : player.pieces) {
-                    if (testSquare.col == piece.col && testSquare.row == piece.row) {
-                        currentSquares.remove(testSquare);
-                    }
-                }
-                testSquare = new Square(this.col - i, this.row + i);
-                if (player.canMove(currentSquare, testSquare)) {
-                    currentSquares.add(testSquare);
-                    protectedSquares.add(testSquare);
-                }
-                for (ChessPiece piece : player.pieces) {
-                    if (testSquare.col == piece.col && testSquare.row == piece.row) {
-                        currentSquares.remove(testSquare);
-                    }
-                }
-            }
-            // Rook-like moves
-            for (int i = 0; i <= 7; i++) {
-                Square testSquare = new Square(this.col, i);
-                if (player.canMove(currentSquare, testSquare)) {
-                    currentSquares.add(testSquare);
-                    protectedSquares.add(testSquare);
-                }
-                for (ChessPiece piece : player.pieces) {
-                    if (testSquare.col == piece.col && testSquare.row == piece.row) {
-                        currentSquares.remove(testSquare);
-                    }
-                }
-            }
-            for (int j = 0; j <= 7; j++) {
-                Square testSquare = new Square(j, this.row);
-                if (player.canMove(currentSquare, testSquare)) {
-                    currentSquares.add(testSquare);
-                    protectedSquares.add(testSquare);
-                }
-                for (ChessPiece piece : player.pieces) {
-                    if (testSquare.col == piece.col && testSquare.row == piece.row) {
-                        currentSquares.remove(testSquare);
-=======
             if (kingInArea1) {
                 int piecesDiscovered = 0;
                 for (int i = 0; i <= 7; i++) {
@@ -425,7 +342,6 @@ public class ChessPiece implements Cloneable{
                             piecesDiscovered++;
                             break;
                         }
->>>>>>> Stashed changes
                     }
                 }
             }
@@ -439,12 +355,8 @@ public class ChessPiece implements Cloneable{
                     Square testSquare = new Square(testCol, testRow);
                     if (player.canMove(currentSquare, testSquare)) {
                         currentSquares.add(testSquare);
-<<<<<<< Updated upstream
-                        protectedSquares.add(testSquare);
-=======
                         currentDiscoveredSquares.add(testSquare);
                         currentProtectedSquares.add(testSquare);
->>>>>>> Stashed changes
                     }
                     for (ChessPiece piece : player.pieces) {
                         if (testSquare.col == piece.col && testSquare.row == piece.row) {
@@ -456,135 +368,10 @@ public class ChessPiece implements Cloneable{
         }
         legalSquares.clear();
         legalSquares.addAll(currentSquares);
-<<<<<<< Updated upstream
-    }
-
-    public void generateDiscoveredSquares(Square currentSquare) {
-        discoveredSquares.clear();
-        if (moveSet.contains(PieceType.KING)) {
-            for (int i = this.row - 1 ; i <= this.row + 1; i++) {
-                for (int j = this.col - 1; j <= this.col + 1; j++) {
-                    if (i < 0 || i > 7 || j < 0 || j > 7) break;
-                    Square testSquare = new Square(j, i);
-                    if (player.canKingAttackMove(currentSquare, testSquare)) {
-                        discoveredSquares.add(testSquare);
-                    }
-                }
-            }
-        } if (moveSet.contains(PieceType.PAWN)) {
-            int rowModifier = 1;
-            for (int i = this.row - rowModifier; i <= this.row + rowModifier; i++) {
-                for (int j = this.col - 1; j <= this.col + 1; j++) {
-                    if (j > 7 || j < -1 || i > 7 || i < -1) break;
-                    Square testSquare = new Square(j, i);
-                    if (player.canPawnTestMove(currentSquare, testSquare)) {
-                        discoveredSquares.add(testSquare);
-                    }
-                }
-            }
-        }
-        if (moveSet.contains(PieceType.ROOK)) {
-            for (int i = 0; i <= 7; i++) {
-                Square testSquare = new Square(this.col, i);
-                if (player.canRookAttackMove(currentSquare, testSquare)) {
-                    discoveredSquares.add(testSquare);
-                }
-            }
-            for (int j = 0; j <= 7; j++) {
-                Square testSquare = new Square(j, this.row);
-                if (player.canRookAttackMove(currentSquare, testSquare)) {
-                    discoveredSquares.add(testSquare);
-                }
-            }
-        }
-        if (moveSet.contains(PieceType.BISHOP)) {
-            for (int i = 0; i <= 7; i++) {
-                Square testSquare1 = new Square(this.col + i, this.row + i);
-                if (player.canBishopAttackMove(currentSquare, testSquare1)) {
-                    discoveredSquares.add(testSquare1);
-                }
-            }
-            for (int i = 0; i < 7; i++) {
-                Square testSquare2 = new Square(this.col - i, this.row - i);
-                if (player.canBishopAttackMove(currentSquare, testSquare2)) {
-                    discoveredSquares.add(testSquare2);
-                }
-            }
-            for (int i = 0; i < 7; i++) {
-                Square testSquare3 = new Square(this.col - i, this.row + i);
-                if (player.canBishopAttackMove(currentSquare, testSquare3)) {
-                    discoveredSquares.add(testSquare3);
-                }
-            }
-            for (int i = 0; i < 7; i++) {
-                Square testSquare4 = new Square(this.col + i, this.row - i);
-                if (player.canBishopAttackMove(currentSquare, testSquare4)) {
-                    discoveredSquares.add(testSquare4);
-                }
-            }
-        }
-        if (moveSet.contains(PieceType.QUEEN)) {
-            // Bishop-like moves
-            for (int i = -7; i <= 7; i++) {
-                if (i == 0) {
-                    continue;
-                }
-                Square testSquare = new Square(this.col + i, this.row + i);
-                if (player.canBishopAttackMove(currentSquare, testSquare)) {
-                    discoveredSquares.add(testSquare);
-                }
-            }
-            for (int i = -7; i <= 7; i++) {
-                Square testSquare = new Square(this.col - i, this.row - i);
-                if (player.canBishopAttackMove(currentSquare, testSquare)) {
-                    discoveredSquares.add(testSquare);
-                }
-            }
-            for (int i = -7; i <= 7; i++) {
-                Square testSquare = new Square(this.col + i, this.row - i);
-                if (player.canBishopAttackMove(currentSquare, testSquare)) {
-                    discoveredSquares.add(testSquare);
-                }
-            }
-            for (int i = -7; i <= 7; i++) {
-                Square testSquare = new Square(this.col - i, this.row + i);
-                if (player.canBishopAttackMove(currentSquare, testSquare)) {
-                    discoveredSquares.add(testSquare);
-                }
-            }
-            // Rook-like moves
-            for (int i = 0; i <= 7; i++) {
-                Square testSquare = new Square(this.col, i);
-                if (player.canRookAttackMove(currentSquare, testSquare)) {
-                    discoveredSquares.add(testSquare);
-                }
-            }
-            for (int j = 0; j <= 7; j++) {
-                Square testSquare = new Square(j, this.row);
-                if (player.canRookAttackMove(currentSquare, testSquare)) {
-                    discoveredSquares.add(testSquare);
-                }
-            }
-        }
-        if (moveSet.contains(PieceType.KNIGHT)) {
-            int[][] possibleOffsets = {{-2, 1}, {-1, 2}, {1, 2}, {2, 1}, {2, -1}, {1, -2}, {-1, -2}, {-2, -1}};
-            for (int[] offset : possibleOffsets) {
-                int testCol = this.col + offset[0];
-                int testRow = this.row + offset[1];
-                if (testCol >= 0 && testCol <= 7 && testRow >= 0 && testRow <= 7) {
-                    Square testSquare = new Square(testCol, testRow);
-                    if (player.canKnightMove(currentSquare, testSquare)) {
-                        discoveredSquares.add(testSquare);
-                    }
-                }
-            }
-        }
-=======
         protectedSquares.clear();
         protectedSquares.addAll(currentProtectedSquares);
         discoveredSquares.clear();
         discoveredSquares.addAll(currentDiscoveredSquares);
->>>>>>> Stashed changes
     }
 
     public ChessPlayer getPlayer () {
