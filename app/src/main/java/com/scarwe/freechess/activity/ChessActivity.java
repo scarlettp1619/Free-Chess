@@ -82,7 +82,7 @@ public class ChessActivity extends Activity implements ChessDelegate {
 
         int count = 0;
 
-        // if whites turn and game playable
+        // if whites turn and gam eplayable
         if (white.turn && gameState == 0) {
             // for capture moves
             int piecesSize = BoardGame.blackPlayer.pieces.size();
@@ -159,10 +159,12 @@ public class ChessActivity extends Activity implements ChessDelegate {
                     for (ChessPiece p : black.pieces) {
                         if (p.getType() == PieceType.KING) {
                             p.resID = R.drawable.cbk;
+                            break;
                         }
                         // if there are any legal moves, checkmated is false
                         if (p.legalSquares.size() != 0) {
                             checkmated = false;
+                            break;
                         }
                     }
                     if (checkmated) {
@@ -256,6 +258,7 @@ public class ChessActivity extends Activity implements ChessDelegate {
                     for (ChessPiece p : white.pieces) {
                         if (p.getType() == PieceType.KING) {
                             p.resID = R.drawable.cwk;
+                            break;
                         }
                         if (p.legalSquares.size() != 0) {
                             checkmated = false;
@@ -273,7 +276,6 @@ public class ChessActivity extends Activity implements ChessDelegate {
                     for (ChessPiece p : white.pieces) {
                         if (p.legalSquares.size() != 0) {
                             stalemated = false;
-                            break;
                         }
                     }
                     if (stalemated) {
