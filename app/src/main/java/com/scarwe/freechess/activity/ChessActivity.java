@@ -87,7 +87,7 @@ public class ChessActivity extends Activity implements ChessDelegate {
             // for capture moves
             int piecesSize = BoardGame.blackPlayer.pieces.size();
             for (ChessPiece p : BoardGame.whitePlayer.pieces) {
-                if (p.getType() == PieceType.KING && !BoardGame.whitePlayer.checked) {
+                if (p.getType() == PieceType.KING) {
                     p.resID = R.drawable.wk;
                     break;
                 }
@@ -191,7 +191,7 @@ public class ChessActivity extends Activity implements ChessDelegate {
         // everything the same for black, should probably simplify this at some point
         } else if (BoardGame.blackPlayer.turn && gameState == 0) {
             for (ChessPiece p : BoardGame.blackPlayer.pieces) {
-                if (p.getType() == PieceType.KING && !BoardGame.blackPlayer.checked) {
+                if (p.getType() == PieceType.KING) {
                     p.resID = R.drawable.bk;
                     break;
                 }
