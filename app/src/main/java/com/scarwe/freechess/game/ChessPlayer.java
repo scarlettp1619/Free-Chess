@@ -550,7 +550,6 @@ public class ChessPlayer {
         return false;
     }
 
-
     public boolean movePiece(Square from, Square to, boolean testMove) throws CloneNotSupportedException {
         // for pgn testing
         castled = 0;
