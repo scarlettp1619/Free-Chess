@@ -364,16 +364,14 @@ public class ChessPlayer {
             // opponents discovered squares stop at a piece that blocks it, so this works
             if (s.getCol() == kingCol && s.getRow() == kingRow) {
                 possibleCheck = true;
+                break;
             }
+        }
+        for (Square s : opponentDiscoveredSquares) {
             // checks squares around king to ensure you can't walk into check
-            for (int i = kingRow - 1; i <= kingRow + 1; i++) {
-                for (int j = kingCol - 1; j <= kingCol + 1; j++) {
-                    if (j < 0 || j > 7 || i < 0 || i > 7) break;
-                    if (tempPiece.col == j && tempPiece.row == i && tempPiece.col == s.col && tempPiece.row == s.row) {
-                        movedIntoDiscovered = true;
-                        break;
-                    }
-                }
+            if (tempPiece.col == s.col && tempPiece.row == s.row) {
+                movedIntoDiscovered = true;
+                break;
             }
         }
 
@@ -427,7 +425,7 @@ public class ChessPlayer {
         }
 
         for (ChessPiece p : opponentPieces) {
-            for (Square s : p.legalSquares) {
+            for (Square s : p.protectedSquares) {
                 if (s.col == kingCol && s.row == kingRow) {
                     // for discovered checks
                     if (p != opponentAttackingPiece) {
@@ -719,7 +717,6 @@ public class ChessPlayer {
             if (!testMove) {
                 BoardGame.gameMove++;
                 currentAttackingPiece = tempPiece;
-                tempPiece.generateDiscoveredSquares(new Square(toCol, toRow));
                 // writes to pgn
                 addToPgn(new Square(fromCol, fromRow), new Square(toCol, toRow), tempPiece.getType(), tempPiece, captureMove, castled);
             }

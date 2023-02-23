@@ -207,6 +207,7 @@ public class ChessActivity extends Activity implements ChessDelegate {
                     player = MediaPlayer.create(this, R.raw.move);
                 }
                 player.start();
+                
                 if (piecesSize == newPiecesSize) {
                     black.sinceCaptured++;
                 } else {
