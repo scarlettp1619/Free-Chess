@@ -2,10 +2,12 @@ package com.scarwe.freechess.activity;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.view.View;
 import android.widget.Button;
 
@@ -34,11 +36,13 @@ public class ChessActivity extends Activity implements ChessDelegate {
     ChessPlayer white = BoardGame.whitePlayer;
     ChessPlayer black = BoardGame.blackPlayer;
 
-    MediaPlayer player;
+    MediaPlayer player = new MediaPlayer();
 
     @SuppressLint("SourceLockedOrientationActivity")
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        player = MediaPlayer.create(this, R.raw.start);
+        player.start();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chess);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
@@ -61,7 +65,11 @@ public class ChessActivity extends Activity implements ChessDelegate {
                 //
             }
             boardView.invalidate();
+            player = MediaPlayer.create(this, R.raw.start);
+            player.start();
         });
+
+        player = MediaPlayer.create(this, R.raw.move);
 
     }
 
@@ -101,18 +109,15 @@ public class ChessActivity extends Activity implements ChessDelegate {
                 BoardGame.whitePlayer.setTurn(false);
                 BoardGame.blackPlayer.setTurn(true);
 
-                // for first move
-                if (player == null) {
-                    player = MediaPlayer.create(this, R.raw.move);
-                }
-                player.start();
-
                 if (piecesSize == newPiecesSize) {
+                    player = MediaPlayer.create(this, R.raw.move);
+                    player.start();
                     white.sinceCaptured++;
                 } else {
+                    player = MediaPlayer.create(this, R.raw.capture);
+                    player.start();
                     white.sinceCaptured = 0;
                     black.sinceCaptured = 0;
-
                 }
                 // find legal moves for players
                 for (ChessPiece p : white.pieces) {
@@ -133,7 +138,10 @@ public class ChessActivity extends Activity implements ChessDelegate {
                 if (drawByRepetition) {
                     // will probably make a button to claim a draw at some point, instead of automatic
                     gameState = 3;
+                    winner = "Draw";
                     System.out.println("draw by repetition");
+                    viewEndScreen(gameState, winner);
+                    BoardGame.pgnMoves.append(" 1-2/1-2");
                 }
 
                 insufficientMaterial = checkInsufficient();
@@ -141,7 +149,10 @@ public class ChessActivity extends Activity implements ChessDelegate {
 
                 if (insufficientMaterial) {
                     gameState = 4;
+                    winner = "Draw";
                     System.out.println("draw by insufficient material");
+                    viewEndScreen(gameState, winner);
+                    BoardGame.pgnMoves.append(" 1-2/1-2");
                 }
 
                 if (white.getSincePawnMoved() > 49 && white.getSinceCaptured() > 49
@@ -151,7 +162,10 @@ public class ChessActivity extends Activity implements ChessDelegate {
 
                 if (fiftyMoveRule) {
                     gameState = 5;
+                    winner = "Draw";
                     System.out.println("fifty move rule reached");
+                    viewEndScreen(gameState, winner);
+                    BoardGame.pgnMoves.append(" 1-2/1-2");
                 }
 
                 if (black.checked) {
@@ -170,6 +184,7 @@ public class ChessActivity extends Activity implements ChessDelegate {
                         winner = "White";
                         BoardGame.pgnMoves.append("# 1-0");
                         System.out.println("black checkmated");
+                        viewEndScreen(gameState, winner);
                     } else {
                         BoardGame.pgnMoves.append("+");
                     }
@@ -183,8 +198,10 @@ public class ChessActivity extends Activity implements ChessDelegate {
                     }
                     if (stalemated) {
                         gameState = 2;
+                        winner = "Draw";
                         System.out.println("black stalemated");
                         BoardGame.pgnMoves.append(" 1-2/1-2");
+                        viewEndScreen(2, winner);
                     }
                 }
             }
@@ -202,15 +219,14 @@ public class ChessActivity extends Activity implements ChessDelegate {
                 BoardGame.setCurrentPlayer(BoardGame.whitePlayer);
                 BoardGame.whitePlayer.setTurn(true);
                 BoardGame.blackPlayer.setTurn(false);
-
-                if (player == null) {
-                    player = MediaPlayer.create(this, R.raw.move);
-                }
-                player.start();
                 
                 if (piecesSize == newPiecesSize) {
+                    player = MediaPlayer.create(this, R.raw.move);
+                    player.start();
                     black.sinceCaptured++;
                 } else {
+                    player = MediaPlayer.create(this, R.raw.capture);
+                    player.start();
                     white.sinceCaptured = 0;
                     black.sinceCaptured = 0;
                 }
@@ -234,12 +250,18 @@ public class ChessActivity extends Activity implements ChessDelegate {
 
                 if (insufficientMaterial) {
                     gameState = 4;
+                    winner = "Draw";
                     System.out.println("draw by insufficient material");
+                    viewEndScreen(gameState, winner);
+                    BoardGame.pgnMoves.append(" 1-2/1-2");
                 }
 
                 if (drawByRepetition) {
                     gameState = 3;
+                    winner = "Draw";
                     System.out.println("draw by repetition");
+                    viewEndScreen(gameState, winner);
+                    BoardGame.pgnMoves.append(" 1-2/1-2");
                 }
 
                 if (white.getSincePawnMoved() > 49 && white.getSinceCaptured() > 49
@@ -249,7 +271,10 @@ public class ChessActivity extends Activity implements ChessDelegate {
 
                 if (fiftyMoveRule) {
                     gameState = 5;
+                    winner = "Draw";
                     System.out.println("fifty move rule reached");
+                    viewEndScreen(gameState, winner);
+                    BoardGame.pgnMoves.append(" 1-2/1-2");
                 }
 
                 if (white.checked) {
@@ -267,6 +292,7 @@ public class ChessActivity extends Activity implements ChessDelegate {
                         winner = "Black";
                         System.out.println("white checkmated");
                         BoardGame.pgnMoves.append("# 0-1");
+                        viewEndScreen(gameState, winner);
                     } else {
                         BoardGame.pgnMoves.append("+");
                     }
@@ -279,8 +305,10 @@ public class ChessActivity extends Activity implements ChessDelegate {
                     }
                     if (stalemated) {
                         gameState = 2;
+                        winner = "Draw";
                         System.out.println("white stalemated");
-                        BoardGame.pgnMoves.append("1-2/1-2");
+                        BoardGame.pgnMoves.append(" 1-2/1-2");
+                        viewEndScreen(gameState, winner);
                     }
                 }
             }
@@ -327,5 +355,14 @@ public class ChessActivity extends Activity implements ChessDelegate {
             }
         }
         return false;
+    }
+
+    private void viewEndScreen(int gameState, String winner) {
+        player = MediaPlayer.create(this, R.raw.game_end);
+        player.start();
+        Intent endScreen = new Intent(ChessActivity.this, EndScreenActivity.class);
+        EndScreenActivity.gameState = gameState;
+        EndScreenActivity.winner = winner;
+        startActivity(endScreen);
     }
 }
