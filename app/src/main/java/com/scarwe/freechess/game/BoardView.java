@@ -12,10 +12,12 @@ import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Button;
 
 import androidx.annotation.Nullable;
 
 import com.scarwe.freechess.R;
+import com.scarwe.freechess.activity.ChessActivity;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -78,16 +80,19 @@ public class BoardView extends View{
         drawPieces(canvas);
     }
 
-    @SuppressLint("ClickableViewAccessibility")
+    @SuppressLint({"ClickableViewAccessibility", "SetTextI18n"})
     @Override
     // when player touches screen
     public boolean onTouchEvent(MotionEvent e) {
+
+
         // holding finger down
         if (e.getAction() == MotionEvent.ACTION_DOWN) {
             moved = false;
             // locate position, math.floor required as rectangles are floats
             fromCol = (int) Math.floor((e.getX() - originX) / cellSize);
             fromRow = 7 - ((int) Math.floor((e.getY() - originY) / cellSize));
+
             try {
                 ChessPiece movingPiece = chessDelegate.pieceLoc(new Square(fromCol, fromRow));
                 movingPieceBitmap = bitmaps.get(movingPiece.resID);

@@ -10,8 +10,31 @@
         android:id="@+id/end_game"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="50dp"
         android:text="@string/end_of_game"
         android:textColor="#000"
         android:textSize="20sp" />
+
+    <Button
+        android:id="@+id/rematch_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="38dp"
+        android:layout_marginTop="134dp"
+        android:text="@string/rematch" />
+
+    <Button
+        android:id="@+id/exit_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginStart="157dp"
+        android:layout_marginTop="134dp"
+        android:text="@string/quit" />
 </RelativeLayout>

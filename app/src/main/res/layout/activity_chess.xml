@@ -6,6 +6,22 @@
     android:gravity="center"
     android:orientation="vertical">
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <Button
+            android:id="@+id/black_resign_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="8dp"
+            android:toDegrees="180"
+            android:text="@string/resign_button"
+            android:rotation="180"/>
+    </LinearLayout>
+
     <com.scarwe.freechess.game.BoardView
         android:id="@+id/board_view"
         android:layout_width="wrap_content"
@@ -18,10 +34,10 @@
         android:orientation="horizontal">
 
         <Button
-            android:id="@+id/reset_button"
+            android:id="@+id/white_resign_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="8dp"
-            android:text="@string/reset_button"/>
+            android:text="@string/resign_button"/>
     </LinearLayout>
 </LinearLayout>

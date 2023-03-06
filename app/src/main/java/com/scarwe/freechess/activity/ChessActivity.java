@@ -7,7 +7,7 @@ import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.os.Bundle;
-import android.provider.MediaStore;
+import android.os.Handler;
 import android.view.View;
 import android.widget.Button;
 
@@ -21,24 +21,20 @@ import com.scarwe.freechess.game.PieceType;
 import com.scarwe.freechess.game.Square;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Collections;
 
 public class ChessActivity extends Activity implements ChessDelegate {
 
-    private final BoardGame board = new BoardGame();
     private final int bgColor = Color.parseColor("#252525");
     private int gameState = 0;
-    // for pop up when winning
-    private String winner = "";
 
     ChessPlayer white = BoardGame.whitePlayer;
     ChessPlayer black = BoardGame.blackPlayer;
 
     MediaPlayer player = new MediaPlayer();
 
-    @SuppressLint("SourceLockedOrientationActivity")
+    @SuppressLint({"SourceLockedOrientationActivity", "SetTextI18n"})
     @Override
     public void onCreate(Bundle savedInstanceState) {
         player = MediaPlayer.create(this, R.raw.start);
@@ -47,26 +43,35 @@ public class ChessActivity extends Activity implements ChessDelegate {
         setContentView(R.layout.activity_chess);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
+        Button blackResign = findViewById(R.id.black_resign_button);
         // finds the board view by its ID
         BoardView boardView = findViewById(R.id.board_view);
         boardView.chessDelegate = this;
 
         setActivityBgColor();
 
-        Button resetButton = findViewById(R.id.reset_button);
+        Button whiteResign = findViewById(R.id.white_resign_button);
 
-        resetButton.setOnClickListener(v -> {
-            try {
-                // load config file
-                board.reader = new BufferedReader(new InputStreamReader(getAssets().open("config.json")));
-                board.resetBoard();
-                gameState = 0;
-            } catch (IOException | CloneNotSupportedException e) {
-                //
+        whiteResign.setOnClickListener(v -> {
+            if (whiteResign.getText().toString().equalsIgnoreCase("resign")) {
+                whiteResign.setText("Are you sure?");
+                Handler handler = new Handler();
+                final Runnable r = () -> whiteResign.setText("Resign");
+                handler.postDelayed(r, 3000);
+            } else {
+                viewEndScreen(6, "Black");
             }
-            boardView.invalidate();
-            player = MediaPlayer.create(this, R.raw.start);
-            player.start();
+        });
+
+        blackResign.setOnClickListener(v -> {
+            if (blackResign.getText().toString().equalsIgnoreCase("resign")) {
+                blackResign.setText("Are you sure?");
+                Handler handler = new Handler();
+                final Runnable r = () -> blackResign.setText("Resign");
+                handler.postDelayed(r, 3000);
+            } else {
+                viewEndScreen(6, "White");
+            }
         });
 
         player = MediaPlayer.create(this, R.raw.move);
@@ -91,6 +96,8 @@ public class ChessActivity extends Activity implements ChessDelegate {
         int count = 0;
 
         // if whites turn and game playable
+        // for pop up when winning
+        String winner = "";
         if (white.turn && gameState == 0) {
             // for capture moves
             int piecesSize = BoardGame.blackPlayer.pieces.size();
@@ -364,5 +371,6 @@ public class ChessActivity extends Activity implements ChessDelegate {
         EndScreenActivity.gameState = gameState;
         EndScreenActivity.winner = winner;
         startActivity(endScreen);
+        finish();
     }
 }

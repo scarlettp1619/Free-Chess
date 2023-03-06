@@ -2,6 +2,7 @@ package com.scarwe.freechess.game;
 
 import com.scarwe.freechess.R;
 
+import java.io.Console;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -331,10 +332,13 @@ public class ChessPlayer {
             }
         }
         for (Square s : opponentDiscoveredSquares) {
+            System.out.println(s.getValToString(s.col) + (s.row + 1));
             // checks squares around king to ensure you can't walk into check
-            if (tempPiece.col == s.col && tempPiece.row == s.row && (to.col != s.col && to.row != s.row)
-            && tempPiece.getType() != PieceType.KING) {
+            if (tempPiece.col == s.col && tempPiece.row == s.row && tempPiece.getType() != PieceType.KING) {
                 movedIntoDiscovered = true;
+            }
+            if (to.col == s.col && to.row == s.row) {
+                movedIntoDiscovered = false;
                 break;
             }
         }
@@ -403,16 +407,18 @@ public class ChessPlayer {
 
         // for non-test discovered check moves
         if (to != null && attackingKingPiece != null) {
-            for (Square s : attackingKingPiece.protectedSquares) {
-                // find squares around king
-                for (int i = kingRow - 1; i < kingRow + 1; i++) {
-                    for (int j = kingCol - 1; j < kingCol + 1; j++) {
-                        // if illegal squares are found
-                        if (j < 0 || j > 7 || i < 0 || i > 7) break;
-                        if (to.col == s.col && to.row == s.row) {
-                            checked = false;
-                            break;
-                        }
+            for (Square s : attackingKingPiece.discoveredSquares) {
+                if (to.col == s.col && to.row == s.row) {
+                    checked = false;
+                    break;
+                }
+            }
+            if (!checked) {
+                for (Square s : opponentAttackingPiece.protectedSquares) {
+                    // in the case of a double check
+                    if (s.getCol() == kingCol && s.getRow() == kingRow) {
+                        checked = true;
+                        break;
                     }
                 }
             }
@@ -420,7 +426,8 @@ public class ChessPlayer {
 
         if (to != null && piece != null) {
             // if attacking piece is captured
-            if (to.col == opponentAttackingPiece.col && to.row == opponentAttackingPiece.row) {
+            if (to.col == opponentAttackingPiece.col && to.row == opponentAttackingPiece.row
+            && attackingKingPiece == null) {
                 checked = false;
             }
         }
