@@ -332,7 +332,7 @@ public class ChessPlayer {
         }
         for (Square s : opponentDiscoveredSquares) {
             // checks squares around king to ensure you can't walk into check
-            if (tempPiece.col == s.col && tempPiece.row == s.row && (to.col != s.col || to.row != s.row)
+            if (tempPiece.col == s.col && tempPiece.row == s.row && (to.col != s.col && to.row != s.row)
             && tempPiece.getType() != PieceType.KING) {
                 movedIntoDiscovered = true;
                 break;

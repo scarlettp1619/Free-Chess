@@ -1,5 +1,5 @@
 {
-  "PawnMoves": "pawn",
+  "PawnMoves": "pawn, knight",
   "KnightMoves": "knight",
   "BishopMoves": "bishop",
   "RookMoves": "rook",
