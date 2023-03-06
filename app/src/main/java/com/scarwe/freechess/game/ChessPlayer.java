@@ -12,6 +12,7 @@ public class ChessPlayer {
 
     public boolean turn = false;
     public boolean checked = false;
+    public boolean discovered = false;
 
     public int colour;
     public int castled;
@@ -293,6 +294,57 @@ public class ChessPlayer {
         return true;
     }
 
+    public void isKingDiscovered(ChessPiece tempPiece, Square to) {
+        LinkedHashSet<Square> opponentDiscoveredSquares = new LinkedHashSet<>();
+        int kingRow = 0, kingCol = 0;
+        discovered = false;
+        boolean possibleCheck = false;
+        boolean movedIntoDiscovered = false;
+
+        if (colour == 0) {
+            // finds all discovered squares
+            for (ChessPiece p : BoardGame.blackPlayer.pieces) {
+                opponentDiscoveredSquares.addAll(p.discoveredSquares);
+            }
+            for (ChessPiece p : BoardGame.whitePlayer.pieces) {
+                if (p.kingID == 1) {
+                    kingRow = p.row;
+                    kingCol = p.col;
+                }
+            }
+        } else {
+            for (ChessPiece p : BoardGame.whitePlayer.pieces) {
+                opponentDiscoveredSquares.addAll(p.discoveredSquares);
+            }
+            for (ChessPiece p : BoardGame.blackPlayer.pieces) {
+                if (p.kingID == 1) {
+                    kingRow = p.row;
+                    kingCol = p.col;
+                }
+            }
+        }
+        for (Square s : opponentDiscoveredSquares) {
+            // opponents discovered squares stop at a piece that blocks it, so this works
+            if (s.getCol() == kingCol && s.getRow() == kingRow) {
+                possibleCheck = true;
+                break;
+            }
+        }
+        for (Square s : opponentDiscoveredSquares) {
+            // checks squares around king to ensure you can't walk into check
+            if (tempPiece.col == s.col && tempPiece.row == s.row && (to.col != s.col || to.row != s.row)
+            && tempPiece.getType() != PieceType.KING) {
+                movedIntoDiscovered = true;
+                break;
+            }
+        }
+
+        // idk why this needs two checks but for some reason it won't work otherwise
+        if (possibleCheck && movedIntoDiscovered) {
+            discovered = true;
+        }
+    }
+
     // honestly idk why this isn't a boolean but i'm lazy to change it
     public void isKingChecked(ChessPiece piece, Square to) {
         // initialise where king could be
@@ -479,9 +531,15 @@ public class ChessPlayer {
             clearTempPieces();
             if (movePiece(from.getCol(), from.getRow(), to.getCol(), to.getRow(), testMove)) {
                 // ensures the attacking piece isn't null
-                if (colour == 0 && BoardGame.gameMove > 2) isKingChecked(tempPiece, to);
-                else if (colour == 1 && BoardGame.gameMove > 1) isKingChecked(tempPiece, to);
-                if (checked) {
+                if (colour == 0 && BoardGame.gameMove > 2) {
+                    isKingDiscovered(tempPiece, to);
+                    isKingChecked(tempPiece, to);
+                }
+                else if (colour == 1 && BoardGame.gameMove > 1) {
+                    isKingDiscovered(tempPiece, to);
+                    isKingChecked(tempPiece, to);
+                }
+                if (checked || discovered) {
                     // reset temp pieces (for testing)
                     resetPieces();
                     BoardGame.pgnMoves.setLength(0);
