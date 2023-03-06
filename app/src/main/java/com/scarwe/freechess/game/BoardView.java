@@ -158,12 +158,10 @@ public class BoardView extends View{
 
 
         if (piece != null) {
-            for (Square s : piece.legalSquares) {
-                if (piece.player == BoardGame.currentPlayer) {
+            for (Square s : piece.protectedSquares) {
                     String legalLightColor = "#F0B095";
                     String legalDarkColor = "#C47358";
                     drawLegalMoves(canvas, s.getRow(), s.getCol(), legalLightColor, legalDarkColor);
-                }
             }
         }
 

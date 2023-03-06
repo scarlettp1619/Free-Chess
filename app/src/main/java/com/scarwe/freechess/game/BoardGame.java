@@ -34,11 +34,6 @@ public class BoardGame {
     public BufferedReader reader = null;
 
     public void resetBoard() throws IOException, CloneNotSupportedException {
-        knightMoveSet.add(PieceType.KNIGHT);
-        bishopMoveSet.add(PieceType.BISHOP);
-        rookMoveSet.add(PieceType.ROOK);
-        queenMoveSet.add(PieceType.QUEEN);
-        kingMoveSet.add(PieceType.KING);
         // clears arraylist
         whitePlayer.pieces.clear();
         blackPlayer.pieces.clear();
@@ -75,11 +70,11 @@ public class BoardGame {
         while (line != null) {
             String testLine = line.replaceAll("\\s","").replace("\"", "");
             if (testLine.startsWith("PawnMoves:")) pawnMoves = testLine;
-            if (testLine.startsWith("KnightMoves:")) knightMoves = testLine;
-            if (testLine.startsWith("BishopMoves:")) bishopMoves = testLine;
-            if (testLine.startsWith("RookMoves:")) rookMoves = testLine;
-            if (testLine.startsWith("QueenMoves:")) queenMoves = testLine;
-            if (testLine.startsWith("KingMoves:")) kingMoves = testLine;
+            else if (testLine.startsWith("KnightMoves:")) knightMoves = testLine;
+            else if (testLine.startsWith("BishopMoves:")) bishopMoves = testLine;
+            else if (testLine.startsWith("RookMoves:")) rookMoves = testLine;
+            else if (testLine.startsWith("QueenMoves:")) queenMoves = testLine;
+            else if (testLine.startsWith("KingMoves:")) kingMoves = testLine;
             line = reader.readLine();
         }
 
@@ -98,16 +93,15 @@ public class BoardGame {
             ArrayList<PieceType> currentMoveSet = new ArrayList<>();
 
             if (i == 0) currentMoveSet = pawnMoveSet;
-            if (i == 1) currentMoveSet = knightMoveSet;
-            if (i == 2) currentMoveSet = bishopMoveSet;
-            if (i == 3) currentMoveSet = rookMoveSet;
-            if (i == 4) currentMoveSet = queenMoveSet;
-            if (i == 5) currentMoveSet = kingMoveSet;
+            else if (i == 1) currentMoveSet = knightMoveSet;
+            else if (i == 2) currentMoveSet = bishopMoveSet;
+            else if (i == 3) currentMoveSet = rookMoveSet;
+            else if (i == 4) currentMoveSet = queenMoveSet;
+            else if (i == 5) currentMoveSet = kingMoveSet;
 
             if (possibleMoves.length == 2) {
                 String[] findMoves = possibleMoves[1].split(",");
                 for (String st : findMoves) {
-
                     if (Objects.equals(st, "pawn")) currentMoveSet.add(PieceType.PAWN);
                     if (Objects.equals(st, "knight")) currentMoveSet.add(PieceType.KNIGHT);
                     if (Objects.equals(st, "bishop")) currentMoveSet.add(PieceType.BISHOP);

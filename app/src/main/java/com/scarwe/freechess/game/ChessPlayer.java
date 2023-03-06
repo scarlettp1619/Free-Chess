@@ -218,19 +218,19 @@ public class ChessPlayer {
                         && BoardGame.pieceLoc(new Square(from.getCol() + 3, from.getRow())).getType() != null
                         && !BoardGame.pieceLoc(kingSquare).getHasMoved()
                         && BoardGame.pieceLoc(kingSquare).getType() == PieceType.KING) {
-                        for (ChessPiece p : tempPieces) {
-                            try {
-                                for (Square s : p.legalSquares) {
-                                    if (s.col == from.getCol() && s.row == from.getRow()
-                                            || s.col == from.getCol() + 1 && s.row == from.getRow()
-                                            || s.col == from.getCol() + 2 && s.row == from.getRow()) {
-                                        return false;
-                                    }
+                    for (ChessPiece p : tempPieces) {
+                        try {
+                            for (Square s : p.legalSquares) {
+                                if (s.col == from.getCol() && s.row == from.getRow()
+                                        || s.col == from.getCol() + 1 && s.row == from.getRow()
+                                        || s.col == from.getCol() + 2 && s.row == from.getRow()) {
+                                    return false;
                                 }
-                            } catch (Exception eg) {
-                                //
                             }
+                        } catch (Exception eg) {
+                            //
                         }
+                    }
                     // gotta rework this return, just makes sure that the king moves to the correct space
                     return to.getCol() - from.getCol() > 1;
                 }
@@ -565,11 +565,11 @@ public class ChessPlayer {
                 // ensures the attacking piece isn't null
                 if (colour == 0 && BoardGame.gameMove > 2) {
                     // prevents moving into check by discovery
-                    isKingDiscovered(tempPiece);
+                    //isKingDiscovered(tempPiece);
                     isKingChecked(tempPiece, to);
                 }
                 else if (colour == 1 && BoardGame.gameMove > 1) {
-                    isKingDiscovered(tempPiece);
+                    //isKingDiscovered(tempPiece);
                     isKingChecked(tempPiece, to);
                 }
                 if (checked || discovered) {
@@ -770,8 +770,8 @@ public class ChessPlayer {
             BoardGame.pgnMoves.append(from.getValToString(from.getCol()).toLowerCase());
 
             if ((piece.moveSet.contains(PieceType.KNIGHT) || piece.moveSet.contains(PieceType.BISHOP)
-            || piece.moveSet.contains(PieceType.ROOK) || piece.moveSet.contains(PieceType.QUEEN)
-            || piece.moveSet.contains(PieceType.KING)) && to.getCol() != from.getCol()) {
+                    || piece.moveSet.contains(PieceType.ROOK) || piece.moveSet.contains(PieceType.QUEEN)
+                    || piece.moveSet.contains(PieceType.KING)) && to.getCol() != from.getCol()) {
                 if (capture)
                     BoardGame.pgnMoves.append("x").append(to.getValToString(to.getCol()).toLowerCase());
                 else {
