@@ -332,7 +332,6 @@ public class ChessPlayer {
             }
         }
         for (Square s : opponentDiscoveredSquares) {
-            System.out.println(s.getValToString(s.col) + (s.row + 1));
             // checks squares around king to ensure you can't walk into check
             if (tempPiece.col == s.col && tempPiece.row == s.row && tempPiece.getType() != PieceType.KING) {
                 movedIntoDiscovered = true;
@@ -602,9 +601,36 @@ public class ChessPlayer {
             // sets attributes of cloned piece
             tempPiece.col = toCol;
             tempPiece.row = toRow;
-            tempPiece.hasMoved = true;
             tempPiece.currentMove += 1;
             pieces.add(tempPiece);
+
+
+            if (tempPiece.type == PieceType.KING && toCol - fromCol > 1 && !testMove) {
+                if (this.colour == 0 && !tempPiece.getHasMoved()) {
+                    movePiece(tempPiece.col, tempPiece.row, 7, 0, true);
+                    movePiece(7, 0, 5, 0, true); // moves rook for kingside
+                    castled = 1;
+                }
+                if (this.colour == 1 && !tempPiece.getHasMoved()) {
+                    movePiece(tempPiece.col, tempPiece.row, 7, 7, true);
+                    movePiece(7, 7, 5, 7, true);
+                    castled = 1;
+                }
+            }
+            if (tempPiece.type == PieceType.KING && toCol - fromCol < -1 && !testMove) {
+                if (this.colour == 0 && !tempPiece.getHasMoved()) {
+                    movePiece(tempPiece.col, tempPiece.row, 2, 0, true);
+                    movePiece(0, 0, 3, 0, true); // moves rook for queenside
+                    castled = 2;
+                }
+                if (this.colour == 1 && !tempPiece.getHasMoved()) {
+                    movePiece(tempPiece.col, tempPiece.row, 2, 7, true);
+                    movePiece(0, 7, 3, 7, true);
+                    castled = 2; // queenside
+                }
+            }
+
+            tempPiece.hasMoved = true;
 
             for (ChessPiece p : BoardGame.whitePlayer.pieces) {
                 if (p.getType() == PieceType.PAWN && p.getCurrentMove() == 1) {
@@ -615,31 +641,6 @@ public class ChessPlayer {
             for (ChessPiece p : BoardGame.blackPlayer.pieces) {
                 if (p.getType() == PieceType.PAWN && p.getCurrentMove() == 1) {
                     if (!testMove) p.addSinceMoved(1);
-                }
-            }
-
-            if (tempPiece.type == PieceType.KING && toCol - fromCol > 1 && !testMove) {
-                if (this.colour == 0) {
-                    movePiece(tempPiece.col, tempPiece.row, 7, 0, true);
-                    movePiece(7, 0, 5, 0, true); // moves rook for kingside
-                    castled = 1;
-                }
-                if (this.colour == 1) {
-                    movePiece(tempPiece.col, tempPiece.row, 7, 7, true);
-                    movePiece(7, 7, 5, 7, true);
-                    castled = 1;
-                }
-            }
-            if (tempPiece.type == PieceType.KING && toCol - fromCol < -1 && !testMove) {
-                if (this.colour == 0) {
-                    movePiece(tempPiece.col, tempPiece.row, 2, 0, true);
-                    movePiece(0, 0, 3, 0, true); // moves rook for queenside
-                    castled = 2;
-                }
-                if (this.colour == 1) {
-                    movePiece(tempPiece.col, tempPiece.row, 2, 7, true);
-                    movePiece(0, 7, 3, 7, true);
-                    castled = 2; // queenside
                 }
             }
 

@@ -34,11 +34,6 @@ public class BoardGame {
     public BufferedReader reader = null;
 
     public void resetBoard() throws IOException, CloneNotSupportedException {
-        knightMoveSet.add(PieceType.KNIGHT);
-        bishopMoveSet.add(PieceType.BISHOP);
-        rookMoveSet.add(PieceType.ROOK);
-        queenMoveSet.add(PieceType.QUEEN);
-        kingMoveSet.add(PieceType.KING);
         // clears arraylist
         whitePlayer.pieces.clear();
         blackPlayer.pieces.clear();

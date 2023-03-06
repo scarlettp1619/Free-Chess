@@ -1,8 +1,8 @@
 {
-  "PawnMoves": "pawn, knight",
-  "KnightMoves": "knight",
-  "BishopMoves": "bishop",
-  "RookMoves": "rook",
-  "QueenMoves": "bishop, rook",
-  "KingMoves": "king"
+  "PawnMoves": "bishop",
+  "KnightMoves": "king, bishop",
+  "BishopMoves": "rook",
+  "RookMoves": "king, knight",
+  "QueenMoves": "bishop, knight",
+  "KingMoves": "king, pawn"
 }

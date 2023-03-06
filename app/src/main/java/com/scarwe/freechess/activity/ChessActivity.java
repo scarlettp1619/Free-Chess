@@ -8,6 +8,7 @@ import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.view.View;
 import android.widget.Button;
 
@@ -55,9 +56,7 @@ public class ChessActivity extends Activity implements ChessDelegate {
         whiteResign.setOnClickListener(v -> {
             if (whiteResign.getText().toString().equalsIgnoreCase("resign")) {
                 whiteResign.setText("Are you sure?");
-                Handler handler = new Handler();
-                final Runnable r = () -> whiteResign.setText("Resign");
-                handler.postDelayed(r, 3000);
+                new Handler(Looper.getMainLooper()).postDelayed(() -> whiteResign.setText("Resign"), 3000);
             } else {
                 viewEndScreen(6, "Black");
             }
@@ -66,9 +65,7 @@ public class ChessActivity extends Activity implements ChessDelegate {
         blackResign.setOnClickListener(v -> {
             if (blackResign.getText().toString().equalsIgnoreCase("resign")) {
                 blackResign.setText("Are you sure?");
-                Handler handler = new Handler();
-                final Runnable r = () -> blackResign.setText("Resign");
-                handler.postDelayed(r, 3000);
+                new Handler(Looper.getMainLooper()).postDelayed(() -> whiteResign.setText("Resign"), 3000);
             } else {
                 viewEndScreen(6, "White");
             }
