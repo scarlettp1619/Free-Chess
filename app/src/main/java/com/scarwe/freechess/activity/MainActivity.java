@@ -5,7 +5,9 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
 
 import com.scarwe.freechess.R;
@@ -18,8 +20,7 @@ import java.nio.Buffer;
 
 public class MainActivity extends Activity {
 
-    /*public MainActivity() throws IOException {
-    }*/
+    private final int bgColor = Color.parseColor("#393939");
 
     @SuppressLint("SourceLockedOrientationActivity")
     @Override
@@ -28,7 +29,10 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
+        setActivityBgColor();
+
         final Button startButton = findViewById(R.id.start_button);
+        final Button newsButton = findViewById(R.id.news_button);
 
         startButton.setOnClickListener((v) -> {
             Context context = MainActivity.this;
@@ -50,5 +54,17 @@ public class MainActivity extends Activity {
             // moves to chess activity
             startActivity(intent);
         });
+
+        newsButton.setOnClickListener((v) -> {
+            Context context = MainActivity.this;
+            Class<NewsActivity> destinationActivity = NewsActivity.class;
+            Intent intent = new Intent(context, destinationActivity);
+            startActivity(intent);
+        });
+    }
+
+    private void setActivityBgColor() {
+        View view = this.getWindow().getDecorView();
+        view.setBackgroundColor(bgColor);
     }
 }

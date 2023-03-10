@@ -23,6 +23,9 @@
         android:theme="@style/Theme.Labs"
         tools:targetApi="33">
         <activity
+            android:name=".activity.NewsActivity"
+            android:exported="false" />
+        <activity
             android:name=".activity.MainActivity"
             android:exported="true">
             <intent-filter>
@@ -36,8 +39,7 @@
             android:exported="false" />
         <activity
             android:name=".activity.ChessActivity"
-            android:exported="false">
-        </activity>
+            android:exported="false" />
     </application>
 
 </manifest>

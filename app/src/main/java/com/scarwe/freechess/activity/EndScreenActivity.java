@@ -3,8 +3,11 @@ package com.scarwe.freechess.activity;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
+import android.graphics.Color;
 import android.graphics.Insets;
 import android.graphics.Point;
 import android.os.Build;
@@ -14,6 +17,7 @@ import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.Gravity;
 import android.view.View;
+import android.view.Window;
 import android.view.WindowInsets;
 import android.view.WindowManager;
 import android.view.WindowMetrics;
@@ -33,9 +37,14 @@ public class EndScreenActivity extends AppCompatActivity {
     public static String winner = "";
     private final BoardGame board = new BoardGame();
 
+    private final int bgColor = Color.parseColor("#252525");
+
+    @SuppressLint("SourceLockedOrientationActivity")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         setContentView(R.layout.activity_end);
 
         Display display = getWindowManager().getDefaultDisplay();
@@ -44,7 +53,9 @@ public class EndScreenActivity extends AppCompatActivity {
         int width = size.x;
         int height = size.y;
 
-        getWindow().setLayout((int)(width*.7),(int)(height*.3));
+        setActivityBgColor();
+
+        getWindow().setLayout((width),(int)(height*.3));
 
         Button resetButton = findViewById(R.id.rematch_button);
         Button exitButton = findViewById(R.id.exit_button);
@@ -89,5 +100,10 @@ public class EndScreenActivity extends AppCompatActivity {
         } else if (gameState == 6) {
             ((TextView) findViewById(R.id.end_game)).setText(String.format("%s wins\nby Resignation", winner));
         }
+    }
+
+    private void setActivityBgColor() {
+        View view = this.getWindow().getDecorView();
+        view.setBackgroundColor(bgColor);
     }
 }
