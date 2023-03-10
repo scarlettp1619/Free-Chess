@@ -6,6 +6,9 @@ import com.scarwe.freechess.activity.ChessActivity;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.StringReader;
+import java.nio.Buffer;
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -31,7 +34,7 @@ public class BoardGame {
 
 
     public static StringBuilder pgnMoves = new StringBuilder("");
-    public BufferedReader reader = null;
+    public String config = "";
 
     public void resetBoard() throws IOException, CloneNotSupportedException {
         // clears arraylist
@@ -61,7 +64,9 @@ public class BoardGame {
         pieces.addAll(blackPlayer.pieces);
 
         // reads config file
-        String line = reader.readLine();
+        Reader inputString = new StringReader(config);
+        BufferedReader configReader = new BufferedReader(inputString);
+        String line = configReader.readLine();
         String pawnMoves = null, knightMoves = null, bishopMoves = null,
                 rookMoves = null, queenMoves = null, kingMoves = null;
         ArrayList<String> moveSet = new ArrayList<>();
@@ -75,7 +80,7 @@ public class BoardGame {
             if (testLine.startsWith("RookMoves:")) rookMoves = testLine;
             if (testLine.startsWith("QueenMoves:")) queenMoves = testLine;
             if (testLine.startsWith("KingMoves:")) kingMoves = testLine;
-            line = reader.readLine();
+            line = configReader.readLine();
         }
 
         // adds to piece move set
@@ -103,12 +108,12 @@ public class BoardGame {
                 String[] findMoves = possibleMoves[1].split(",");
                 for (String st : findMoves) {
 
-                    if (Objects.equals(st, "pawn")) currentMoveSet.add(PieceType.PAWN);
-                    if (Objects.equals(st, "knight")) currentMoveSet.add(PieceType.KNIGHT);
-                    if (Objects.equals(st, "bishop")) currentMoveSet.add(PieceType.BISHOP);
-                    if (Objects.equals(st, "rook")) currentMoveSet.add(PieceType.ROOK);
-                    if (Objects.equals(st, "queen")) currentMoveSet.add(PieceType.QUEEN);
-                    if (Objects.equals(st, "king")) currentMoveSet.add(PieceType.KING);
+                    if (Objects.equals(st, "Pawn")) currentMoveSet.add(PieceType.PAWN);
+                    if (Objects.equals(st, "Knight")) currentMoveSet.add(PieceType.KNIGHT);
+                    if (Objects.equals(st, "Bishop")) currentMoveSet.add(PieceType.BISHOP);
+                    if (Objects.equals(st, "Rook")) currentMoveSet.add(PieceType.ROOK);
+                    if (Objects.equals(st, "Queen")) currentMoveSet.add(PieceType.QUEEN);
+                    if (Objects.equals(st, "King")) currentMoveSet.add(PieceType.KING);
                 }
             }
         }

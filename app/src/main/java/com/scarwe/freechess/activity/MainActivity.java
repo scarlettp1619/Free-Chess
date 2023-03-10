@@ -13,10 +13,10 @@ import android.widget.Button;
 import com.scarwe.freechess.R;
 import com.scarwe.freechess.game.BoardGame;
 
-import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.Buffer;
 
 public class MainActivity extends Activity {
 
@@ -33,17 +33,34 @@ public class MainActivity extends Activity {
 
         final Button startButton = findViewById(R.id.start_button);
         final Button newsButton = findViewById(R.id.news_button);
+        final Button settingsButton = findViewById(R.id.settings_button);
 
         startButton.setOnClickListener((v) -> {
             Context context = MainActivity.this;
 
             Class<ChessActivity> destinationActivity = ChessActivity.class;
-
+            File path = getApplicationContext().getFilesDir();
+            File readFrom = new File(path, "config.json");
+            StringBuilder config = new StringBuilder();
+            if ((int) readFrom.length() == 0) {
+                config.append("{");
+                config.append("\n    \"PawnMoves\": \"" + "Pawn" + "\",");
+                config.append("\n    \"KnightMoves\": \"" + "Knight" + "\",");
+                config.append("\n    \"BishopMoves\": \"" + "Bishop" + "\",");
+                config.append("\n    \"RookMoves\": \"" + "Rook" + "\",");
+                config.append("\n    \"QueenMoves\": \"" + "Rook, Bishop" + "\",");
+                config.append("\n    \"KingMoves\": \"" + "King" + "\"\n");
+                config.append("}");
+                writeConfig(config.toString());
+                readFrom = new File(path, "config.json");
+            }
+            byte[] content = new byte[(int) readFrom.length()];
             try {
-                // reads config file and starts game
-                BufferedReader reader = new BufferedReader(new InputStreamReader(getAssets().open("config.json")));
+                FileInputStream stream = new FileInputStream(readFrom);
+                stream.read(content);
+                System.out.println(new String(content));
                 BoardGame board = new BoardGame();
-                board.reader = reader;
+                board.config = new String(content);
                 board.resetBoard();
             } catch (IOException | CloneNotSupportedException e) {
                 //
@@ -61,6 +78,24 @@ public class MainActivity extends Activity {
             Intent intent = new Intent(context, destinationActivity);
             startActivity(intent);
         });
+
+        settingsButton.setOnClickListener((v) -> {
+            Context context = MainActivity.this;
+            Class<SettingsActivity> destinationActivity = SettingsActivity.class;
+            Intent intent = new Intent(context, destinationActivity);
+            startActivity(intent);
+            finish();
+        });
+    }
+
+    private void writeConfig(String data) {
+        try {
+            File path = getApplicationContext().getFilesDir();
+            FileOutputStream writer = new FileOutputStream(new File(path, "config.json"));
+            writer.write(data.getBytes());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private void setActivityBgColor() {

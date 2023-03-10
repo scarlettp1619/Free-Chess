@@ -28,6 +28,8 @@ import com.scarwe.freechess.R;
 import com.scarwe.freechess.game.BoardGame;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
@@ -61,8 +63,14 @@ public class EndScreenActivity extends AppCompatActivity {
         Button exitButton = findViewById(R.id.exit_button);
 
         resetButton.setOnClickListener(v -> {
+            File path = getApplicationContext().getFilesDir();
+            File readFrom = new File(path, "config.json");
+            byte[] content = new byte[(int) readFrom.length()];
             try {
-                board.reader = new BufferedReader(new InputStreamReader(getAssets().open("config.json")));
+                FileInputStream stream = new FileInputStream(readFrom);
+                stream.read(content);
+                System.out.println(new String(content));
+                board.config = new String(content);
                 board.resetBoard();
             } catch (IOException | CloneNotSupportedException e) {
                 throw new RuntimeException(e);

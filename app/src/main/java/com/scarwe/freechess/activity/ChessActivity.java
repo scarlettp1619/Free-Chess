@@ -20,9 +20,6 @@ import com.scarwe.freechess.game.ChessPlayer;
 import com.scarwe.freechess.R;
 import com.scarwe.freechess.game.PieceType;
 import com.scarwe.freechess.game.Square;
-
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
 import java.util.Collections;
 
 public class ChessActivity extends Activity implements ChessDelegate {
