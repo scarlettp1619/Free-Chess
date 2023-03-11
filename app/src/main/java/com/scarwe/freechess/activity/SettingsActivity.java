@@ -49,13 +49,11 @@ public class SettingsActivity extends AppCompatActivity {
     private StringBuilder queenMoves = new StringBuilder();
     private StringBuilder kingMoves = new StringBuilder();
 
-    @SuppressLint("SourceLockedOrientationActivity")
     @Override
     protected void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
         supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_settings);
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         setActivityBgColor();
 
         TextView[] dropDowns = new TextView[]{findViewById(R.id.pawn_box), findViewById(R.id.knight_box),

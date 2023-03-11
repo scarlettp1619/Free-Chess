@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class News {
+    // gets news stuff
     @SerializedName("status")
     @Expose
     private String status;
@@ -19,10 +20,7 @@ public class News {
     @Expose
     private ArrayList<Article> articles;
 
-    public String getStatus() {
-        return status;
-    }
-
+    // getters and setters
     public void setStatus(String status) {
         this.status = status;
     }

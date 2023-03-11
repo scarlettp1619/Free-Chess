@@ -5,6 +5,7 @@ import com.google.gson.annotations.SerializedName;
 
 public class Source {
 
+    // where the news comes from
     @SerializedName("id")
     @Expose
     private String id;
@@ -23,9 +24,5 @@ public class Source {
 
     public String getName() {
         return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 }

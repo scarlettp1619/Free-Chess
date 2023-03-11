@@ -30,6 +30,7 @@ import java.util.ArrayList;
 
 public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
 
+    // initialises list for articles to be loaded
     private ArrayList<Article> articles;
     private Context contx;
 
@@ -47,8 +48,10 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder vh, int pos) {
+        // gets current article
         Article currArt = articles.get(pos);
 
+        // sets attributes in activity
         vh.title.setText(currArt.getTitle());
         vh.description.setText(currArt.getDescription());
         vh.author.setText(currArt.getAuthor());
@@ -56,6 +59,7 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
         vh.publishedAt.setText(" \u2022 " + Utils.DateToTimeFormat(currArt.getPublishedAt()));;
         vh.time.setText(Utils.DateFormat(currArt.getPublishedAt()));
 
+        // if images don't load, colours are in place
         RequestOptions requestOptions = new RequestOptions();
         requestOptions.placeholder(Utils.getRandomDrawableColor());
         requestOptions.error(Utils.getRandomDrawableColor());
@@ -64,6 +68,7 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
 
         String imageUrl = currArt.getUrlToImage();
 
+        // uses glide to load  image
         Glide.with(contx).load(imageUrl).apply(requestOptions).listener(new RequestListener<Drawable>() {
             @Override
             public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
@@ -77,10 +82,10 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
                 return false;
             }
         }).transition(DrawableTransitionOptions.withCrossFade()).into(vh.image);
-
         vh.image.setContentDescription(currArt.getDescription());
 
         vh.itemView.setOnClickListener(v -> {
+            // implicit intent to view webpage
             Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(currArt.getUrl()));
             contx.startActivity(browserIntent);
         });
@@ -92,6 +97,7 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
+        // initialises everything in item view to be changed
         private TextView title, description, author, source, time, publishedAt;
         private ProgressBar progressBar;
         private ImageView image;

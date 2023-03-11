@@ -53,6 +53,7 @@ public class ChessActivity extends Activity implements ChessDelegate {
         whiteResign.setOnClickListener(v -> {
             if (whiteResign.getText().toString().equalsIgnoreCase("resign")) {
                 whiteResign.setText("Are you sure?");
+                // changes text back after 3 seconds
                 new Handler(Looper.getMainLooper()).postDelayed(() -> whiteResign.setText("Resign"), 3000);
             } else {
                 viewEndScreen(6, "Black");

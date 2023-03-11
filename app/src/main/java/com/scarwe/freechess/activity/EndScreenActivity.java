@@ -46,6 +46,7 @@ public class EndScreenActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         supportRequestWindowFeature(Window.FEATURE_NO_TITLE);
+        // locks screen so it's consistent with chess
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         setContentView(R.layout.activity_end);
 
@@ -57,6 +58,7 @@ public class EndScreenActivity extends AppCompatActivity {
 
         setActivityBgColor();
 
+        // doesn't fill up entire screen
         getWindow().setLayout((width),(int)(height*.3));
 
         Button resetButton = findViewById(R.id.rematch_button);
@@ -64,10 +66,12 @@ public class EndScreenActivity extends AppCompatActivity {
 
         resetButton.setOnClickListener(v -> {
             File path = getApplicationContext().getFilesDir();
+            // find the config file
             File readFrom = new File(path, "config.json");
             byte[] content = new byte[(int) readFrom.length()];
             try {
                 FileInputStream stream = new FileInputStream(readFrom);
+                // re-reads config so reader isn't empty
                 stream.read(content);
                 System.out.println(new String(content));
                 board.config = new String(content);
@@ -82,15 +86,9 @@ public class EndScreenActivity extends AppCompatActivity {
         });
 
         exitButton.setOnClickListener(v -> finish());
-
-        WindowManager.LayoutParams params = getWindow().getAttributes();
-        params.gravity = Gravity.CENTER;
-        params.x = 0;
-        params.y = -20;
-
-        getWindow().setAttributes(params);
         findViewById(R.id.end_game).setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
 
+        // goes through game states and displays correct message
         if (gameState == 1) {
             ((TextView) findViewById(R.id.end_game)).setText(String.format("%s wins\nby Checkmate", winner));
         }

@@ -22,12 +22,10 @@ public class MainActivity extends Activity {
 
     private final int bgColor = Color.parseColor("#393939");
 
-    @SuppressLint("SourceLockedOrientationActivity")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         setActivityBgColor();
 

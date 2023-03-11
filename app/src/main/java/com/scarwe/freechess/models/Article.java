@@ -5,6 +5,7 @@ import com.google.gson.annotations.SerializedName;
 
 public class Article {
 
+    // sets everything for the article, to be edited later
     @SerializedName("source")
     @Expose
     private Source source;

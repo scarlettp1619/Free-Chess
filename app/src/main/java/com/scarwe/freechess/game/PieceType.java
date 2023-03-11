@@ -1,5 +1,6 @@
 package com.scarwe.freechess.game;
 
+// declaration stuff
 public enum PieceType {
     KING,
     QUEEN,

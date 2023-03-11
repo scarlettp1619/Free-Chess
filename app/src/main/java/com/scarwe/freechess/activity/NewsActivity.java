@@ -44,24 +44,25 @@ import retrofit2.Response;
 
 public class NewsActivity extends AppCompatActivity {
 
+    // api key for news api
     public static final String API_KEY = "76296d75652b456584636a1d755230ee";
     private final int bgColor = Color.parseColor("#393939");
+    // recyclerview for showing news items
     private RecyclerView recyclerView;
     private RecyclerView.LayoutManager layoutManager;
     private ArrayList<Article> articles = new ArrayList<>();
     private Adapter adapter;
 
-    @SuppressLint("SourceLockedOrientationActivity")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_news);
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         setActivityBgColor();
 
         recyclerView = findViewById(R.id.recyclerView);
         layoutManager = new LinearLayoutManager(NewsActivity.this);
+        // settings for recycler view
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setNestedScrollingEnabled(false);
@@ -78,10 +79,12 @@ public class NewsActivity extends AppCompatActivity {
         exitButton.setOnClickListener(v -> finish());
     }
 
+    // loading news (returns json)
     public void loadJSON() {
         ApiInterface apiInterface = ApiClient.getAPIClient().create(ApiInterface.class);
 
         Call<News> call;
+        // ensures news is chess related
         String query = "chess";
         call = apiInterface.getNews(query, API_KEY);
 
@@ -89,23 +92,27 @@ public class NewsActivity extends AppCompatActivity {
 
             @Override
             public void onResponse(Call<News> call, Response<News> response) {
+                // if response is fine
                 if (response.isSuccessful() && response.body().getArticles() != null) {
                     articles = (ArrayList<Article>) response.body().getArticles();
                     ArrayList<Article> filteredArticles = new ArrayList<>();
                     for (int i = 0; i < articles.size(); i++) {
+                        // filters out non chess articles (a few show up)
                         if (articles.get(i).getTitle().toLowerCase().contains("chess")) {
                             filteredArticles.add(articles.get(i));
                         }
                     }
+                    // shows articles on page
                     adapter = new Adapter(NewsActivity.this, filteredArticles);
                     recyclerView.setAdapter(adapter);
                 } else {
-                    Toast.makeText(NewsActivity.this, "No Result!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(NewsActivity.this, "No Results!", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onFailure(Call<News> call, Throwable t) {
+                Toast.makeText(NewsActivity.this, "Error searching news!", Toast.LENGTH_SHORT).show();
             }
         });
     }
