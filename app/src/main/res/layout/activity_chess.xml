@@ -19,6 +19,8 @@
             android:layout_margin="8dp"
             android:toDegrees="180"
             android:text="@string/resign_button"
+            android:backgroundTint="#656565"
+            android:textColor="#FFFFFF"
             android:rotation="180"/>
     </LinearLayout>
 
@@ -38,6 +40,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="8dp"
+            android:backgroundTint="#656565"
+            android:textColor="#FFFFFF"
             android:text="@string/resign_button"/>
     </LinearLayout>
+
 </LinearLayout>

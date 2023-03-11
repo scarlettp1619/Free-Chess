@@ -6,11 +6,21 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.media.MediaPlayer;
+import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkCapabilities;
+import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.scarwe.freechess.R;
@@ -21,6 +31,10 @@ import com.scarwe.freechess.draw.Utils;
 import com.scarwe.freechess.models.Article;
 import com.scarwe.freechess.models.News;
 
+import java.io.Console;
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -58,6 +72,10 @@ public class NewsActivity extends AppCompatActivity {
 
         ColorDrawable colorDrawable = new ColorDrawable(Color.parseColor("#393939"));
         getSupportActionBar().setBackgroundDrawable(colorDrawable);
+
+        Button exitButton = findViewById(R.id.exit_button);
+
+        exitButton.setOnClickListener(v -> finish());
     }
 
     public void loadJSON() {
@@ -96,4 +114,5 @@ public class NewsActivity extends AppCompatActivity {
         View view = this.getWindow().getDecorView();
         view.setBackgroundColor(bgColor);
     }
+
 }

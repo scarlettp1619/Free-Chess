@@ -24,19 +24,12 @@ import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.Target;
 import com.scarwe.freechess.R;
-import com.scarwe.freechess.activity.NewsActivity;
 import com.scarwe.freechess.models.Article;
-import com.squareup.picasso.Picasso;
-
-import java.io.Console;
 import java.util.ArrayList;
-import java.util.List;
+
 
 public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
-    // For debugging
-    private static String TAG = "ArticleAdapter";
 
-    // List to hold news articles
     private ArrayList<Article> articles;
     private Context contx;
 
@@ -56,7 +49,6 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
     public void onBindViewHolder(@NonNull ViewHolder vh, int pos) {
         Article currArt = articles.get(pos);
 
-        // Set the current article's title to this view
         vh.title.setText(currArt.getTitle());
         vh.description.setText(currArt.getDescription());
         vh.author.setText(currArt.getAuthor());
@@ -70,10 +62,8 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
         requestOptions.diskCacheStrategy(DiskCacheStrategy.ALL);
         requestOptions.centerCrop();
 
-        // Gets the author of the article and the shortened date it was released on
         String imageUrl = currArt.getUrlToImage();
 
-        // Use Picasso dependency to load the image needed
         Glide.with(contx).load(imageUrl).apply(requestOptions).listener(new RequestListener<Drawable>() {
             @Override
             public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
@@ -96,10 +86,6 @@ public class Adapter extends RecyclerView.Adapter<Adapter.ViewHolder> {
         });
     }
 
-    /*
-     * Public access point used to get the number of articles in the list
-     * @returns articles.size() - Number of Article objects in the list
-     */
     @Override
     public int getItemCount() {
         return articles.size();

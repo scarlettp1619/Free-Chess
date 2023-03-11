@@ -41,14 +41,14 @@ public class ChessActivity extends Activity implements ChessDelegate {
         setContentView(R.layout.activity_chess);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
+        Button whiteResign = findViewById(R.id.white_resign_button);
         Button blackResign = findViewById(R.id.black_resign_button);
+
         // finds the board view by its ID
         BoardView boardView = findViewById(R.id.board_view);
         boardView.chessDelegate = this;
 
         setActivityBgColor();
-
-        Button whiteResign = findViewById(R.id.white_resign_button);
 
         whiteResign.setOnClickListener(v -> {
             if (whiteResign.getText().toString().equalsIgnoreCase("resign")) {
