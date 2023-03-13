@@ -56,7 +56,7 @@ public class MainActivity extends Activity {
             try {
                 FileInputStream stream = new FileInputStream(readFrom);
                 stream.read(content);
-                System.out.println(new String(content));
+                //System.out.println(new String(content));
                 BoardGame board = new BoardGame();
                 board.config = new String(content);
                 board.resetBoard();

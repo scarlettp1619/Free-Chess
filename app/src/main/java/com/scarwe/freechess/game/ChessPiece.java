@@ -132,8 +132,8 @@ public class ChessPiece implements Cloneable{
                     }
                 }
             }
+            int piecesDiscovered = 0;
             if (kingRow > this.row) {
-                int piecesDiscovered = 0;
                 for (int i = this.row; i <= kingRow; i++) {
                     if (kingInArea) {
                         Square testSquare = new Square(this.col, i);
@@ -158,7 +158,6 @@ public class ChessPiece implements Cloneable{
                     }
                 }
             } else {
-                int piecesDiscovered = 0;
                 for (int i = this.row; i >= kingRow; i--) {
                     if (kingInArea) {
                         Square testSquare = new Square(this.col, i);
@@ -204,7 +203,7 @@ public class ChessPiece implements Cloneable{
                     }
                 }
             }
-            int piecesDiscovered = 0;
+            piecesDiscovered = 0;
             if (kingCol > this.col) {
                 for (int i = this.col; i <= kingCol; i++) {
                     if (kingInArea) {
@@ -255,7 +254,6 @@ public class ChessPiece implements Cloneable{
                 }
             }
         }
-        //Math.abs(from.getCol() - to.getCol()) == Math.abs(from.getRow() - to.getRow())
         if (moveSet.contains(PieceType.BISHOP)) {
             ChessPlayer opponent;
             ChessPlayer currentPlayer;

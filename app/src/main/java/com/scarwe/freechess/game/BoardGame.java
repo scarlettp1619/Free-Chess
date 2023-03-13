@@ -37,6 +37,14 @@ public class BoardGame {
     public String config = "";
 
     public void resetBoard() throws IOException, CloneNotSupportedException {
+        // makes sure that move sets are cleared
+        pawnMoveSet.clear();
+        knightMoveSet.clear();
+        bishopMoveSet.clear();
+        rookMoveSet.clear();
+        queenMoveSet.clear();
+        kingMoveSet.clear();
+
         // clears arraylist
         whitePlayer.pieces.clear();
         blackPlayer.pieces.clear();
