@@ -17,6 +17,7 @@ public class ChessPiece implements Cloneable{
     public int bishopColour = -1;
     public int kingID = 0;
     public boolean hasMoved = false;
+    public boolean pieceHasChecked = false;
 
     public LinkedHashSet<Square> legalSquares = new LinkedHashSet<>();
     // literally only exists cause pawns exist

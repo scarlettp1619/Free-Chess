@@ -86,26 +86,28 @@ public class SettingsActivity extends AppCompatActivity {
                             stringBuilder.append(", ");
                         }
                     }
-                    if (t == findViewById(R.id.pawn_box)) {
-                        pawnMoves = stringBuilder;
-                        t.setText("Pawn: " + stringBuilder);
-                    } else if (t == findViewById(R.id.bishop_box)) {
-                        bishopMoves = stringBuilder;
-                        t.setText("Bishop: " + stringBuilder);
-                    } else if (t == findViewById(R.id.knight_box)) {
-                        knightMoves = stringBuilder;
-                        t.setText("Knight: " + stringBuilder);
-                    } else if (t == findViewById(R.id.rook_box)) {
-                        rookMoves = stringBuilder;
-                        t.setText("Rook: " + stringBuilder);
-                    } else if (t == findViewById(R.id.queen_box)) {
-                        queenMoves = stringBuilder;
-                        t.setText("Queen: " + stringBuilder);
-                    } else if (t == findViewById(R.id.king_box)) {
-                        kingMoves = stringBuilder;
-                        t.setText("King: " + stringBuilder);
+                    if (currentMoveSet.size() > 0) {
+                        if (t == findViewById(R.id.pawn_box)) {
+                            pawnMoves = stringBuilder;
+                            t.setText("Pawn: " + stringBuilder);
+                        } else if (t == findViewById(R.id.bishop_box)) {
+                            bishopMoves = stringBuilder;
+                            t.setText("Bishop: " + stringBuilder);
+                        } else if (t == findViewById(R.id.knight_box)) {
+                            knightMoves = stringBuilder;
+                            t.setText("Knight: " + stringBuilder);
+                        } else if (t == findViewById(R.id.rook_box)) {
+                            rookMoves = stringBuilder;
+                            t.setText("Rook: " + stringBuilder);
+                        } else if (t == findViewById(R.id.queen_box)) {
+                            queenMoves = stringBuilder;
+                            t.setText("Queen: " + stringBuilder);
+                        } else if (t == findViewById(R.id.king_box)) {
+                            kingMoves = stringBuilder;
+                            t.setText("King: " + stringBuilder);
+                        }
+                        moveSets.put(t, currentMoveSet);
                     }
-                    moveSets.put(t, currentMoveSet);
                 });
 
                 builder.setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss());
@@ -155,6 +157,8 @@ public class SettingsActivity extends AppCompatActivity {
             Class<MainActivity> destinationActivity = MainActivity.class;
             Intent intent = new Intent(context, destinationActivity);
             startActivity(intent);
+
+            Toast.makeText(context, "Config file updated", Toast.LENGTH_SHORT).show();
             finish();
         });
         cancelButton.setOnClickListener((v) -> {

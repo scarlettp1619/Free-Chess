@@ -17,6 +17,7 @@ public class ChessPlayer {
 
     public int colour;
     public int castled;
+    public int piecesDiscovered;
 
     public ArrayList<ChessPiece> pieces = new ArrayList<>();
 
@@ -297,6 +298,7 @@ public class ChessPlayer {
 
     public void isKingDiscovered(ChessPiece tempPiece, Square to) {
         LinkedHashSet<Square> opponentDiscoveredSquares = new LinkedHashSet<>();
+        ChessPlayer opponent;
         int kingRow = 0, kingCol = 0;
         discovered = false;
         boolean possibleCheck = false;
@@ -307,6 +309,7 @@ public class ChessPlayer {
             for (ChessPiece p : BoardGame.blackPlayer.pieces) {
                 opponentDiscoveredSquares.addAll(p.discoveredSquares);
             }
+            opponent = BoardGame.blackPlayer;
             for (ChessPiece p : BoardGame.whitePlayer.pieces) {
                 if (p.kingID == 1) {
                     kingRow = p.row;
@@ -317,6 +320,7 @@ public class ChessPlayer {
             for (ChessPiece p : BoardGame.whitePlayer.pieces) {
                 opponentDiscoveredSquares.addAll(p.discoveredSquares);
             }
+            opponent = BoardGame.whitePlayer;
             for (ChessPiece p : BoardGame.blackPlayer.pieces) {
                 if (p.kingID == 1) {
                     kingRow = p.row;
@@ -331,12 +335,13 @@ public class ChessPlayer {
                 break;
             }
         }
+        System.out.println(opponent.piecesDiscovered);
         for (Square s : opponentDiscoveredSquares) {
             // checks squares around king to ensure you can't walk into check
             if (tempPiece.col == s.col && tempPiece.row == s.row && tempPiece.getType() != PieceType.KING) {
                 movedIntoDiscovered = true;
             }
-            if (to.col == s.col && to.row == s.row) {
+            if (to.col == s.col && to.row == s.row && opponent.piecesDiscovered < 2) {
                 movedIntoDiscovered = false;
                 break;
             }

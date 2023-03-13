@@ -121,13 +121,32 @@ public class ChessActivity extends Activity implements ChessDelegate {
                     white.sinceCaptured = 0;
                     black.sinceCaptured = 0;
                 }
+                white.piecesDiscovered = 0;
+                black.piecesDiscovered = 0;
                 // find legal moves for players
                 for (ChessPiece p : white.pieces) {
+                    p.pieceHasChecked = false;
+                }
+                for (ChessPiece p : black.pieces) {
+                    p.pieceHasChecked = false;
+                }
+
+                for (ChessPiece p : white.pieces) {
                     p.generateLegalSquares(new Square(p.col, p.row));
+
+                    if (p.discoveredSquares.size() > 0 && !p.pieceHasChecked) {
+                        white.piecesDiscovered++;
+                        p.pieceHasChecked = true;
+                    }
                 }
 
                 for (ChessPiece p : black.pieces) {
                     p.generateLegalSquares(new Square(p.col, p.row));
+
+                    if (p.discoveredSquares.size() > 0 && !p.pieceHasChecked) {
+                        black.piecesDiscovered++;
+                        p.pieceHasChecked = true;
+                    }
                 }
 
                 black.findLegalMoves();
@@ -233,12 +252,32 @@ public class ChessActivity extends Activity implements ChessDelegate {
                     black.sinceCaptured = 0;
                 }
 
+                white.piecesDiscovered = 0;
+                black.piecesDiscovered = 0;
+
+                for (ChessPiece p : white.pieces) {
+                    p.pieceHasChecked = false;
+                }
+                for (ChessPiece p : black.pieces) {
+                    p.pieceHasChecked = false;
+                }
+
                 for (ChessPiece p : white.pieces) {
                     p.generateLegalSquares(new Square(p.col, p.row));
+
+                    if (p.discoveredSquares.size() > 0 && !p.pieceHasChecked) {
+                        white.piecesDiscovered++;
+                        p.pieceHasChecked = true;
+                    }
                 }
 
                 for (ChessPiece p : black.pieces) {
                     p.generateLegalSquares(new Square(p.col, p.row));
+
+                    if (p.discoveredSquares.size() > 0 && !p.pieceHasChecked) {
+                        black.piecesDiscovered++;
+                        p.pieceHasChecked = true;
+                    }
                 }
 
                 white.findLegalMoves();
@@ -316,6 +355,7 @@ public class ChessActivity extends Activity implements ChessDelegate {
             }
         }
         System.out.println(BoardGame.pgnMoves);
+        System.out.println("\nNEW MOVE");
         findViewById(R.id.board_view).invalidate();
         if (gameState != 0) {
             System.out.println("game end");
